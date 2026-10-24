@@ -1,0 +1,63 @@
+---
+title: Programowanie to rozwiązywanie problemów
+nav: Rozwiązywanie problemów
+description: Każdy program bierze dane wejściowe, przetwarza ja i wytwarza wyjście. To, co pomiędzy, to czarna skrzynka, czyli algorytm.
+czas: 5
+---
+
+<Cel>Poznać podstawowy model każdego programu: wejście, czarna skrzynka, wyjście.</Cel>
+
+<Pojecia
+  lista={[
+    ["wejście", "input"],
+    ["wyjście", "output"],
+    ["czarna skrzynka", "black box"],
+    ["algorytm", "algorithm"],
+    ["reprezentacja", "representation"],
+  ]}
+/>
+
+## Wejście, czarna skrzynka, wyjście
+
+Programowanie to wzięcie **wejścia** i wytworzenie **wyjścia**. To, co dzieje się pomiędzy, nazywamy „czarną skrzynką”, i właśnie jej poświęcony jest cały kurs.
+
+```txt title="Model każdego programu"
+[wejście] ──► [ ??? algorytm ??? ] ──► [wyjście]
+```
+
+Wejściem może być tekst wpisany z klawiatury, kliknięcie, zdjęcie albo odczyt z czujnika. Wyjściem może być liczba na ekranie, dźwięk, ruch robota albo trasa w nawigacji. Czarna skrzynka to **algorytm**: przepis krok po kroku, który zamienia jedno w drugie.
+
+Wybierz algorytm, wpisz coś na wejściu i zobacz, co wychodzi:
+
+<CzarnaSkrzynka />
+
+## Najpierw reprezentacja
+
+Zanim napiszemy jakikolwiek algorytm, musimy ustalić, **jak zapisać** dane, na których będzie pracował: liczby, tekst, kolor, dźwięk. Komputer nie „widzi” litery A ani koloru czerwonego. Ma tylko prąd: płynie albo nie płynie. Kilka kolejnych modułów odpowiada na pytanie, jak z tego zbudować wszystko inne.
+
+<NaZajeciach tytul="Sprawdźmy obecność" czas="3 min">
+Wejście to ludzie na sali, wyjście to jedna liczba. Liczymy na palcach, po jednym palcu na osobę. Jaki to algorytm? Ile kroków zajmie przy 30 osobach, a ile przy 300?
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Co jest wejściem, a co wyjściem nawigacji GPS?"
+    odpowiedzi={[
+      "Wejście: pozycja, cel i mapa; wyjście: trasa",
+      "Wejście: trasa; wyjście: mapa",
+      "Wejście: satelity; wyjście: telefon",
+    ]}
+    poprawna={0}
+    wyjasnienie="Nawigacja dostaje to, gdzie jesteś, dokąd jedziesz i jak wyglądają drogi, a zwraca trasę. Algorytm szukania trasy to jej czarna skrzynka."
+  />
+  <Pytanie
+    pytanie="Co trzeba ustalić, zanim napisze się algorytm?"
+    odpowiedzi={[
+      "Kolor interfejsu",
+      "Jak reprezentować dane (liczby, tekst, obraz)",
+      "Nazwę pliku z programem",
+    ]}
+    poprawna={1}
+    wyjasnienie="Algorytm pracuje na danych, więc najpierw trzeba wiedzieć, jak są zapisane. Tym zajmują się kolejne moduły."
+  />
+</Quiz>

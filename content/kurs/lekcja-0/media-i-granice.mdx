@@ -1,0 +1,125 @@
+---
+title: Reprezentacja mediów i granice reprezentacji
+nav: Media i przepełnienia
+description: Obraz, wideo i dźwięk to też liczby. Ile ważą, po co je kompresujemy i co się dzieje, gdy liczbie zabraknie bitów.
+czas: 16
+---
+
+<Cel>Zobaczyć, ile miejsca zajmują media, i zrozumieć, że każda reprezentacja ma swoje granice.</Cel>
+
+<Pojecia
+  lista={[
+    ["typ danych", "data type"],
+    ["klatka", "frame"],
+    ["klatki na sekundę", "fps"],
+    ["próbkowanie", "sampling"],
+    ["kompresja", "compression"],
+    ["przepełnienie", "overflow"],
+    ["liczba zmiennoprzecinkowa", "floating-point number"],
+    ["token"],
+    ["tokenizacja", "tokenization"],
+  ]}
+/>
+
+## Wszystko jest liczbą
+
+**Obraz** to siatka pikseli RGB. **Wideo** to sekwencja obrazów wyświetlanych jeden po drugim, jak w kartkowym flipbooku. **Muzykę** zapisuje się bajtami na dwa sposoby: jako nuty-liczby (wysokość, długość, głośność, jak w standardzie MIDI, którego numerów nut używa rozszerzenie „Muzyka” w Scratchu) albo przez **próbkowanie**, czyli wielokrotne mierzenie fali dźwiękowej w każdej sekundzie.
+
+Kluczowa idea całej lekcji: `72 73 33` to liczby, napis albo kolor, **zależnie od umowy**. W języku C taką umowę deklaruje się jawnie jako **typ danych**: `int`, `char`, `float`.
+
+## Ile to waży i po co kompresja
+
+| dane | obliczenie | wynik |
+|---|---|---|
+| klatka Full HD | 1920 × 1080 × 3 B | 6 220 800 B ≈ **6,2 MB** |
+| 1 s wideo, 30 fps | × 30 | ≈ **186,6 MB/s** |
+| 1 min wideo | × 60 | ≈ **11,2 GB** |
+| dźwięk z płyty CD | 44 100 × 16 bitów × 2 kanały | **1411,2 kbit/s** |
+| 1 min dźwięku CD | | ≈ **10,6 MB** |
+
+Format płyty CD określa standard „Red Book” firm Sony i Philips z 1980 roku: dwukanałowy, 16-bitowy zapis PCM z próbkowaniem 44,1 kHz.<Zrodlo n={[18, 19]} />
+
+<KalkulatorMediow />
+
+Minuta surowego wideo Full HD to ponad 11 GB. Dlatego istnieje **kompresja**:
+
+- **bezstratna** (PNG, ZIP, FLAC): po rozpakowaniu dostajesz dokładnie te same bajty,
+- **stratna** (JPEG, MP3, H.264, HEVC, AV1): wyrzuca to, czego człowiek słabo postrzega, i zyskuje dużo więcej miejsca.
+
+## Przepełnienie: gdy zabraknie bitów
+
+Każda liczba w komputerze ma ustaloną liczbę bitów. Ośmiobitowy licznik dojdzie do 255, a po dodaniu jedynki „przekręci się” na 0, jak stary licznik kilometrów w samochodzie. To **przepełnienie** (*overflow*).
+
+<LicznikKilometrow />
+
+### Prawdziwe przypadki
+
+**Gangnam Style (2014).** YouTube ogłosił, że teledysk przekroczył 2 147 483 647 wyświetleń, czyli maksimum 32-bitowej liczby ze znakiem, i licznik „trzeba było” zmienić na 64-bitowy. Guinness odnotował „pierwszy film wymagający 64-bitowego licznika”. Rzecznik YouTube powiedział jednak magazynowi Variety w grudniu 2014: „To easter egg. Zaktualizowaliśmy licznik do 64 bitów kilka miesięcy temu”. Granica jest prawdziwa, ale „zepsuty YouTube” to żart. To dobra lekcja krytycznego czytania.
+
+**Boeing 787 (2015).** Dyrektywa FAA AD 2015-09-07: samolot zasilany bez przerwy przez **248 dni** mógł stracić całe zasilanie prądem zmiennym. Licznik w jednostkach sterowania generatorami (GCU) się przepełniał, a cztery główne GCU przechodziły w tryb awaryjny jednocześnie, niezależnie od fazy lotu. Nakazano okresowe wyłączanie zasilania, a później nowe oprogramowanie.<Zrodlo n={[20, 21, 22]} /> Popularne wyjaśnienie „2³¹ setnych sekundy ≈ 248,55 dnia” jest spójne, ale dyrektywa nie podaje jednostki licznika, więc to tylko hipoteza.
+
+**Ariane 5, lot 501 (4 czerwca 1996).** Około 37 sekund po rozpoczęciu sekwencji zapłonu rakieta uległa zniszczeniu. Raport komisji pod kierunkiem J.-L. Lionsa (19 lipca 1996) wskazał wyjątek przy konwersji 64-bitowej liczby zmiennoprzecinkowej na 16-bitową liczbę całkowitą ze znakiem: wartość była za duża. Kod przeniesiono z rakiety Ariane 4.<Zrodlo n={[23, 24, 25]} /> Morał: kod poprawny w jednym kontekście bywa błędny w innym. Maksimum 16 bitów ze znakiem to 32 767.<Zrodlo n={26} />
+
+**Rok 2038.** Czas uniksowy liczy sekundy od 1 stycznia 1970 roku (UTC). Zapisany w 32-bitowej liczbie ze znakiem kończy się **19 stycznia 2038 o 03:14:07 UTC**, a potem przeskakuje do roku 1901.<Zrodlo n={[27, 28]} /> Rozwiązaniem jest 64-bitowy typ `time_t`.<Zrodlo n={28} />
+
+**Rok 2000.** Rok zapisywany dwiema cyframi dziesiętnymi przeskakiwał z 99 na 00. Problem Y2K wynikał ze stałej szerokości zapisu dziesiętnego, a problem 2038 wynika ze stałej szerokości zapisu dwójkowego.<Zrodlo n={29} /> Oszczędność kilku bajtów kosztowała ogromne prace naprawcze.
+
+## 0.1 + 0.2 = 0.30000000000000004
+
+JavaScript przechowuje liczby jako 64-bitowe liczby zmiennoprzecinkowe w standardzie IEEE 754: 1 bit znaku, 11 bitów wykładnika i 52 bity mantysy.<Zrodlo n={[30, 31]} /> Liczba 0,1 ma w systemie dwójkowym nieskończone rozwinięcie, tak jak 1/3 w dziesiętnym (0,333…), więc musi zostać zaokrąglona. Precyzja to około 15–17 cyfr znaczących.<Zrodlo n={[32, 33]} />
+
+<Zmiennoprzecinkowe />
+
+<Wskazowka tytul="Dwie zasady na całe życie">
+Nie porównuj liczb zmiennoprzecinkowych operatorem `==`. Pieniądze licz w groszach, jako liczby całkowite.
+</Wskazowka>
+
+## Most do AI: tokeny
+
+Modele językowe czytają **tokeny**, czyli fragmenty tekstu z przypisanymi numerami w słowniku modelu. Tokenizacja to kolejne „ASCII”, tyle że wyuczone statystycznie na ogromnych zbiorach tekstów.
+
+Polski kosztuje więcej tokenów niż angielski. Tokenizery trenowano głównie na angielskim, polszczyzna ma bogatą odmianę wyrazów, a polskie litery w UTF-8 zajmują po dwa bajty.<Zrodlo n={34} /> W pracy o modelach PLLuM (2025) model Mistral-7B potrzebował średnio około **3,14 tokenu na słowo po polsku**, a po angielsku około **1,88**. Polski tokenizer obniżył to do około 2,19.<Zrodlo n={35} /> Petrov i in. (Oxford, NeurIPS 2023) wykazali, że ten sam tekst w różnych językach może mieć długość w tokenach różniącą się nawet piętnastokrotnie (skrajny przypadek to język szan), a tokenizer ChatGPT/GPT-4 zużywa ok. 1,6 razy więcej tokenów na tekst włoski niż na angielski. Wpływa to na koszt, czas odpowiedzi i to, ile tekstu zmieści się w kontekście modelu.
+
+<Tokenizer />
+
+<NaZajeciach tytul="Licznik kilometrów w konsoli" czas="4 min">
+Wpisujemy w konsoli przeglądarki i zgadujemy wyniki:
+
+```js
+const a = new Uint8Array(1); a[0] = 256; a[0]   // 0
+const b = new Int32Array(1); b[0] = 2147483647; b[0] += 1; b[0] // -2147483648
+0.1 + 0.2 === 0.3                                // false
+```
+</NaZajeciach>
+
+<NaZajeciach tytul="Ile kosztuje polski?" czas="3 min">
+W tokenizerze OpenAI (platform.openai.com/tokenizer) porównujemy „I met a huge dog” i „Spotkałem ogromnego psa”. Który tekst ma więcej tokenów?<Zrodlo n={34} />
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Jaka jest największa 32-bitowa liczba całkowita ze znakiem?"
+    odpowiedzi={["4 294 967 295", "2 147 483 647", "65 535", "32 767"]}
+    poprawna={1}
+    wyjasnienie="2³¹ − 1 = 2 147 483 647. Jeden z 32 bitów przypada na znak, więc na wartość zostaje 31."
+  />
+  <Pytanie
+    pytanie="Czy teledysk Gangnam Style naprawdę „zepsuł” YouTube?"
+    odpowiedzi={[
+      "Tak, licznik się przepełnił i YouTube przestał działać",
+      "Nie, licznik zmieniono wcześniej, a komunikat był żartem (easter egg)",
+    ]}
+    poprawna={1}
+    wyjasnienie="Granica 2 147 483 647 jest prawdziwa, ale YouTube przeszedł na 64 bity, zanim teledysk ją przekroczył."
+  />
+  <Pytanie
+    pytanie="Dlaczego 0.1 + 0.2 nie daje dokładnie 0.3?"
+    odpowiedzi={[
+      "Bo JavaScript ma błąd",
+      "Bo 0,1 nie da się dokładnie zapisać w systemie dwójkowym",
+      "Bo dodawanie ułamków jest w komputerze losowe",
+    ]}
+    poprawna={1}
+    wyjasnienie="0,1 ma w systemie dwójkowym nieskończone rozwinięcie, więc jest zaokrąglana. Małe błędy zaokrągleń sumują się."
+  />
+</Quiz>

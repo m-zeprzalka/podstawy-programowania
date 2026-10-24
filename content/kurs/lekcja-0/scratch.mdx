@@ -1,0 +1,262 @@
+---
+title: "Scratch: od „Witaj, świecie” do gier"
+nav: Scratch
+description: Programowanie z klocków, bez nawiasów i średników. Funkcje, argumenty, zmienne, warunki, pętle, zdarzenia, wątki i własne bloki.
+czas: 25
+---
+
+<Cel>Zbudować pierwsze programy w Scratchu i nazwać pojęcia, które za tydzień spotkasz w języku C.</Cel>
+
+<Pojecia
+  lista={[
+    ["duszek", "sprite"],
+    ["scena", "stage"],
+    ["tło", "backdrop"],
+    ["kostium", "costume"],
+    ["skrypt", "script"],
+    ["zdarzenie", "event"],
+    ["wątek", "thread"],
+    ["zmienna", "variable"],
+    ["argument"],
+    ["wartość zwracana", "return value"],
+    ["efekt uboczny", "side effect"],
+    ["własny blok", "custom block"],
+    ["klon", "clone"],
+    ["abstrakcja", "abstraction"],
+  ]}
+/>
+
+## Czym jest Scratch
+
+**Scratch** stworzyła grupa Lifelong Kindergarten w MIT Media Lab pod kierunkiem prof. Mitchela Resnicka.<Zrodlo n={[36, 37]} /> Wystartował w maju 2007 roku jako aplikacja na komputer. Wersja 2.0 (2013) przeniosła go do przeglądarki, a 3.0 (styczeń 2019) działa bez żadnych wtyczek.<Zrodlo n={38} /> Projekt wspiera Scratch Foundation założona w 2013 roku. Według MIT Media Lab (grudzień 2022) platforma zdobyła 100 milionów użytkowników na całym świecie i jest największą darmową społecznością programowania dla dzieci.
+
+Scratch jest darmowy na [scratch.mit.edu](https://scratch.mit.edu), a język interfejsu zmienia się ikoną globusa na **Polski**. Zaczynamy od niego, bo pozwala bawić się klockami bez nawiasów i średników. W Polsce Scratch jest obecny w szkołach, a Zintegrowana Platforma Edukacyjna (zpe.gov.pl) ma lekcje w Scratchu, np. o algorytmie Euklidesa.<Zrodlo n={39} />
+
+## Interfejs
+
+- **Lewa kolumna** to paleta bloków w kategoriach: Ruch, Wygląd, Dźwięk, Zdarzenia, Kontrola, Czujniki, Wyrażenia, Zmienne, Moje bloki, a także rozszerzenia (Muzyka, Pióro, Czujnik wideo, Tekst na mowę).<Zrodlo n={[38, 40]} />
+- **Środek** to obszar skryptów, gdzie układasz klocki.
+- **Prawa góra** to **scena**, a **prawy dół** to lista duszków i teł.
+- Zakładki nad paletą: **Kod**, **Kostiumy**, **Dźwięki**.
+
+Środek sceny to punkt (0, 0). Współrzędna x biegnie od −240 do 240, a y od −180 do 180.
+
+## Od pseudokodu do Scratcha i C
+
+Te same pojęcia wrócą za tydzień w języku C. Wybierz pojęcie i porównaj:
+
+<TlumaczKlockow />
+
+| pojęcie | Scratch | C (lekcja 1) |
+|---|---|---|
+| funkcja | `powiedz [ ]`, `zagraj dźwięk [ ] i czekaj` | `printf(...)` |
+| argument | tekst w okienku bloku | `"hello, world"` |
+| wartość zwracana | owalne: `odpowiedź`, `połącz [ ] i [ ]`, `losuj od ( ) do ( )` | `get_string(...)` |
+| efekt uboczny | dymek, dźwięk | tekst w terminalu |
+| zmienna | `odpowiedź`, `ustaw [ ] na ( )`, `zmień [ ] o ( )` | `int x = 0;` |
+| wyrażenie logiczne | `dotyka [ ]?`, `klawisz [ ] naciśnięty?`, `i`, `lub`, `nie` | `x < y`, `&&`, `\|\|`, `!` |
+| warunek | `jeżeli < > to … w przeciwnym razie` | `if … else` |
+| pętla | `powtórz (10) razy`, `zawsze`, `powtarzaj aż < >` | `for`, `while` |
+| zdarzenie | `kiedy kliknięto zieloną flagę`, `kiedy otrzymam [ ]` | `main` (zdarzenia wrócą w JS) |
+| wątek | kilka skryptów od tego samego zdarzenia | wielowątkowość, `async` w JS |
+| abstrakcja | Moje bloki → Utwórz blok → `definiuj …` | `void miau(int n)` |
+
+<Ramka>
+Polskie etykiety bloków podajemy według polskiego forum Scratcha i zpe.gov.pl. Część różni się między Scratchem 2 i 3, więc sprawdzaj je w edytorze (więcej w module „Zastrzeżenia”).
+</Ramka>
+
+## „Witaj, świecie”
+
+Pierwszy program w każdym języku. Zdarzenie uruchamia skrypt, a funkcja `powiedz` wyświetla dymek:
+
+<ScratchSkrypt
+  duszek="Kot"
+  kod={`kiedy kliknięto zieloną flagę        (Zdarzenia)
+powiedz [Witaj, świecie!]            (Wygląd)`}
+/>
+
+**Argument** to tekst „Witaj, świecie!”, **funkcja** to `powiedz`, a **efekt uboczny** to dymek nad kotem.
+
+## „Witaj, ty”
+
+Teraz program pyta o imię i odpowiada:
+
+<ScratchSkrypt
+  duszek="Kot"
+  kod={`kiedy kliknięto zieloną flagę
+zapytaj [Jak masz na imię?] i czekaj           (Czujniki)
+powiedz (połącz [Cześć, ] i (odpowiedź))       (Wygląd + Wyrażenia)`}
+/>
+
+Blok `zapytaj` zapisuje wpis w zmiennej `odpowiedź`. Blok `połącz` **zwraca** sklejony tekst, który staje się **argumentem** bloku `powiedz`. Wyjście jednej funkcji jest więc wejściem drugiej. Wariant: rozszerzenie **Tekst na mowę** i blok mówienia (po angielsku `speak`).
+
+<Uwaga tytul="Typowy błąd">
+Brak spacji po „Cześć,”. Bez niej kot powie „Cześć,Ala”. Komputer skleja dokładnie to, co mu dasz.
+</Uwaga>
+
+## „Miau”, pętle i abstrakcja
+
+Wersja pierwsza: trzy razy skopiowany blok `zagraj dźwięk [Miau] i czekaj` i `czekaj (1) s`. Działa, ale powtórzenia to sygnał złego projektu. Lepiej użyć pętli:
+
+<ScratchSkrypt
+  duszek="Kot"
+  kod={`kiedy kliknięto zieloną flagę
+powtórz (3) razy
+    zagraj dźwięk [Miau] i czekaj
+    czekaj (1) s`}
+/>
+
+A jeszcze lepiej: **własny blok z parametrem** (Moje bloki → Utwórz blok → „miau”, pole `n`, etykieta „razy”):
+
+<ScratchSkrypt
+  duszek="Kot"
+  kod={`definiuj miau (n) razy
+powtórz (n) razy
+    zagraj dźwięk [Miau] i czekaj
+    czekaj (1) s
+
+kiedy kliknięto zieloną flagę
+miau (3) razy`}
+/>
+
+**Abstrakcja** to rozbijanie problemu na mniejsze części i ukrywanie szczegółów. Przypomina to przygotowanie wielkiej kolacji: polecenie „ugotuj wszystko” przytłacza, a „zrób sałatkę, upiecz mięso, podaj deser” już nie.
+
+## Warunki
+
+<ScratchSkrypt
+  duszek="Kot"
+  kod={`kiedy kliknięto zieloną flagę
+zawsze
+    jeżeli <dotyka [wskaźnik myszy]?> to
+        zagraj dźwięk [Miau] i czekaj`}
+/>
+
+Pętla `zawsze` sprawdza warunek w kółko, więc kot miauczy za każdym razem, gdy najedziesz na niego myszą.<Zrodlo n={41} /> Wariant z rozszerzeniem Czujnik wideo: `kiedy ruch wideo > (10)`, a kot miauczy, gdy pomachasz do kamery.
+
+<Wskazowka tytul="Gdy coś nie działa">
+Zadaj sobie trzy pytania: nad jakim konkretnym problemem pracujesz, co już działa, a co nie?
+</Wskazowka>
+
+## Oscartime
+
+Klasyczna gra w Scratchu: przeciągamy śmieci do kosza, w którym mieszka Oskar.
+
+<ScratchEmbed id="277537196" tytul="Oscartime" />
+
+Uproszczona wersja składa się z dwóch duszków. Oscar zmienia kostium, gdy najedzie się na niego myszą:
+
+<ScratchSkrypt
+  duszek="Oscar"
+  kod={`kiedy kliknięto zieloną flagę
+zmień kostium na [oscar1]
+zawsze
+    jeżeli <dotyka [wskaźnik myszy]?> to
+        zmień kostium na [oscar2]
+    w przeciwnym razie
+        zmień kostium na [oscar1]`}
+/>
+
+Śmieć ma dwa skrypty startujące od zielonej flagi, czyli dwa **wątki**. Jeden przesuwa go w dół, drugi sprawdza, czy trafił do kosza:
+
+<ScratchSkrypt
+  duszek="Śmieć"
+  kod={`kiedy kliknięto zieloną flagę
+ustaw tryb przeciągania na [z możliwością przeciągania]
+idź na górę
+zawsze
+    zmień y o (-1)
+
+kiedy kliknięto zieloną flagę
+zawsze
+    jeżeli <dotyka [Oscar]?> to
+        zmień [wynik] o (1)
+        idź na górę
+
+definiuj idź na górę
+idź do x: (losuj od (0) do (240)) y: (180)`}
+/>
+
+Śmieć startuje na górze sceny (y = 180) w losowym miejscu i opada. Powtarzany kod wydzielono do własnego bloku `idź na górę`. Zmienna `wynik` (na starcie `ustaw [wynik] na (0)`) liczy punkty. **Nasze rozszerzenie:** klony (`utwórz klon [siebie]` co 3 s, `kiedy zaczynam jako klon`, `usuń tego klona`) dają wiele spadających śmieci naraz.
+
+## Ivy’s Hardest Game
+
+Sterujemy duszkiem „Harvard” i unikamy „Yale” oraz „MIT”.
+
+<ScratchEmbed id="565742837" tytul="Ivy’s Hardest Game" />
+
+<ScratchSkrypt
+  duszek="Harvard"
+  kod={`kiedy kliknięto zieloną flagę
+idź do x: (0) y: (0)
+zawsze
+    słuchaj klawiatury
+    wyczuwaj ściany
+
+definiuj słuchaj klawiatury
+jeżeli <klawisz [strzałka w górę] naciśnięty?> to
+    zmień y o (1)
+(analogicznie: w dół → zmień y o (-1), w prawo → zmień x o (1), w lewo → zmień x o (-1))
+
+definiuj wyczuwaj ściany
+jeżeli <dotyka [lewa ściana]?> to
+    zmień x o (1)
+jeżeli <dotyka [prawa ściana]?> to
+    zmień x o (-1)`}
+/>
+
+Przeciwnicy: Yale chodzi tam i z powrotem, a MIT goni gracza.
+
+<ScratchSkrypt
+  duszek="Yale"
+  kod={`kiedy kliknięto zieloną flagę
+idź do x: (0) y: (0)
+ustaw kierunek na (90)
+zawsze
+    jeżeli <<dotyka [lewa ściana]?> lub <dotyka [prawa ściana]?>> to
+        obróć w prawo o (180) stopni
+    przesuń o (1) kroków`}
+/>
+
+<ScratchSkrypt
+  duszek="MIT"
+  kod={`kiedy kliknięto zieloną flagę
+idź do [losowa pozycja]
+zawsze
+    ustaw w stronę [Harvard]
+    przesuń o (1) kroków`}
+/>
+
+Dzięki abstrakcji główny skrypt Harvarda czyta się jak pseudokod: „zawsze słuchaj klawiatury i wyczuwaj ściany”. **Nasze rozszerzenie:** blok `jeżeli <<dotyka [Yale]?> lub <dotyka [MIT]?>> to` przenosi gracza do (0, 0) i zmienia `[życia] o (-1)`.
+
+## Sprawdź się: klocki i pojęcia
+
+<DopasujPojecia />
+
+<NaZajeciach tytul="Scratch na żywo" czas="18 min">
+Przykłady „Witaj, świecie”, „Witaj, ty”, „Miau” i warunki budujemy na żywo. Przy każdym bloku pytamy: co jest funkcją, co argumentem, co wartością zwracaną, a co zdarzeniem? Oscartime i Ivy’s Hardest Game pokazujemy najpierw jako gotowe gry (2 min), a ich budowę przenosimy na lekcję 1.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Który blok zwraca wartość w programie „Witaj, ty”?"
+    odpowiedzi={["powiedz", "połącz", "kiedy kliknięto zieloną flagę"]}
+    poprawna={1}
+    wyjasnienie="„połącz” zwraca sklejony tekst, który trafia jako argument do „powiedz”. „powiedz” niczego nie zwraca, tylko wywołuje efekt uboczny (dymek)."
+  />
+  <Pytanie
+    pytanie="Dwa skrypty duszka zaczynające się od zielonej flagi to…"
+    odpowiedzi={["Dwie pętle", "Dwa wątki", "Dwie zmienne"]}
+    poprawna={1}
+    wyjasnienie="Oba skrypty działają równolegle, każdy w swoim wątku."
+  />
+  <Pytanie
+    pytanie="Po co tworzymy własny blok „miau (n) razy”?"
+    odpowiedzi={[
+      "Żeby ukryć szczegóły i nie powtarzać kodu (abstrakcja)",
+      "Bo Scratch nie ma pętli",
+      "Żeby kot miauczał głośniej",
+    ]}
+    poprawna={0}
+    wyjasnienie="Własny blok z parametrem to abstrakcja: nazywamy czynność i ukrywamy, jak jest zrobiona."
+  />
+</Quiz>

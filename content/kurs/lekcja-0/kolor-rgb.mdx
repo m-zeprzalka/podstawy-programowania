@@ -1,0 +1,58 @@
+---
+title: "Kolor: RGB i zapis szesnastkowy"
+nav: Kolor RGB
+description: Trzy bajty, czyli ile czerwieni, zieleni i niebieskiego. Te same liczby 72 73 33 mogą być tekstem albo kolorem.
+czas: 7
+---
+
+<Cel>Zrozumieć, że kolor to trzy liczby, a obraz to wiele takich trójek.</Cel>
+
+<Pojecia
+  lista={[
+    ["RGB", "red, green, blue"],
+    ["piksel", "pixel"],
+    ["kanał", "channel"],
+  ]}
+/>
+
+## Trzy bajty na kolor
+
+Kolor w modelu **RGB** to trzy bajty, każdy od 0 do 255: ile jest w nim czerwieni (*red*), zieleni (*green*) i niebieskiego (*blue*). Trzy bajty to 24 bity, więc kolorów jest 256³ = **16 777 216**.
+
+Weźmy liczby 72, 73 i 33 z napisu „HI!” i potraktujmy je jako R, G i B. Program graficzny pokaże wtedy kolor, a nie tekst. Te same bajty, inna umowa. Obraz to po prostu zbiór takich trójek, po jednej na każdy **piksel**.
+
+<SuwakiRgb />
+
+## Zapis szesnastkowy w CSS
+
+W CSS i programach graficznych kolor zapisuje się często jako `#RRGGBB`, czyli trzy bajty w systemie szesnastkowym, po dwie cyfry na kanał:
+
+| zapis | R | G | B | opis |
+|---|---|---|---|---|
+| `#FF5733` | 255 | 87 | 51 | intensywny pomarańczowo-czerwony |
+| `#484921` | 72 | 73 | 33 | „HI!” jako kolor |
+| `#00FF00` | 0 | 255 | 0 | czysta zieleń |
+| `#000000` | 0 | 0 | 0 | czarny |
+| `#FFFFFF` | 255 | 255 | 255 | biały |
+
+<Wskazowka tytul="Jasny czy ciemny?">
+Przy wartościach nie większych niż 73 na 255 wszystkie trzy kanały świecą słabo, więc kolor `#484921` jest **ciemny, oliwkowy**. Jasne kolory mają duże wartości kanałów. Sprawdź na suwakach powyżej i oceń sam albo sama.
+</Wskazowka>
+
+<NaZajeciach tytul="Próbnik koloru w DevTools" czas="4 min">
+W narzędziach deweloperskich przeglądarki wpisujemy `rgb(72, 73, 33)` i sprawdzamy zapis szesnastkowy, a potem odwrotnie: `#FF5733`. Pytanie do sali: jaki kolor widzicie przy (72, 73, 33)?
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Ile bajtów potrzeba na jeden piksel w modelu RGB?"
+    akceptowane={["3", "trzy"]}
+    wyjasnienie="Po jednym bajcie na kanał: czerwony, zielony i niebieski."
+  />
+  <Pytanie
+    pytanie="Jaki kolor zapisuje #00FF00?"
+    odpowiedzi={["Czerwony", "Zielony", "Niebieski", "Biały"]}
+    poprawna={1}
+    wyjasnienie="R = 00, G = FF (255), B = 00, czyli pełna zieleń."
+  />
+</Quiz>

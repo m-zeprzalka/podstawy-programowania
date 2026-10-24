@@ -1,0 +1,69 @@
+---
+title: "ASCII: umowa, że liczby oznaczają litery"
+nav: ASCII
+description: Te same bity mogą znaczyć liczbę albo literę. ASCII to umowa, która mówi, jak je czytać. 72 73 33 to „HI!”.
+czas: 8
+---
+
+<Cel>Zrozumieć, że tekst to liczby zapisane według wspólnej umowy, czyli kodowania znaków.</Cel>
+
+<Pojecia
+  lista={[
+    ["kodowanie znaków", "character encoding"],
+    ["ASCII", "American Standard Code for Information Interchange"],
+    ["znak sterujący", "control character"],
+  ]}
+/>
+
+## Liczby, które są literami
+
+Komputer przechowuje tylko bity. Skoro te same bity mogą oznaczać liczby, potrzebna jest **umowa**, które liczby oznaczają które litery. Taką umową jest standard **ASCII**. W nim **A** to 65, czyli `01000001`.
+
+Bajty 72, 73 i 33 oznaczają więc napis **„HI!”**:
+
+| znak | H | I | ! |
+|---|---|---|---|
+| dziesiętnie | 72 | 73 | 33 |
+| dwójkowo | `01001000` | `01001001` | `00100001` |
+| szesnastkowo | `0x48` | `0x49` | `0x21` |
+
+ASCII używa **128 kodów** (od 0 do 127), choć bajt pozwala na 256. Kody 0–31 i 127 to **znaki sterujące**, które niczego nie rysują, tylko coś robią: 10 to nowa linia, 9 to tabulator.
+
+| kod | znak | kod | znak | kod | znak |
+|---|---|---|---|---|---|
+| 32 | spacja | 65 | A | 97 | a |
+| 33 | ! | 66 | B | 98 | b |
+| 48 | 0 | 72 | H | 104 | h |
+| 57 | 9 | 90 | Z | 122 | z |
+
+<TlumaczAscii />
+
+## Wielka litera, mała litera: jeden bit różnicy
+
+**A = 65, a = 97.** Różnica wynosi 32, czyli 2⁵. W zapisie dwójkowym `01000001` i `01100001` różnią się dokładnie jednym bitem, tym o wadze 32. Zmiana wielkości litery to więc przełączenie jednego bitu. Projektanci ASCII zrobili to celowo.
+
+Podobny trik jest z cyframi: znak „0” ma kod 48, „1” ma 49 i tak dalej. Wartość cyfry to więc **kod − 48**. Przyda się to w języku C.
+
+<NaZajeciach tytul="Co znaczy 72 73 33?" czas="5 min">
+Na slajdzie: `72 73 33`. „Co to znaczy?” Najpierw pada „liczby”, potem ktoś odkrywa „HI!”. Następnie pary kodują swoje inicjały w ASCII i wymieniają się kartkami do odszyfrowania.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Jaki kod ASCII ma mała litera „b”?"
+    akceptowane={["98"]}
+    wyjasnienie="„B” to 66, a mała litera jest o 32 dalej: 66 + 32 = 98."
+  />
+  <Pytanie
+    pytanie="Ile znaków obejmuje standard ASCII?"
+    odpowiedzi={["128", "256", "26", "65 536"]}
+    poprawna={0}
+    wyjasnienie="ASCII ma 128 kodów, od 0 do 127. Bajt mieści 256 wartości, ale ASCII używa tylko połowy."
+  />
+  <Pytanie
+    pytanie="Którym bitem różnią się „A” (01000001) i „a” (01100001)?"
+    odpowiedzi={["Bitem o wadze 1", "Bitem o wadze 32", "Bitem o wadze 128"]}
+    poprawna={1}
+    wyjasnienie="Różnica 97 − 65 = 32 = 2⁵, czyli jeden bit."
+  />
+</Quiz>

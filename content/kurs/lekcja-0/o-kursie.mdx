@@ -1,0 +1,73 @@
+---
+title: "Najpierw rozwiązanie problemu, potem składnia"
+nav: O kursie
+description: Programowanie to rozwiązywanie problemów, a nie zapamiętywanie składni. Naucz się myślenia programisty, potem rozpocznij nauke konkretnych języków programowania i rozwiązań.
+czas: 6
+---
+
+<Cel>Programowanie to rozwiązywanie problemów, a nie zapamiętywanie składni.</Cel>
+
+<Pojecia
+  lista={[
+    ["informatyka", "computer science"],
+    ["myślenie komputacyjne", "computational thinking"],
+    ["poprawność", "correctness"],
+  ]}
+/>
+
+## Od problemu do składni
+
+Ten kurs to wprowadzenie do informatyki i programowania dla osób bez doświadczenia. Uczy rozwiązywania problemów zarówno za pomocą kodu jak i bez niego, a każde rozwiązanie oceniamy według trzech kryteriów:
+
+- **Poprawność**: czy program robi to, co miał robić, także w nietypowych sytuacjach?
+- **Projekt**: czy robi to "rozsądnie", czyli bez zbędnych powtórzeń, z dobrze dobranymi krokami i bez marnowania pamięci komputera i czasu?
+- **Styl**: czy da się go łatwo przeczytać, czyli poziada czytelne nazwy, porządek, przypisy i odpowiednie wcięcia?
+
+Ta kolejność nie jest przypadkowa. Najpierw program ma działać, potem ma działać dobrze, a na końcu ma być przyjemny w czytaniu dla innych ludzi, w tym dla ciebie np. za pół roku, kiedy do niego wrócisz i będziesz chciał coś poprawić.
+
+## Mapa nauki
+
+Kurs składa się z lekcji, a każda lekcja z krótkich modułów:
+
+| lekcja | temat |
+|---|---|
+| 0 | Podstawy informatyki i Scratch |
+| 1 | Język C |
+| 2 | Tablice |
+
+Zaczynamy od teorii i gotowych "klocków", pozwalają one skupić się na myśleniu, a nie na konkretnej składni danego języka. Potem schodzimy niżej, do języka C i pamięci komputera. Program będzie się rozwijał razem z kursem.
+
+## Skąd startujesz?
+
+Jeśli nigdy wcześniej nie programowałeś ani nie programowałaś, nie martw się: na kursach wprowadzających to częsty punkt wyjścia, a ten kurs zakłada start od zera.
+
+Nie ma więc „złego” punktu startu. Liczy się nie to, gdzie jesteś obecnie na tle innych, tylko to, gdzie będziesz za kilka miesięcy w odniesieniu do siebie z pierwszego dnia.
+
+<SkadStartujesz />
+
+<NaZajeciach tytul="Kto już programował?" czas="3 min">
+Podnieście ręce: kto już programował, a kto nigdy? Ustalamy „kontrakt” kursu: oceniamy postęp względem siebie z pierwszego dnia.
+</NaZajeciach>
+
+<DlaProwadzacego>
+Ankietę warto powtórzyć na koniec semestru i porównać wyniki.
+</DlaProwadzacego>
+
+<Quiz>
+  <Pytanie
+    pytanie="Według jakich trzech kryteriów oceniamy jakość kodu?"
+    odpowiedzi={[
+      "Poprawność, projekt, styl",
+      "Szybkość, długość, liczba komentarzy",
+      "Składnia, kompilacja, testy",
+    ]}
+    poprawna={0}
+    wyjasnienie="Najpierw poprawność (działa), potem projekt (działa dobrze), na końcu styl (dobrze się czyta)."
+  />
+  <Pytanie
+    pytanie="Program działa bez zarzutu, ale ten sam fragment kodu skopiowano w nim pięć razy. Które kryterium kuleje najbardziej?"
+    odpowiedzi={["Poprawność", "Projekt", "Styl"]}
+    poprawna={1}
+    wyjasnienie="Skoro działa, poprawność jest w porządku. Powtórzenia to sygnał słabego projektu. W Scratchu naprawimy to pętlą i własnym blokiem."
+  />
+</Quiz>

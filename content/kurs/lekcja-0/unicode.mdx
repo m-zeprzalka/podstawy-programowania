@@ -1,0 +1,128 @@
+---
+title: Unicode, emoji i UTF-8 (oraz polskie „krzaczki”)
+nav: Unicode i UTF-8
+description: 128 znaków nie wystarcza dla języków świata. Unicode nadaje numer każdemu znakowi, a UTF-8 mówi, jak zapisać go w bajtach.
+czas: 14
+---
+
+<Cel>Odróżniać numer znaku (Unicode) od sposobu zapisu w bajtach (UTF-8) i rozumieć, skąd biorą się „krzaczki”.</Cel>
+
+<Pojecia
+  lista={[
+    ["Unicode"],
+    ["punkt kodowy", "code point, U+XXXX"],
+    ["UTF-8"],
+    ["modyfikator koloru skóry", "skin tone modifier"],
+    ["łącznik zerowej szerokości", "zero width joiner, ZWJ"],
+    ["krzaczki", "mojibake"],
+    ["strona kodowa", "code page"],
+  ]}
+/>
+
+## Za mało miejsca w ASCII
+
+128, a nawet 256 znaków to za mało dla języków świata, w tym dla polskich liter, cyrylicy, chińskich znaków czy emoji. **Unicode** rozszerza liczbę bitów i obejmuje wszystkie te pisma, a także emoji.
+
+Każdy znak ma w Unicode swój numer, czyli **punkt kodowy**, zapisywany jako `U+` i liczba szesnastkowa. Na przykład 😂 to **U+1F602 FACE WITH TEARS OF JOY**, dodane w Unicode 6.0 w 2010 roku.<Zrodlo n={[3, 4]} /> Unicode standaryzuje numery, ale wygląd zależy od producenta: każdy rysuje emoji trochę inaczej.
+
+## Emoji złożone z kilku znaków
+
+**Modyfikatory koloru skóry.** Unicode 8.0 (połowa 2015 roku) dodał pięć modyfikatorów U+1F3FB–U+1F3FF opartych na skali Fitzpatricka. Postawiony po emoji postaci tworzy jeden glif: 👍 U+1F44D + U+1F3FD → 👍🏽.<Zrodlo n={[5, 6]} />
+
+**Sekwencje ZWJ.** Łącznik zerowej szerokości U+200D „skleja” emoji.<Zrodlo n={7} /> „Rodzina” 👨‍👩‍👧 to 👨 U+1F468 + ZWJ + 👩 U+1F469 + ZWJ + 👧 U+1F467: jeden widoczny znak, ale pięć punktów kodowych.<Zrodlo n={[5, 8]} />
+
+<RozbieraczEmoji />
+
+## UTF-8: jak zapisać numer w bajtach
+
+Unicode mówi, **jaki numer** ma znak. **UTF-8** mówi, **jak zapisać** ten numer w bajtach. Według RFC 3629 znaki od U+0000 do U+10FFFF koduje się w 1–4 bajtach. Znaki U+0000–U+007F (czyli całe ASCII) to pojedyncze bajty 00–7F, więc każdy tekst ASCII jest jednocześnie poprawnym UTF-8.<Zrodlo n={[9, 10]} />
+
+| zakres | bajty | wzorzec bitów |
+|---|---|---|
+| U+0000–U+007F | 1 | `0xxxxxxx` |
+| U+0080–U+07FF | 2 | `110xxxxx 10xxxxxx` |
+| U+0800–U+FFFF | 3 | `1110xxxx 10xxxxxx 10xxxxxx` |
+| U+10000–U+10FFFF | 4 | `11110xxx 10xxxxxx 10xxxxxx 10xxxxxx` |
+
+Wzorzec pochodzi z RFC 3629.<Zrodlo n={11} /> Zobaczmy go w działaniu na literze **ą = U+0105**:
+
+```txt title="ą w UTF-8"
+U+0105  →  11 bitów: 00100 000101
+           110 + 00100   = 11000100 = 0xC4
+           10  + 000101  = 10000101 = 0x85
+wynik:     C4 85
+```
+
+Wynik **C4 85** zgadza się z polskimi tabelami kodów.<Zrodlo n={12} /> Emoji 😂 zajmuje cztery bajty: **F0 9F 98 82**.<Zrodlo n={[13, 14]} />
+
+## Długość tekstu ma trzy odpowiedzi
+
+Otwórz konsolę przeglądarki (klawisz F12, zakładka *Console*) i wpisz:
+
+```js title="Konsola przeglądarki"
+"👨‍👩‍👧".length                                   // 8
+[..."👨‍👩‍👧"].length                              // 5  (punkty kodowe)
+[...new Intl.Segmenter().segment("👨‍👩‍👧")].length  // 1  (grafem)
+new TextEncoder().encode("ą").length            // 2
+new TextEncoder().encode("ą")                   // Uint8Array [196, 133] = C4 85
+new TextEncoder().encode("😂")                  // [240, 159, 152, 130]
+```
+
+Dlaczego 8? Właściwość `.length` liczy jednostki kodowania UTF-16. Trzy emoji osób leżą poza U+FFFF i zajmują po dwie jednostki (tzw. pary surogatów), a dwa łączniki ZWJ po jednej: 3 × 2 + 2 × 1 = **8**. „Długość tekstu” ma więc trzy różne odpowiedzi: 8, 5 i 1. To dobry wstęp do typów i abstrakcji w JavaScripcie i TypeScripcie.
+
+## Polskie kodowania i „krzaczki”
+
+Zanim wszyscy przeszli na UTF-8, polskie litery zapisywano na wiele sposobów. Każdy system miał własną **stronę kodową**:
+
+| kodowanie | status | ą | ś | ź | Ą |
+|---|---|---|---|---|---|
+| **Mazovia** | popularne w Polsce w czasach DOS | `0x86` | `0x9E` | `0xA6` | `0x8F` |
+| **CP852** | IBM PC Latin 2 (DOS) | `0xA5` | `0x98` | `0xAB` | `0xA4` |
+| **ISO-8859-2** | standard międzynarodowy (PN-93/T-42118) | `0xB1` | `0xB6` | `0xBC` | `0xA1` |
+| **Windows-1250** | strona kodowa Microsoftu | `0xB9` | `0x9C` | `0x9F` | `0xA5` |
+| **UTF-8** | współczesny standard | `C4 85` | `C5 9B` | `C5 BA` | `C4 84` |
+
+Dane z tabel kodów polskich liter.<Zrodlo n={[12, 15]} />
+
+**Skąd biorą się „krzaczki”?** Bajty odczytano według innej umowy niż ta, w której je zapisano. Tekst w ISO-8859-2 czytany jako Windows-1250 zamienia „ą” w „±”, „ś” w „¶”, a „ź” w „Ľ”.<Zrodlo n={16} /> W drugą stronę „ą” staje się „š”.<Zrodlo n={17} /> Tekst w UTF-8 czytany jako Windows-1250 zamienia „ą” w „Ä…”, a „ó” w „Ăł”.
+
+<GeneratorKrzaczkow />
+
+Pangram **„Zażółć gęślą jaźń”** zawiera wszystkie dziewięć polskich małych liter diakrytycznych (ą, ć, ę, ł, ń, ó, ś, ź, ż), dlatego od lat służy do testowania polskich znaków.
+
+<NaZajeciach tytul="Czy plik się zepsuł?" czas="4 min">
+Plik `zazolc.txt` zapisany w UTF-8 otwieramy z wymuszonym kodowaniem „Środkowoeuropejskie (Windows)”, np. przez import CSV w Excelu. Pytanie: czy plik się zepsuł? Nie. Bajty są te same, zmieniła się tylko umowa odczytu.
+</NaZajeciach>
+
+<NaZajeciach tytul="Konsola przeglądarki" czas="6 min">
+Wspólnie wpisujemy w konsoli polecenia z sekcji „Długość tekstu ma trzy odpowiedzi” i zgadujemy wynik przed naciśnięciem Enter.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Ile bajtów w UTF-8 zajmują kolejno „a”, „ą” i „😂”?"
+    odpowiedzi={["1, 1, 1", "1, 2, 4", "1, 2, 2", "2, 2, 4"]}
+    poprawna={1}
+    wyjasnienie="„a” jest w ASCII (1 bajt), „ą” = U+0105 mieści się w 2 bajtach (C4 85), a 😂 leży poza U+FFFF, więc zajmuje 4 bajty (F0 9F 98 82)."
+  />
+  <Pytanie
+    pytanie="Zamiast „ą” widzisz „Ä…”. Co się stało?"
+    odpowiedzi={[
+      "Plik jest uszkodzony",
+      "Tekst w UTF-8 odczytano jako Windows-1250",
+      "Tekst w Windows-1250 odczytano jako UTF-8",
+    ]}
+    poprawna={1}
+    wyjasnienie="Bajty C4 85 (ą w UTF-8) w Windows-1250 oznaczają „Ä” i „…”. Plik jest w porządku, zawiodła umowa odczytu."
+  />
+  <Pytanie
+    pytanie="Czym różni się Unicode od UTF-8?"
+    odpowiedzi={[
+      "Unicode nadaje znakom numery, a UTF-8 określa, jak zapisać je w bajtach",
+      "To dwie nazwy tego samego",
+      "UTF-8 to starsza wersja Unicode",
+    ]}
+    poprawna={0}
+    wyjasnienie="Unicode to „katalog” znaków z numerami (punktami kodowymi), a UTF-8 to jeden ze sposobów ich zapisu w bajtach."
+  />
+</Quiz>

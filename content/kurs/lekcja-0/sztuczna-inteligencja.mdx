@@ -1,0 +1,105 @@
+---
+title: Sztuczna inteligencja - po co uczyć się programowania w dobie AI?
+nav: AI i programowanie
+description: Kilka linijek Pythona wystarczy, żeby porozmawiać z modelem językowym w konkretny sposób. Właśnie dlatego trzeba rozumieć, co dzieje się "pod spodem".
+czas: 10
+---
+
+<Cel>AI pomaga tym, którzy rozumieją podstawy. Ustalamy też zasady korzystania z AI na zajęciach.</Cel>
+
+<Pojecia
+  lista={[
+    ["sztuczna inteligencja", "artificial intelligence, AI"],
+    ["duży model językowy", "large language model, LLM"],
+    ["prompt", "prompt"],
+    ["prompt systemowy", "system prompt"],
+    ["biblioteka", "library"],
+    ["zintegrowane środowisko programistyczne", "IDE"],
+  ]}
+/>
+
+## Dlaczego zaczynamy od AI
+
+Zaczynamy od sztucznej inteligencji, bo to z nią każda osoba ucząca się dziś programowania spotyka się najpierw. AI usuwa część „ludzkich wąskich gardeł”: szybciej pisze, szuka, podpowiada. To jednak rozumienie, pisanie i porządkowanie kodu sprawia, że człowiek jest „kierowcą” albo „pilotem”, a nie pasażerem. Znajomość podstaw w połączeniu z AI otwiera zupełnie nowe możliwości.
+
+## Program, który rozmawia z modelem
+
+Żeby porozmawiać z modelem językowym z poziomu kodu, wystarczy kilka linijek Pythona. Program `chat.py` napisany w edytorze VS Code:
+
+1. importuje bibliotekę OpenAI i tworzy klienta,
+2. wysyła do modelu `gpt-5` pytanie „W jednym zdaniu: czym jest programowanie?”,
+3. wypisuje odpowiedź.
+
+W kolejnej wersji pytanie zadaje już użytkownik (`input("Prompt: ")`), a na koniec dochodzi **monit systemowy**: „Odpowiadaj jednym zdaniem. Udawaj, że jesteś kotem”. Morał: w około dziesięciu linijkach da się zbudować bardzo potężny program. W praktyce trzeba jeszcze założyć konto, zdobyć klucz API i skonfigurować środowisko, więc na razie traktuj ten przykład poglądowo.
+
+**Monit systemowy** ustala zasady zachowania modelu (rolę, ton, ograniczenia). **Monit użytkownika** to konkretne pytanie. Zobacz, jak oba trafiają do żądania wysyłanego do modelu:
+
+<PromptPlayground />
+
+## Kaczka, która zadaje pytania
+
+Programiści od dawna stosują *rubber duck debugging*: tłumaczą problem na głos gumowej kaczce i w trakcie sami znajdują błąd. Na tej samej zasadzie AI może być dobrym korepetytorem. Zamiast podawać gotowe rozwiązanie, naprowadza pytaniami: „Co już działa?”, „Co dzieje się w tej linii?”, „Czego się spodziewasz, a co widzisz?”. Wtedy uczysz się ty, a nie model.
+
+Taki „tryb kaczki” to nie cecha konkretnego narzędzia, tylko sposób korzystania z AI. Większość czatów da się w niego wprowadzić jednym monitem systemowym (przykład znajdziesz niżej, w bloku dla dociekliwych).
+
+## Jak działa model językowy (w uproszczeniu)
+
+Model zamienia tekst na liczby, czyli **tokeny** (wrócimy do nich w module o mediach), i na podstawie wzorców z ogromnych zbiorów tekstu przewiduje kolejne tokeny. Znaczenia słów koduje się przy tym jako *embeddingi*, czyli wektory liczb oddające relacje między słowami.
+
+Zapamiętaj jedno: **AI też „tylko” operuje na liczbach.** Cała ta lekcja jest o tym, jak liczby mogą znaczyć litery, kolory czy dźwięki.
+
+## Po co programowanie, skoro AI pisze kod?
+
+1. **Ocena.** Bez rozumienia kodu nie ocenisz, czy wygenerowany kod jest poprawny i bezpieczny.
+2. **Specyfikacja.** Opisanie problemu krok po kroku (pseudokod) zostaje po stronie człowieka.
+3. **Pułapki.** Błędy takie jak przepełnienia czy zaokrąglenia liczb AI potrafi przemycić do kodu po cichu. Nauczysz się je rozpoznawać.
+
+<Ramka tytul="Zasada na lekcjach 0–2: AI w trybie kaczki">
+Możesz prosić AI o **wyjaśnienia** pojęć, błędów i przykładów. Nie proś o **gotowe rozwiązania** zadań. Traktuj AI jak korepetytora, który zadaje pytania, a nie jak kogoś, kto odrabia lekcje.
+</Ramka>
+
+<NaZajeciach tytul="Ten sam czat, dwie instrukcje" czas="7 min">
+Zadajemy to samo pytanie czatowi AI dwa razy: bez instrukcji systemowej i z instrukcją „odpowiadaj jak kot”. Pytanie do sali: co tu jest **wejściem**, co **wyjściem**, a co **czarną skrzynką**?
+</NaZajeciach>
+
+<Dociekliwi tytul="Jak zrobić z AI korepetytora">
+Wklej do czatu (albo do pola monitu systemowego) instrukcję w rodzaju:
+
+```txt title="Monit systemowy: tryb kaczki"
+Jesteś korepetytorem programowania. Nie podawaj gotowego kodu
+ani rozwiązań zadań. Zadawaj pytania naprowadzające, wyjaśniaj
+pojęcia na prostych przykładach i proś, żebym sam(a) spróbował(a)
+następnego kroku.
+```
+
+Potem sprawdź w laboratorium powyżej, jak zmienia się żądanie wysyłane do modelu, gdy dopiszesz taki monit.
+</Dociekliwi>
+
+<Quiz>
+  <Pytanie
+    pytanie="Czym różni się monit systemowy od monitu użytkownika?"
+    odpowiedzi={[
+      "Systemowy ustala zasady zachowania modelu, a użytkownika to konkretne pytanie",
+      "Systemowy pisze komputer, a użytkownika pisze człowiek",
+      "Nie ma różnicy, to dwie nazwy tego samego",
+    ]}
+    poprawna={0}
+    wyjasnienie="Monit systemowy to „regulamin” rozmowy (np. „odpowiadaj jak kot”), a monit użytkownika to treść pytania."
+  />
+  <Pytanie
+    pytanie="Na czym operuje model językowy w środku?"
+    odpowiedzi={["Na literach", "Na liczbach (tokenach i wektorach)", "Na obrazkach słów"]}
+    poprawna={1}
+    wyjasnienie="Tekst jest zamieniany na tokeny, czyli liczby, a znaczenia słów na wektory liczb (embeddingi)."
+  />
+  <Pytanie
+    pytanie="Czego oczekujemy od AI w „trybie kaczki”?"
+    odpowiedzi={[
+      "Że poda gotowy kod rozwiązania",
+      "Że będzie naprowadzać pytaniami, jak dobry korepetytor",
+      "Że sprawdzi zadanie i wystawi ocenę",
+    ]}
+    poprawna={1}
+    wyjasnienie="Dobry korepetytor zadaje więcej pytań, niż udziela odpowiedzi. Taki tryb obowiązuje u nas na lekcjach 0–2."
+  />
+</Quiz>

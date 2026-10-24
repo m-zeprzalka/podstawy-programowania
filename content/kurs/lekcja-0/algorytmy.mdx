@@ -1,0 +1,81 @@
+---
+title: "Algorytmy: książka telefoniczna"
+nav: Algorytmy
+description: Trzy sposoby szukania nazwiska w książce telefonicznej. Wszystkie znajdą osobę, ale jeden robi to w 20 krokach zamiast miliona.
+czas: 12
+---
+
+<Cel>Porównać algorytmy pod kątem poprawności i wydajności, na przykładzie wyszukiwania liniowego i binarnego.</Cel>
+
+<Pojecia
+  lista={[
+    ["algorytm", "algorithm"],
+    ["wyszukiwanie liniowe", "linear search"],
+    ["wyszukiwanie binarne", "binary search"],
+    ["dziel i zwyciężaj", "divide and conquer"],
+    ["czas działania", "running time"],
+    ["notacja dużego O", "big O notation"],
+    ["poprawność", "correctness"],
+    ["wydajność", "efficiency"],
+  ]}
+/>
+
+## Problem: znaleźć nazwisko
+
+**Algorytm** to instrukcje krok po kroku, które rozwiązują problem. Nasz problem: znaleźć nazwisko w grubej, posortowanej alfabetycznie książce telefonicznej.
+
+1. **Strona po stronie.** Algorytm jest poprawny, bo w końcu trafi na nazwisko, ale wolny: przy n stronach w najgorszym razie potrzebuje **n kroków**.
+2. **Po dwie strony naraz.** Dwa razy szybciej (**n/2** kroków), ale **bez poprawki jest niepoprawny**: może przeskoczyć stronę z szukanym nazwiskiem. Poprawka: jeśli „przeskoczyliśmy” literę, cofamy się o jedną stronę.
+3. **Od środka.** Otwieramy książkę na środku i sprawdzamy, czy nazwisko jest w lewej, czy w prawej połowie. Niepotrzebną połowę odrzucamy (na zajęciach można ją dosłownie przedrzeć na pół) i powtarzamy. To **wyszukiwanie binarne**.
+
+## Jak szybko rosną te algorytmy
+
+Na wykresie n i n/2 to proste linie. Linia log₂ n prawie przestaje rosnąć: **podwojenie danych to tylko jeden krok więcej**.
+
+| liczba stron n | strona po stronie (n) | po dwie (n/2) | od środka (⌈log₂ n⌉) |
+|---|---|---|---|
+| 1 000 | 1 000 | 500 | 10 |
+| 1 000 000 | 1 000 000 | 500 000 | 20 |
+| 4 mld | 4 mld | 2 mld | 32 |
+
+<WykresZlozonosci />
+
+Najpierw poprawność, potem szybkość. Szybki algorytm, który czasem nie znajduje wyniku, jest bezużyteczny.
+
+## Zagraj w wyszukiwanie binarne
+
+Myślisz o liczbie od 1 do 1000, a odpowiadasz tylko „więcej”, „mniej” albo „trafione”. Skoro 2¹⁰ = 1024 ≥ 1000, dziesięć pytań zawsze wystarczy, jeśli za każdym razem pytamy o środek przedziału.
+
+<ZgadnijLiczbe />
+
+<NaZajeciach tytul="Zgadnij liczbę od 1 do 1000 w maks. 10 ruchach" czas="8 min">
+Prowadzący odpowiada tylko „więcej / mniej / trafione”. Najpierw sala zgaduje liniowo (1, 2, 3…), potem od środka (500 → 250 lub 750 …). Wariant fizyczny: papierowy słownik i szukanie słowa „informatyka” przez połowienie.
+</NaZajeciach>
+
+<Dociekliwi tytul="Haczyk wyszukiwania binarnego">
+Wyszukiwanie binarne działa tylko na danych **posortowanych**. W nieposortowanej książce nie wiadomo, którą połowę odrzucić. Sortowaniem zajmiemy się w jednej z kolejnych lekcji.
+</Dociekliwi>
+
+<Quiz>
+  <Pytanie
+    pytanie="Ile kroków potrzebuje wyszukiwanie binarne w książce z milionem stron (w najgorszym razie)?"
+    akceptowane={["20", "dwadzieścia"]}
+    wyjasnienie="2²⁰ = 1 048 576 ≥ 1 000 000, więc wystarczy 20 połowień."
+  />
+  <Pytanie
+    pytanie="Algorytm „po dwie strony naraz” bez poprawki jest:"
+    odpowiedzi={[
+      "Szybszy i zawsze poprawny",
+      "Szybszy, ale może przeoczyć szukaną stronę",
+      "Wolniejszy od strony po stronie",
+    ]}
+    poprawna={1}
+    wyjasnienie="Przeskakując po dwie strony, można minąć nazwisko. Poprawka: przy przeskoczeniu cofnij się o stronę."
+  />
+  <Pytanie
+    pytanie="Ile dodatkowych kroków potrzebuje wyszukiwanie binarne, gdy książka stanie się dwa razy grubsza?"
+    odpowiedzi={["Jeden", "Dwa razy więcej", "Żadnego"]}
+    poprawna={0}
+    wyjasnienie="Jedno dodatkowe połowienie wystarczy, żeby wrócić do poprzedniego rozmiaru problemu."
+  />
+</Quiz>

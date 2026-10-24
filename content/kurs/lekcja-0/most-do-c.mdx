@@ -1,0 +1,66 @@
+---
+title: "Most do C: procesor i pamięć"
+nav: Procesor i pamięć
+description: Pamięć to rząd ponumerowanych szufladek, a procesor w kółko pobiera, dekoduje i wykonuje instrukcje. Zapowiedź lekcji o C.
+czas: 9
+---
+
+<Cel>Zbudować prosty model pamięci i procesora, który przyda się w lekcji o języku C.</Cel>
+
+<Pojecia
+  lista={[
+    ["procesor", "CPU"],
+    ["cykl pobierz–dekoduj–wykonaj", "fetch–decode–execute"],
+    ["pamięć RAM", "random-access memory"],
+    ["adres", "address"],
+    ["kod maszynowy", "machine code"],
+    ["kompilator", "compiler"],
+  ]}
+/>
+
+## Pamięć: ponumerowane szufladki
+
+**Pamięć** można sobie wyobrazić jako długi rząd szufladek, z których każda mieści jeden bajt. Każda szufladka ma numer, czyli **adres**, zapisywany zwykle szesnastkowo, np. `0x7ffd5c3a`. **Zmienna** w języku C to po prostu nazwana szufladka (albo kilka sąsiednich).
+
+<Pamiec />
+
+## Procesor: pobierz, zdekoduj, wykonaj
+
+**Procesor** robi w kółko trzy rzeczy: **pobiera** kolejną instrukcję z pamięci, **dekoduje** ją (sprawdza, co ma zrobić) i **wykonuje**: dodaje, porównuje, skacze w inne miejsce programu. Polecenie „wróć do linii 3” z pseudokodu to na tym poziomie właśnie **skok**.
+
+<Procesor />
+
+Języki programowania to abstrakcja nad zerami i jedynkami. Nikt nie musi już pisać bajtów instrukcji ręcznie: stoimy na ramionach tych, którzy zbudowali kolejne warstwy.
+
+## Pierwszy program w C
+
+Tak wygląda klasyczny pierwszy program w języku C:
+
+```c title="hello.c"
+#include <stdio.h>
+
+int main(void)
+{
+    printf("hello, world\n");
+}
+```
+
+Funkcja `printf` odpowiada scratchowemu blokowi `powiedz`, a `main` to odpowiednik „kiedy kliknięto zieloną flagę”. **Kompilator** tłumaczy taki kod źródłowy na kod maszynowy, czyli instrukcje dla procesora. Tym zajmiemy się na lekcji 1.
+
+<Quiz>
+  <Pytanie
+    pytanie="Jakie są trzy fazy cyklu pracy procesora?"
+    odpowiedzi={[
+      "Pobierz, zdekoduj, wykonaj",
+      "Wczytaj, zapisz, usuń",
+      "Kompiluj, uruchom, zamknij",
+    ]}
+    poprawna={0}
+    wyjasnienie="Procesor w kółko pobiera instrukcję, dekoduje ją i wykonuje."
+  />
+  <Pytanie
+    pytanie="Ile szufladek (bajtów) zajmuje w UTF-8 napis „HI!” razem z bajtem kończącym napis w C?"
+    akceptowane={["4", "cztery"]}
+    wyjasnienie="Trzy znaki ASCII po 1 bajcie i bajt 0x00 kończący napis: razem 4."
+  />
+</Quiz>

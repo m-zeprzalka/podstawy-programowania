@@ -1,0 +1,139 @@
+---
+title: "System dwójkowy: bity, żarówki, tranzystory"
+nav: System dwójkowy
+description: Zera i jedynki, czyli język komputerów. Zapis pozycyjny w podstawie 2, bit, bajt i zakres 0–255.
+czas: 14
+---
+
+<Cel>Opanować zapis pozycyjny w podstawie 2: bit, bajt i zakres 0–255.</Cel>
+
+<Pojecia
+  lista={[
+    ["system dwójkowy", "binary, base-2"],
+    ["bit", "binary digit"],
+    ["bajt", "byte"],
+    ["tranzystor", "transistor"],
+    ["system dziesiętny", "decimal"],
+    ["system szesnastkowy", "hexadecimal"],
+  ]}
+/>
+
+## Jak naprawdę czytamy liczbę 123
+
+W liczbie 123 każda pozycja ma swoją **wagę**, czyli potęgę dziesiątki:
+
+```txt title="System dziesiętny"
+cyfra     1      2      3
+waga    ×100    ×10    ×1
+         10²    10¹    10⁰
+suma    100  +  20  +  3  = 123
+```
+
+Cyfr jest dziesięć (0–9), bo podstawa wynosi 10. W **systemie dwójkowym** wszystko działa tak samo, tylko podstawą jest 2: cyfry to 0 i 1, a wagi pozycji to kolejne potęgi dwójki (1, 2, 4, 8, 16…).
+
+## Bit: zero albo jedynka
+
+Od angielskiego *binary digit* pochodzi słowo **bit**: zero albo jedynka, wyłączone albo włączone. Komputer to miliony, a dziś raczej miliardy **tranzystorów**, czyli maleńkich przełączników. Można o nich myśleć jak o żarówkach: świeci się albo nie.
+
+Weźmy trzy żarówki o wagach 4, 2 i 1 (czyli 2², 2¹, 2⁰). Wartość to suma wag tych, które świecą:
+
+<Zarowki bity={3} tytul="Trzy żarówki" />
+
+| bity | obliczenie | wartość |
+|---|---|---|
+| `000` | 0 | 0 |
+| `001` | 1 | 1 |
+| `010` | 2 | 2 |
+| `011` | 2 + 1 | 3 |
+| `100` | 4 | 4 |
+| `101` | 4 + 1 | 5 |
+| `110` | 4 + 2 | 6 |
+| `111` | 4 + 2 + 1 | 7 |
+
+Trzy bity dają osiem wartości, od 0 do 7. Żeby zapisać 8, potrzeba czwartej żarówki: `1000`.
+
+## Bajt: osiem bitów
+
+**Bajt** to 8 bitów. `00000101` to 5, a `11111111` to 255. Osiem bitów daje 2⁸ = **256** różnych wartości, od 0 do 255.
+
+| 128 | 64 | 32 | 16 | 8 | 4 | 2 | 1 |
+|---|---|---|---|---|---|---|---|
+| 2⁷ | 2⁶ | 2⁵ | 2⁴ | 2³ | 2² | 2¹ | 2⁰ |
+
+Jak zamienić liczbę na zapis dwójkowy? Idź od największej wagi: jeśli waga mieści się w tym, co zostało, zapal żarówkę i odejmij. Na przykład 42 = 32 + 8 + 2, więc `00101010`.
+
+<Zarowki bity={8} wyzwanie={42} />
+
+<Wskazowka>
+Zauważ wzór: n bitów pozwala zapisać 2ⁿ wartości, od 0 do 2ⁿ − 1. Każdy dodatkowy bit **podwaja** zakres.
+</Wskazowka>
+
+## 31 na jednej ręce
+
+Skoro palec może być podniesiony (1) albo opuszczony (0), dłoń to pięć bitów. Kciuk = 1, wskazujący = 2, środkowy = 4, serdeczny = 8, mały = 16. Wszystkie palce razem dają 31, czyli 2⁵ − 1. Dwie ręce to 10 bitów i maksimum 1023.
+
+<Palce />
+
+## Potęgi dwójki, które warto znać
+
+| n | 2ⁿ | gdzie się pojawia |
+|---|---|---|
+| 4 | 16 | jedna cyfra szesnastkowa |
+| 5 | 32 | jedna ręka → 0–31 |
+| 7 | 128 | ASCII (0–127) |
+| 8 | 256 | bajt |
+| 10 | 1 024 | dwie ręce → 0–1023 |
+| 16 | 65 536 | próbka dźwięku na płycie CD |
+| 24 | 16 777 216 | kolory RGB |
+| 31 | 2 147 483 648 | 2³¹ − 1 to maksimum 32-bitowej liczby ze znakiem |
+| 32 | 4 294 967 296 | adresy IPv4 |
+
+<NaZajeciach tytul="31 na jednej ręce" czas="5 min">
+Kciuk = 1, wskazujący = 2, środkowy = 4, serdeczny = 8, mały = 16. Wszystkie palce dają 31, dwie ręce 1023. Pokażcie 10 i 21.
+</NaZajeciach>
+
+<NaZajeciach tytul="Żywe żarówki" czas="5 min">
+Osiem osób staje w rzędzie z kartkami 128, 64, 32, 16, 8, 4, 2, 1. Prowadzący podaje liczbę 72, a „bajt” sam się układa: 64 + 8, czyli `01001000`. To przygotowanie do litery „H” w module o ASCII.
+</NaZajeciach>
+
+<DlaProwadzacego>
+Przy „31 na ręce” uprzedź salę, zanim padnie liczba 4: to sam środkowy palec.
+</DlaProwadzacego>
+
+<Dociekliwi tytul="Dlaczego akurat dwójka?">
+1. **Odporność na zakłócenia.** Dwa stany (jest napięcie / nie ma) łatwiej rozróżnić niż dziesięć poziomów napięcia.
+2. **Tranzystor to przełącznik o dwóch stanach**, a skala jest ogromna: układ Apple M3 Max z 2023 roku ma 92 miliardy tranzystorów.<Zrodlo n={[1, 2]} />
+3. **Logika Boole’a** (prawda / fałsz) przekłada się bezpośrednio na 1 / 0.
+</Dociekliwi>
+
+<Dociekliwi tytul="System szesnastkowy (hex)">
+System szesnastkowy ma 16 cyfr: 0–9 i A–F (A = 10, …, F = 15). Jedna cyfra szesnastkowa to dokładnie 4 bity, więc bajt zapisuje się dwiema cyframi, od `0x00` do `0xFF`. Przedrostek `0x` mówi, że liczba jest szesnastkowa.
+
+| dwójkowo | szesnastkowo | dziesiętnie | znaczenie |
+|---|---|---|---|
+| `0100 0001` | `0x41` | 65 | litera „A” |
+| `0100 1000` | `0x48` | 72 | litera „H” |
+| `0010 1010` | `0x2A` | 42 | odpowiedź na wszystko |
+| `1111 1111` | `0xFF` | 255 | największy bajt |
+
+Zapis szesnastkowy spotkasz w kolorach (`#FF5733`), kodach Unicode (`U+0105`) i adresach pamięci (`0x7ffd5c3a`).
+</Dociekliwi>
+
+<Quiz>
+  <Pytanie
+    pytanie="Zapisz liczbę 13 w systemie dwójkowym."
+    akceptowane={["1101", "00001101", "0b1101"]}
+    wyjasnienie="13 = 8 + 4 + 1, więc zapalamy wagi 8, 4 i 1: 1101."
+  />
+  <Pytanie
+    pytanie="Ile to jest 0x2A w systemie dziesiętnym?"
+    akceptowane={["42"]}
+    wyjasnienie="2 × 16 + A (czyli 10) = 32 + 10 = 42."
+  />
+  <Pytanie
+    pytanie="Ile różnych wartości można zapisać w jednym bajcie?"
+    odpowiedzi={["255", "256", "8", "128"]}
+    poprawna={1}
+    wyjasnienie="8 bitów daje 2⁸ = 256 wartości: od 0 do 255. Pułapka: największa wartość to 255, ale wartości jest 256, bo liczymy też zero."
+  />
+</Quiz>

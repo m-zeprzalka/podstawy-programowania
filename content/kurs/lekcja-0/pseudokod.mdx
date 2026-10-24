@@ -1,0 +1,84 @@
+---
+title: Pseudokod
+nav: Pseudokod
+description: Czytelne instrukcje krok po kroku, zanim napiszesz choć linijkę kodu. Funkcje, warunki, wyrażenia logiczne i pętle.
+czas: 12
+---
+
+<Cel>Umieć opisać algorytm pseudokodem i rozpoznać w nim funkcje, warunki, wyrażenia logiczne i pętle.</Cel>
+
+<Pojecia
+  lista={[
+    ["pseudokod", "pseudocode"],
+    ["funkcja", "function"],
+    ["warunek", "conditional"],
+    ["wyrażenie logiczne", "Boolean expression"],
+    ["pętla", "loop"],
+  ]}
+/>
+
+## Algorytm po ludzku
+
+**Pseudokod** to czytelne instrukcje opisujące kroki algorytmu zwykłym językiem. Pozwala przemyśleć logikę, zanim zaczniesz kodować, i wyjaśnić ją innym. Tak wygląda wyszukiwanie binarne w książce telefonicznej:
+
+```txt title="Pseudokod: szukanie w książce telefonicznej"
+1  Weź książkę telefoniczną
+2  Otwórz na środku książki
+3  Spójrz na stronę
+4  Jeśli osoba jest na stronie
+5      Zadzwoń do osoby
+6  W przeciwnym razie, jeśli osoba jest wcześniej w książce
+7      Otwórz na środku lewej połowy książki
+8      Wróć do linii 3
+9  W przeciwnym razie, jeśli osoba jest później w książce
+10     Otwórz na środku prawej połowy książki
+11     Wróć do linii 3
+12 W przeciwnym razie
+13     Zakończ
+```
+
+Uruchom go krok po kroku i zobacz, jak książka kurczy się o połowę:
+
+<KsiazkaTelefoniczna />
+
+## Cztery rodzaje klocków
+
+W tych trzynastu linijkach kryją się cztery podstawowe elementy prawie każdego programu:
+
+| klocek | linie | nazwa |
+|---|---|---|
+| „weź”, „otwórz”, „spójrz”, „zadzwoń” | 1, 2, 3, 5 | **funkcje**: czynności |
+| „jeśli / w przeciwnym razie” | 4, 6, 9, 12 | **warunki**: rozgałęzienia |
+| „osoba jest na stronie” | 4, 6, 9 | **wyrażenia logiczne**: pytania tak/nie |
+| „wróć do linii 3” | 8, 11 | **pętle**: powtórzenia |
+
+Linie 12–13 obsługują sytuację, gdy osoby **nie ma** w książce. Bez nich program mógłby się zawiesić albo kręcić w kółko. To klasyczny błąd początkujących: zapomnieć o przypadku „nie znaleziono”.
+
+<NaZajeciach tytul="Kanapka wykonywana dosłownie" czas="10 min">
+Na stole: chleb w opakowaniu, słoik z masłem, plastikowy nóż. Sala dyktuje instrukcje, a prowadzący wykonuje je **dosłownie**. „Połóż masło na chlebie” kończy się położeniem zamkniętego słoika na zamkniętym opakowaniu. Potem pary piszą pseudokod z funkcjami, warunkami i pętlami. Puenta: komputer robi dokładnie to, co mu każemy, a nie to, co mieliśmy na myśli.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Co jest wyrażeniem logicznym: „Zadzwoń do osoby” czy „osoba jest na stronie”?"
+    odpowiedzi={["„Zadzwoń do osoby”", "„osoba jest na stronie”"]}
+    poprawna={1}
+    wyjasnienie="Wyrażenie logiczne to pytanie, na które odpowiedź brzmi tak albo nie. „Zadzwoń” to czynność, czyli funkcja."
+  />
+  <Pytanie
+    pytanie="Która linia pseudokodu tworzy pętlę?"
+    odpowiedzi={["„Spójrz na stronę”", "„Wróć do linii 3”", "„W przeciwnym razie”"]}
+    poprawna={1}
+    wyjasnienie="„Wróć do linii 3” sprawia, że kroki się powtarzają, dopóki nie znajdziemy osoby albo nie skończy się książka."
+  />
+  <Pytanie
+    pytanie="Po co są linie 12–13 („W przeciwnym razie: Zakończ”)?"
+    odpowiedzi={[
+      "Żeby program był dłuższy",
+      "Żeby obsłużyć przypadek, gdy osoby nie ma w książce",
+      "Żeby zadzwonić jeszcze raz",
+    ]}
+    poprawna={1}
+    wyjasnienie="Bez nich program nie wiedziałby, co zrobić, gdy osoby brak, i mógłby się zawiesić."
+  />
+</Quiz>

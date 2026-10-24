@@ -1,0 +1,38 @@
+---
+title: System jedynkowy
+nav: System jedynkowy
+description: Liczenie na palcach po jednym na osobę to najprostszy system liczbowy. Intuicyjny, ale bardzo rozrzutny.
+czas: 4
+---
+
+<Cel>Zrozumieć najprostszy sposób zapisu liczb i to, dlaczego komputery go nie używają.</Cel>
+
+<Pojecia lista={[["system jedynkowy", "unary, base-1"], ["symbol", "symbol"]]} />
+
+## Kreska za kreską
+
+Kiedy liczymy obecnych na palcach, po jednym palcu na osobę, używamy **systemu jedynkowego** (base-1). Każdy element to jedna kreska, jeden palec albo jedno nacięcie na patyku. Tak samo działa zapis na kartce przy liczeniu głosów: cztery kreski i piąta na ukos.
+
+System jedynkowy jest intuicyjny, ale nieoszczędny. Jedna ręka pozwala policzyć tylko od 0 do 5, a liczba potrzebnych symboli rośnie **liniowo**: żeby zapisać 1000, potrzeba 1000 kresek.
+
+<Kreski />
+
+Porównaj długości zapisu. W systemie dziesiętnym 1000 to cztery cyfry, w dwójkowym dziesięć. W jedynkowym tysiąc kresek. Właśnie dlatego ludzie wymyślili **systemy pozycyjne**, w których znaczenie cyfry zależy od miejsca, w którym stoi.
+
+<NaZajeciach tytul="Na ile osób starczy wam rąk?" czas="2 min">
+Ile osób policzymy na dwóch rękach, licząc po jednym palcu? Dziesięć. Zapowiedź na kolejny moduł: „Zaraz policzymy na jednej ręce do 31”.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Ile kresek potrzeba, żeby zapisać 1000 w systemie jedynkowym?"
+    akceptowane={["1000", "tysiąc"]}
+    wyjasnienie="W systemie jedynkowym każda jednostka to osobny symbol, więc 1000 to 1000 kresek."
+  />
+  <Pytanie
+    pytanie="Jak rośnie długość zapisu liczby w systemie jedynkowym?"
+    odpowiedzi={["Liniowo, razem z liczbą", "Logarytmicznie", "Wcale, zawsze jest jedna kreska"]}
+    poprawna={0}
+    wyjasnienie="Dwa razy większa liczba to dwa razy więcej kresek. W systemach pozycyjnych długość rośnie dużo wolniej."
+  />
+</Quiz>
