@@ -4,15 +4,27 @@ import * as React from "react"
 import {
   ArrowCounterClockwiseIcon,
   CheckCircleIcon,
+  LightbulbIcon,
   ShuffleIcon,
   TimerIcon,
-  XCircleIcon,
+  TrophyIcon,
 } from "@phosphor-icons/react"
 
 import { Lab, LabReadout, LabReadouts } from "@/components/kurs/lab"
 import { Button } from "@/components/ui/button"
+import { Field, FieldLabel } from "@/components/ui/field"
 import { Progress } from "@/components/ui/progress"
+import { Switch } from "@/components/ui/switch"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { asciiLabel, groupBits, toBin, toHex } from "@/lib/bity"
+import { odmiana } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
 const SUPERSCRIPT = "⁰¹²³⁴⁵⁶⁷⁸⁹"
@@ -26,17 +38,38 @@ const sup = (n: number) =>
 const teraz = () => performance.now()
 const losowa = (max: number) => Math.floor(Math.random() * (max + 1))
 
-type Challenge =
-  | { state: "idle" }
-  | { state: "running"; startedAt: number }
-  | { state: "won"; ms: number }
-  | { state: "lost" }
+/** Ile różnych liczb od 1 do max, w losowej kolejności. */
+function losowaSeria(ile: number, max: number) {
+  const zbior = new Set<number>()
+  while (zbior.size < Math.min(ile, max)) zbior.add(1 + losowa(max - 1))
+  return [...zbior]
+}
+
+const SEKUNDY = new Intl.NumberFormat("pl-PL", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+})
+const sekundy = (ms: number) => `${SEKUNDY.format(ms / 1000)} s`
+
+const LICZBY: [string, string, string] = ["liczbę", "liczby", "liczb"]
+
+/** Pauza po trafieniu, żeby było widać ułożony wzór bitów. */
+const PAUZA_MS = 1200
+
+type Wynik = { liczba: number; ms: number; zPodpowiedzia: boolean }
+
+type Seria =
+  | { stan: "start" }
+  | { stan: "gra"; runda: number; startedAt: number; podpowiedz: boolean }
+  | { stan: "trafione"; runda: number }
+  | { stan: "koniec" }
 
 /**
  * Rząd klikalnych żarówek (bitów). Pokazuje wartość dziesiętną,
  * szesnastkową, dwójkową i (dla 8 bitów) znak ASCII.
+ * Z `wyzwanie` dochodzi seria liczb do ustawienia na czas.
  *
- * @example <Zarowki bity={8} wyzwanie={42} />
+ * @example <Zarowki bity={8} wyzwanie={[5, 16, 42, 255]} />
  */
 export function Zarowki({
   bity = 8,
@@ -49,64 +82,109 @@ export function Zarowki({
   bity?: number
   /** Wartość początkowa. */
   wartosc?: number
-  /** Liczba do ustawienia w trybie wyzwania. */
-  wyzwanie?: number
-  /** Limit czasu wyzwania w sekundach. */
+  /** Liczba albo seria liczb do ustawienia, od najłatwiejszej. */
+  wyzwanie?: number | number[]
+  /** Limit czasu na jedną liczbę, w sekundach. */
   czas?: number
   tytul?: string
 }) {
   const n = Math.min(16, Math.max(1, Math.round(bity)))
   const max = 2 ** n - 1
+  // Zero jest ustawione od razu, więc w serii liczymy od 1.
+  const zadane = React.useMemo(
+    () =>
+      wyzwanie === undefined
+        ? []
+        : [wyzwanie]
+            .flat()
+            .map((x) => Math.min(max, Math.max(1, Math.round(x)))),
+    [wyzwanie, max]
+  )
+
   const [value, setValue] = React.useState(() =>
     Math.min(max, Math.max(0, wartosc))
   )
-  const [challenge, setChallenge] = React.useState<Challenge>({ state: "idle" })
+  const [liczby, setLiczby] = React.useState(zadane)
+  const [seria, setSeria] = React.useState<Seria>({ stan: "start" })
+  const [wyniki, setWyniki] = React.useState<Wynik[]>([])
+  const [wGlowie, setWGlowie] = React.useState(false)
   const [now, setNow] = React.useState(0)
+  const idBazowe = React.useId()
 
   const limitMs = czas * 1000
-  const running = challenge.state === "running"
+  const wSerii = seria.stan === "gra" || seria.stan === "trafione"
+  const cel = wSerii ? liczby[seria.runda] : undefined
 
-  // Odliczanie czasu wyzwania.
+  // Odliczanie czasu na bieżącą liczbę. Po czasie: podpowiedź, bez przerywania.
   React.useEffect(() => {
-    if (challenge.state !== "running") return
+    if (seria.stan !== "gra" || seria.podpowiedz) return
     const id = window.setInterval(() => {
       const t = teraz()
       setNow(t)
-      if (t - challenge.startedAt >= limitMs) setChallenge({ state: "lost" })
+      if (t - seria.startedAt >= limitMs)
+        setSeria({ ...seria, podpowiedz: true })
     }, 50)
     return () => window.clearInterval(id)
-  }, [challenge, limitMs])
+  }, [seria, limitMs])
+
+  // Po trafieniu chwila pauzy, potem następna liczba.
+  React.useEffect(() => {
+    if (seria.stan !== "trafione") return
+    const id = window.setTimeout(() => {
+      setValue(0)
+      const t = teraz()
+      setNow(t)
+      setSeria({
+        stan: "gra",
+        runda: seria.runda + 1,
+        startedAt: t,
+        podpowiedz: false,
+      })
+    }, PAUZA_MS)
+    return () => window.clearTimeout(id)
+  }, [seria])
 
   const update = (next: number) => {
     setValue(next)
-    if (
-      challenge.state === "running" &&
-      wyzwanie !== undefined &&
-      next === wyzwanie
-    ) {
-      setChallenge({
-        state: "won",
-        ms: teraz() - challenge.startedAt,
-      })
-    }
+    if (seria.stan !== "gra" || next !== liczby[seria.runda]) return
+    setWyniki((w) => [
+      ...w,
+      {
+        liczba: next,
+        ms: teraz() - seria.startedAt,
+        zPodpowiedzia: seria.podpowiedz,
+      },
+    ])
+    setSeria(
+      seria.runda + 1 < liczby.length
+        ? { stan: "trafione", runda: seria.runda }
+        : { stan: "koniec" }
+    )
   }
 
-  const toggleBit = (bit: number) => update(value ^ (1 << bit))
+  const toggleBit = (bit: number) => {
+    // W pauzie po trafieniu wzór zostaje na ekranie.
+    if (seria.stan === "trafione") return
+    update(value ^ (1 << bit))
+  }
 
-  const startChallenge = () => {
+  const startSerii = (nowe: number[]) => {
+    setLiczby(nowe)
+    setWyniki([])
     setValue(0)
     const t = teraz()
     setNow(t)
-    setChallenge({ state: "running", startedAt: t })
+    setSeria({ stan: "gra", runda: 0, startedAt: t, podpowiedz: false })
   }
 
   const remaining =
-    challenge.state === "running"
-      ? Math.max(0, limitMs - (now - challenge.startedAt))
+    seria.stan === "gra" && !seria.podpowiedz
+      ? Math.max(0, limitMs - (now - seria.startedAt))
       : 0
 
   const ascii = n === 8 ? asciiLabel(value) : null
   const bits = Array.from({ length: n }, (_, i) => n - 1 - i)
+  const ukryj = wGlowie && seria.stan === "gra"
 
   return (
     <Lab
@@ -115,6 +193,9 @@ export function Zarowki({
         <>
           Kliknij żarówkę, żeby ją włączyć (1) lub wyłączyć (0). Wartość to suma
           wag włączonych żarówek.
+          {zadane.length > 1
+            ? " Potem sprawdź się w serii wyzwań pod spodem."
+            : null}
         </>
       }
       akcje={
@@ -124,7 +205,7 @@ export function Zarowki({
             size="icon-sm"
             onClick={() => update(losowa(max))}
             aria-label="Losowa wartość"
-            disabled={running}
+            disabled={wSerii}
           >
             <ShuffleIcon />
           </Button>
@@ -132,7 +213,8 @@ export function Zarowki({
             variant="ghost"
             size="icon-sm"
             onClick={() => {
-              setChallenge({ state: "idle" })
+              setSeria({ stan: "start" })
+              setWyniki([])
               setValue(0)
             }}
             aria-label="Wyzeruj"
@@ -188,7 +270,12 @@ export function Zarowki({
         </div>
 
         <LabReadouts>
-          <LabReadout label="Dziesiętnie" value={value} accent />
+          <LabReadout
+            label="Dziesiętnie"
+            value={ukryj ? "?" : value}
+            hint={ukryj ? "licz w głowie" : undefined}
+            accent
+          />
           <LabReadout
             label="Szesnastkowo"
             value={`0x${toHex(value, Math.ceil(n / 4))}`}
@@ -216,51 +303,231 @@ export function Zarowki({
           )}
         </LabReadouts>
 
-        {wyzwanie !== undefined ? (
-          <div className="flex flex-col gap-3 border border-dashed p-3 sm:flex-row sm:items-center">
-            <div className="flex flex-1 flex-col gap-2">
-              <p className="text-sm">
-                {challenge.state === "won" ? (
-                  <span className="flex items-center gap-2 font-medium text-signal-ink">
-                    <CheckCircleIcon weight="fill" className="size-5" />
-                    Brawo! {wyzwanie} w {(challenge.ms / 1000).toFixed(1)} s.
-                  </span>
-                ) : challenge.state === "lost" ? (
-                  <span className="flex items-center gap-2 font-medium text-destructive">
-                    <XCircleIcon weight="fill" className="size-5" />
-                    Czas minął. Podpowiedź: {wyzwanie} = {decompose(wyzwanie)}.
-                  </span>
-                ) : (
-                  <>
-                    <span className="font-medium">Wyzwanie:</span> ustaw{" "}
-                    <span className="font-mono font-semibold">{wyzwanie}</span>{" "}
-                    w {czas} sekund.
-                  </>
-                )}
-              </p>
-              {running ? (
-                <Progress
-                  value={(remaining / limitMs) * 100}
-                  aria-label="Pozostały czas"
-                />
-              ) : null}
+        {zadane.length ? (
+          <div className="flex flex-col gap-3 border border-dashed p-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex flex-1 flex-col gap-2">
+                <p className="text-sm" aria-live="polite">
+                  {seria.stan === "start" && liczby.length > 1 ? (
+                    <>
+                      <span className="font-medium">Seria wyzwań:</span> ustaw
+                      po kolei {odmiana(liczby.length, LICZBY)}, na każdą masz{" "}
+                      {czas} s.
+                    </>
+                  ) : seria.stan === "start" ? (
+                    <>
+                      <span className="font-medium">Wyzwanie:</span> ustaw{" "}
+                      <span className="font-mono font-semibold">
+                        {liczby[0]}
+                      </span>{" "}
+                      w {czas} s.
+                    </>
+                  ) : seria.stan === "gra" ? (
+                    <span className="flex flex-wrap items-baseline gap-x-2">
+                      {liczby.length > 1 ? (
+                        <span className="text-muted-foreground">
+                          Liczba {seria.runda + 1} z {liczby.length}:
+                        </span>
+                      ) : null}
+                      <span>
+                        ustaw{" "}
+                        <span className="font-mono text-2xl font-semibold tabular-nums">
+                          {cel}
+                        </span>
+                      </span>
+                    </span>
+                  ) : seria.stan === "trafione" ? (
+                    <span className="flex items-center gap-2 font-medium text-signal-ink">
+                      <CheckCircleIcon weight="fill" className="size-5" />
+                      Brawo! {cel} = {groupBits(toBin(cel ?? 0, n))}
+                    </span>
+                  ) : (
+                    <Podsumowanie wyniki={wyniki} />
+                  )}
+                </p>
+                {seria.stan === "gra" && seria.podpowiedz ? (
+                  <p className="flex items-start gap-2 text-sm text-amber-ink">
+                    <LightbulbIcon
+                      weight="fill"
+                      className="mt-0.5 size-4 shrink-0"
+                    />
+                    <span>
+                      Czas minął. Podpowiedź: {cel} = {decompose(cel ?? 0)}.
+                      Ustaw ją, żeby przejść dalej.
+                    </span>
+                  </p>
+                ) : null}
+                {seria.stan === "gra" && !seria.podpowiedz ? (
+                  <Progress
+                    value={(remaining / limitMs) * 100}
+                    aria-label="Pozostały czas"
+                  />
+                ) : null}
+              </div>
+              {seria.stan === "trafione" ? null : (
+                <div className="flex flex-wrap gap-2">
+                  {seria.stan === "gra" ? (
+                    <Button variant="outline" disabled>
+                      <TimerIcon data-icon="inline-start" />
+                      {sekundy(remaining)}
+                    </Button>
+                  ) : (
+                    <>
+                      <Button onClick={() => startSerii(liczby)}>
+                        <TimerIcon data-icon="inline-start" />
+                        {seria.stan === "start" ? "Start" : "Jeszcze raz"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          startSerii(losowaSeria(liczby.length, max))
+                        }
+                      >
+                        <ShuffleIcon data-icon="inline-start" />
+                        Losowe liczby
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
-            <Button
-              onClick={startChallenge}
-              variant={running ? "outline" : "default"}
-              disabled={running}
-            >
-              <TimerIcon data-icon="inline-start" />
-              {running
-                ? `${(remaining / 1000).toFixed(1)} s`
-                : challenge.state === "idle"
-                  ? "Start"
-                  : "Jeszcze raz"}
-            </Button>
+
+            {liczby.length > 1 && seria.stan !== "koniec" ? (
+              <ol
+                aria-label="Liczby w serii"
+                className="flex flex-wrap gap-1.5"
+              >
+                {liczby.map((liczba, i) => {
+                  const wynik = wyniki[i]
+                  const biezaca = seria.stan === "gra" && seria.runda === i
+                  return (
+                    <li
+                      key={i}
+                      className={cn(
+                        "flex min-w-12 flex-col items-center border px-2 py-1 font-mono text-xs tabular-nums",
+                        wynik
+                          ? wynik.zPodpowiedzia
+                            ? "border-amber bg-amber-soft text-amber-ink"
+                            : "border-signal bg-signal-soft text-signal-ink"
+                          : biezaca
+                            ? "border-foreground font-semibold"
+                            : "border-dashed text-muted-foreground"
+                      )}
+                    >
+                      <span className="text-sm">{liczba}</span>
+                      <span className="text-[0.625rem]">
+                        {wynik
+                          ? sekundy(wynik.ms)
+                          : biezaca
+                            ? "teraz"
+                            : "\u00a0"}
+                      </span>
+                    </li>
+                  )
+                })}
+              </ol>
+            ) : null}
+
+            {seria.stan === "koniec" && liczby.length > 1 ? (
+              <Table className="font-mono text-xs tabular-nums">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>liczba</TableHead>
+                    <TableHead>dwójkowo</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      suma wag
+                    </TableHead>
+                    <TableHead className="text-right">czas</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {wyniki.map((w, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="font-semibold">
+                        {w.liczba}
+                      </TableCell>
+                      <TableCell>{groupBits(toBin(w.liczba, n))}</TableCell>
+                      <TableCell className="hidden whitespace-normal sm:table-cell">
+                        {decompose(w.liczba)}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          "text-right",
+                          w.zPodpowiedzia ? "text-amber-ink" : "text-signal-ink"
+                        )}
+                      >
+                        <span className="inline-flex items-center gap-1">
+                          {w.zPodpowiedzia ? (
+                            <LightbulbIcon weight="fill" className="size-3.5" />
+                          ) : null}
+                          {sekundy(w.ms)}
+                          {w.zPodpowiedzia ? (
+                            <span className="sr-only">, z podpowiedzią</span>
+                          ) : null}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : null}
+
+            {seria.stan === "koniec" && wyniki.some((w) => w.zPodpowiedzia) ? (
+              <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <LightbulbIcon
+                  weight="fill"
+                  className="size-3.5 text-amber-ink"
+                />
+                ustawione po podpowiedzi, czyli po czasie. Spróbuj jeszcze raz!
+              </p>
+            ) : null}
+
+            {!wSerii ? (
+              <Field orientation="horizontal" className="w-fit">
+                <Switch
+                  id={`${idBazowe}-w-glowie`}
+                  checked={wGlowie}
+                  onCheckedChange={(c) => setWGlowie(c)}
+                />
+                <FieldLabel
+                  htmlFor={`${idBazowe}-w-glowie`}
+                  className="min-h-10 text-sm"
+                >
+                  Trudniej: ukryj wartość dziesiętną i licz w głowie
+                </FieldLabel>
+              </Field>
+            ) : null}
           </div>
         ) : null}
       </div>
     </Lab>
+  )
+}
+
+/** Wynik całej serii: ile w limicie czasu i łączny czas. */
+function Podsumowanie({ wyniki }: { wyniki: Wynik[] }) {
+  const wCzasie = wyniki.filter((w) => !w.zPodpowiedzia).length
+  const razem = wyniki.reduce((s, w) => s + w.ms, 0)
+  if (wyniki.length === 1) {
+    return (
+      <span className="flex items-center gap-2 font-medium text-signal-ink">
+        <CheckCircleIcon weight="fill" className="size-5" />
+        Brawo! {wyniki[0].liczba} w {sekundy(razem)}.
+      </span>
+    )
+  }
+  return (
+    <span
+      className={cn(
+        "flex items-center gap-2 font-medium",
+        wCzasie === wyniki.length ? "text-signal-ink" : "text-foreground"
+      )}
+    >
+      <TrophyIcon weight="fill" className="size-5 shrink-0" />
+      {wCzasie === wyniki.length
+        ? `Komplet! Wszystkie ${odmiana(wyniki.length, LICZBY)} w limicie czasu, razem ${sekundy(razem)}.`
+        : `Seria ukończona: ${wCzasie} z ${wyniki.length} w limicie czasu, razem ${sekundy(razem)}.`}
+    </span>
   )
 }
 

@@ -1,11 +1,11 @@
 ---
-title: "System dwójkowy: bity, żarówki, tranzystory"
+title: "System dwójkowy: bity, bajty, system binarny - jak działa komputer"
 nav: System dwójkowy
-description: Zera i jedynki, czyli język komputerów. Zapis pozycyjny w podstawie 2, bit, bajt i zakres 0–255.
+description: Zera i jedynki, czyli język komputerów. Zapis pozycyjny w systemie binarnym, bit, bajt i zakres 0–255.
 czas: 14
 ---
 
-<Cel>Opanować zapis pozycyjny w podstawie 2: bit, bajt i zakres 0–255.</Cel>
+<Cel>Opanować zapis pozycyjny w systemie dwójkowym (binarnym): bit, bajt i zakres 0–255.</Cel>
 
 <Pojecia
   lista={[
@@ -29,7 +29,7 @@ waga    ×100    ×10    ×1
 suma    100  +  20  +  3  = 123
 ```
 
-Cyfr jest dziesięć (0–9), bo podstawa wynosi 10. W **systemie dwójkowym** wszystko działa tak samo, tylko podstawą jest 2: cyfry to 0 i 1, a wagi pozycji to kolejne potęgi dwójki (1, 2, 4, 8, 16…).
+Cyfr jest dziesięć (0–9), bo podstawa wynosi 10. W **systemie dwójkowym** wszystko działa tak samo, z tym że cyfry to 0 i 1, a wagi pozycji to kolejne potęgi dwójki (1, 2, 4, 8, 16…).
 
 ## Bit: zero albo jedynka
 
@@ -62,7 +62,9 @@ Trzy bity dają osiem wartości, od 0 do 7. Żeby zapisać 8, potrzeba czwartej 
 
 Jak zamienić liczbę na zapis dwójkowy? Idź od największej wagi: jeśli waga mieści się w tym, co zostało, zapal żarówkę i odejmij. Na przykład 42 = 32 + 8 + 2, więc `00101010`.
 
-<Zarowki bity={8} wyzwanie={42} />
+Teraz twoja kolej. Seria wyzwań zaczyna się od łatwych liczb, a kończy na 255. Jeśli nie zdążysz, dostaniesz podpowiedź. Kiedy seria pójdzie gładko, kliknij „Losowe liczby” albo włącz liczenie w głowie.
+
+<Zarowki bity={8} wyzwanie={[5, 16, 31, 42, 72, 100, 170, 255]} />
 
 <Wskazowka>
 Zauważ wzór: n bitów pozwala zapisać 2ⁿ wartości, od 0 do 2ⁿ − 1. Każdy dodatkowy bit **podwaja** zakres.

@@ -1,7 +1,7 @@
 ---
-title: "ASCII: umowa, że liczby oznaczają litery"
+title: "ASCII: założenie, w którym liczby oznaczają litery"
 nav: ASCII
-description: Te same bity mogą znaczyć liczbę albo literę. ASCII to umowa, która mówi, jak je czytać. 72 73 33 to „HI!”.
+description: Te same bity mogą znaczyć liczbę albo literę. ASCII to założenie, które mówi, jak je czytać. 72 73 33 to „HI!”.
 czas: 8
 ---
 
@@ -19,7 +19,7 @@ czas: 8
 
 Komputer przechowuje tylko bity. Skoro te same bity mogą oznaczać liczby, potrzebna jest **umowa**, które liczby oznaczają które litery. Taką umową jest standard **ASCII**. W nim **A** to 65, czyli `01000001`.
 
-Bajty 72, 73 i 33 oznaczają więc napis **„HI!”**:
+72, 73 i 33 oznaczają więc napis **„HI!”**:
 
 | znak | H | I | ! |
 |---|---|---|---|
@@ -40,7 +40,7 @@ ASCII używa **128 kodów** (od 0 do 127), choć bajt pozwala na 256. Kody 0–3
 
 ## Wielka litera, mała litera: jeden bit różnicy
 
-**A = 65, a = 97.** Różnica wynosi 32, czyli 2⁵. W zapisie dwójkowym `01000001` i `01100001` różnią się dokładnie jednym bitem, tym o wadze 32. Zmiana wielkości litery to więc przełączenie jednego bitu. Projektanci ASCII zrobili to celowo.
+**A = 65, a = 97.** Różnica wynosi 32, czyli 2⁵. W zapisie dwójkowym `01000001` i `01100001` różnią się dokładnie jednym bitem, tym o wadze 32. Zmiana wielkości litery to przełączenie jednego bitu. Projektanci ASCII zrobili to celowo.
 
 Podobny trik jest z cyframi: znak „0” ma kod 48, „1” ma 49 i tak dalej. Wartość cyfry to więc **kod − 48**. Przyda się to w języku C.
 

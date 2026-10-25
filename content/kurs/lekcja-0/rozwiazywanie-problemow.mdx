@@ -1,11 +1,11 @@
 ---
 title: Programowanie to rozwiązywanie problemów
 nav: Rozwiązywanie problemów
-description: Każdy program bierze dane wejściowe, przetwarza ja i wytwarza wyjście. To, co pomiędzy, to czarna skrzynka, czyli algorytm.
+description: Każdy program bierze dane wejściowe, przetwarza je i generuje dane wyjściowe. To, co znajduje się pomiędzy, to „czarna skrzynka”, czyli algorytm.
 czas: 5
 ---
 
-<Cel>Poznać podstawowy model każdego programu: wejście, czarna skrzynka, wyjście.</Cel>
+<Cel>Poznać podstawowy model każdego programu: wejście, algorytm, wyjście.</Cel>
 
 <Pojecia
   lista={[
@@ -17,26 +17,26 @@ czas: 5
   ]}
 />
 
-## Wejście, czarna skrzynka, wyjście
+## Wejście, algorytm, wyjście
 
-Programowanie to wzięcie **wejścia** i wytworzenie **wyjścia**. To, co dzieje się pomiędzy, nazywamy „czarną skrzynką”, i właśnie jej poświęcony jest cały kurs.
+Programowanie to wzięcie **wejścia** i wytworzenie **wyjścia**. To, co dzieje się pomiędzy, nazywamy „czarną skrzynką” i właśnie jej poświęcona jest lekcja.
 
 ```txt title="Model każdego programu"
 [wejście] ──► [ ??? algorytm ??? ] ──► [wyjście]
 ```
 
-Wejściem może być tekst wpisany z klawiatury, kliknięcie, zdjęcie albo odczyt z czujnika. Wyjściem może być liczba na ekranie, dźwięk, ruch robota albo trasa w nawigacji. Czarna skrzynka to **algorytm**: przepis krok po kroku, który zamienia jedno w drugie.
+Wejściem może być tekst wpisany z klawiatury, kliknięcie, zdjęcie albo odczyt z czujnika. Wyjściem może być liczba na ekranie, dźwięk, ruch robota albo trasa w nawigacji. Czarna skrzynka to **algorytm**: przepis krok po kroku, który zamienia jeden typ danych w inny.
 
-Wybierz algorytm, wpisz coś na wejściu i zobacz, co wychodzi:
+Wybierz algorytm, wpisz coś na wejściu i zobacz, co z tego wyjdzie:
 
 <CzarnaSkrzynka />
 
 ## Najpierw reprezentacja
 
-Zanim napiszemy jakikolwiek algorytm, musimy ustalić, **jak zapisać** dane, na których będzie pracował: liczby, tekst, kolor, dźwięk. Komputer nie „widzi” litery A ani koloru czerwonego. Ma tylko prąd: płynie albo nie płynie. Kilka kolejnych modułów odpowiada na pytanie, jak z tego zbudować wszystko inne.
+Zanim napiszemy jakikolwiek algorytm, musimy ustalić, **jak zapisać** dane, na których będzie pracował: liczby, tekst, kolor, dźwięk. Komputer nie „widzi” litery A ani koloru czerwonego. Ma tylko prąd: płynie albo nie płynie. Kilka kolejnych modułów odpowiada na pytanie, jak w oparciou o tę zasadę możemy zbudować wszystko za pomocą komputera.
 
 <NaZajeciach tytul="Sprawdźmy obecność" czas="3 min">
-Wejście to ludzie na sali, wyjście to jedna liczba. Liczymy na palcach, po jednym palcu na osobę. Jaki to algorytm? Ile kroków zajmie przy 30 osobach, a ile przy 300?
+Wejście to osoby na sali, wyjście to jedna liczba. Liczymy na palcach, po jednym palcu na osobę. Jaki to algorytm? Ile kroków zajmie przy 30 osobach, a ile przy 300?
 </NaZajeciach>
 
 <Quiz>

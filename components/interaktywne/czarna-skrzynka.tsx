@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import {
   ArrowCounterClockwiseIcon,
   ArrowDownIcon,
@@ -12,6 +13,14 @@ import {
 import { Lab, LabLabel } from "@/components/kurs/lab"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatPL, groupBits } from "@/lib/bity"
 import { cn } from "@/lib/utils"
@@ -20,38 +29,70 @@ import { odmiana } from "./wstep-dane"
 
 type Algorytm = "litery" | "wielkie" | "odwroc" | "dwojkowy"
 
+/** Linia pseudokodu; `poziom` to głębokość wcięcia (0, 1, 2). */
+type Linia = { tekst: string; poziom?: number }
+
 const ALGORYTMY: {
   id: Algorytm
   etykieta: string
-  pseudokod: string
+  pseudokod: Linia[]
 }[] = [
   {
     id: "litery",
     etykieta: "Policz litery",
-    pseudokod:
-      "licznik ← 0; dla każdego znaku: jeśli to litera, licznik ← licznik + 1; zwróć licznik",
+    pseudokod: [
+      { tekst: "Weź tekst z wejścia" },
+      { tekst: "Ustaw licznik na 0" },
+      { tekst: "Dla każdego znaku tekstu, od lewej do prawej:" },
+      { tekst: "Jeśli znak jest literą", poziom: 1 },
+      { tekst: "Dodaj 1 do licznika", poziom: 2 },
+      { tekst: "Podaj licznik na wyjście" },
+    ],
   },
   {
     id: "wielkie",
     etykieta: "WIELKIE LITERY",
-    pseudokod:
-      "dla każdego znaku: jeśli to mała litera, zamień ją na wielką; zwróć wynik",
+    pseudokod: [
+      { tekst: "Weź tekst z wejścia" },
+      { tekst: "Zacznij od pustego wyniku" },
+      { tekst: "Dla każdego znaku tekstu, od lewej do prawej:" },
+      { tekst: "Jeśli znak jest małą literą", poziom: 1 },
+      { tekst: "Dopisz do wyniku tę literę, ale wielką", poziom: 2 },
+      { tekst: "W przeciwnym razie", poziom: 1 },
+      { tekst: "Dopisz do wyniku znak bez zmian", poziom: 2 },
+      { tekst: "Podaj wynik na wyjście" },
+    ],
   },
   {
     id: "odwroc",
     etykieta: "Odwróć tekst",
-    pseudokod:
-      "wynik ← pusty; dla każdego znaku od ostatniego do pierwszego: dopisz go do wyniku; zwróć wynik",
+    pseudokod: [
+      { tekst: "Weź tekst z wejścia" },
+      { tekst: "Zacznij od pustego wyniku" },
+      { tekst: "Dla każdego znaku tekstu, od prawej do lewej:" },
+      { tekst: "Dopisz znak na koniec wyniku", poziom: 1 },
+      { tekst: "Podaj wynik na wyjście" },
+    ],
   },
   {
     id: "dwojkowy",
     etykieta: "Na dwójkowy",
-    pseudokod:
-      "dopóki n > 0: zapisz resztę z dzielenia n przez 2, n ← n div 2; odczytaj reszty od końca",
+    pseudokod: [
+      { tekst: "Weź liczbę z wejścia" },
+      { tekst: "Zacznij od pustego wyniku" },
+      { tekst: "Podziel liczbę przez 2" },
+      { tekst: "Dopisz resztę z dzielenia (0 albo 1) na początek wyniku" },
+      { tekst: "Wynik dzielenia, bez reszty, to teraz nowa liczba" },
+      { tekst: "Jeśli liczba jest większa od 0" },
+      { tekst: "Wróć do linii 3", poziom: 1 },
+      { tekst: "Podaj wynik na wyjście" },
+    ],
   },
 ]
 
 const CZAS_PRZETWARZANIA = 350
+/** Tyle kroków pokazuje tabela „krok po kroku”; resztę streszczamy. */
+const MAKS_KROKOW = 10
 
 type Wynik =
   { ok: true; tekst: string; dopisek?: string } | { ok: false; blad: string }
@@ -63,6 +104,21 @@ function znaki(tekst: string): string[] {
     return Array.from(seg.segment(tekst), (s) => s.segment)
   }
   return Array.from(tekst)
+}
+
+const jestLitera = (z: string) => /\p{L}/u.test(z)
+const jestMala = (z: string) => z !== z.toLocaleUpperCase("pl-PL")
+
+/** Poprawna liczba z wejścia albo komunikat błędu. */
+function liczbaZWejscia(liczba: string): number | string {
+  const s = liczba.trim()
+  if (s === "") return "Wpisz liczbę, np. 50."
+  if (!/^\d+$/.test(s))
+    return "Tylko cyfry 0–9: liczba całkowita, bez minusa i przecinka."
+  const n = Number(s)
+  if (!Number.isSafeInteger(n))
+    return `Za duża liczba (maks. ${formatPL(Number.MAX_SAFE_INTEGER)}).`
+  return n
 }
 
 function uruchom(alg: Algorytm, tekst: string, liczba: string): Wynik {
@@ -80,19 +136,8 @@ function uruchom(alg: Algorytm, tekst: string, liczba: string): Wynik {
     case "odwroc":
       return { ok: true, tekst: znaki(tekst).reverse().join("") }
     case "dwojkowy": {
-      const s = liczba.trim()
-      if (s === "") return { ok: false, blad: "Wpisz liczbę, np. 50." }
-      if (!/^\d+$/.test(s))
-        return {
-          ok: false,
-          blad: "Tylko cyfry 0–9: liczba całkowita, bez minusa i przecinka.",
-        }
-      const n = Number(s)
-      if (!Number.isSafeInteger(n))
-        return {
-          ok: false,
-          blad: `Za duża liczba (maks. ${formatPL(Number.MAX_SAFE_INTEGER)}).`,
-        }
+      const n = liczbaZWejscia(liczba)
+      if (typeof n === "string") return { ok: false, blad: n }
       const bin = n.toString(2)
       return {
         ok: true,
@@ -103,9 +148,209 @@ function uruchom(alg: Algorytm, tekst: string, liczba: string): Wynik {
   }
 }
 
+/* ---------- Krok po kroku ---------- */
+
+/** Komórka tabeli: tekst albo znak, który trzeba pokazać wprost (np. spacja). */
+type Komorka = string | { znak: string }
+
+type Slad = {
+  kolumny: string[]
+  wiersze: Komorka[][]
+  /** Ile kroków nie zmieściło się w tabeli. */
+  pominiete: number
+  /** Wynik ostatniego kroku, gdy tabela jest przycięta. */
+  koniec?: Komorka
+  /** Gdy nie ma kroków do pokazania. */
+  pusty?: string
+}
+
+const takNie = (b: boolean) => (b ? "tak" : "nie")
+
+/** Pokazuje najwyżej `MAKS_KROKOW` wierszy, ale zapamiętuje wynik końcowy. */
+function przytnij(
+  kolumny: string[],
+  wiersze: Komorka[][],
+  pusty?: string
+): Slad {
+  const pominiete = Math.max(0, wiersze.length - MAKS_KROKOW)
+  return {
+    kolumny,
+    wiersze: wiersze.slice(0, MAKS_KROKOW),
+    pominiete,
+    koniec: pominiete > 0 ? wiersze.at(-1)?.at(-1) : undefined,
+    pusty,
+  }
+}
+
+/** Ten sam algorytm co w `uruchom`, ale zapisuje każdy obrót pętli. */
+function slad(alg: Algorytm, tekst: string, liczba: string): Slad {
+  if (alg === "dwojkowy") {
+    const kolumny = ["liczba", "÷ 2", "reszta", "wynik"]
+    let n = liczbaZWejscia(liczba)
+    if (typeof n === "string")
+      return {
+        kolumny,
+        wiersze: [],
+        pominiete: 0,
+        pusty: "Popraw wejście, żeby zobaczyć kroki.",
+      }
+    const wiersze: Komorka[][] = []
+    let wynik = ""
+    do {
+      const reszta = n % 2
+      const iloraz = Math.floor(n / 2)
+      wynik = String(reszta) + wynik
+      wiersze.push([formatPL(n), formatPL(iloraz), String(reszta), wynik])
+      n = iloraz
+    } while (n > 0)
+    return przytnij(kolumny, wiersze)
+  }
+
+  const z = znaki(tekst)
+  const pusty =
+    z.length === 0 ? "Pusty tekst: pętla nie wykona się ani razu." : undefined
+  const wiersze: Komorka[][] = []
+  let kolumny: string[]
+
+  if (alg === "litery") {
+    kolumny = ["znak", "litera?", "licznik"]
+    let licznik = 0
+    for (const znak of z) {
+      if (jestLitera(znak)) licznik += 1
+      wiersze.push([{ znak }, takNie(jestLitera(znak)), String(licznik)])
+    }
+  } else if (alg === "wielkie") {
+    kolumny = ["znak", "mała litera?", "wynik"]
+    let wynik = ""
+    for (const znak of z) {
+      wynik += jestMala(znak) ? znak.toLocaleUpperCase("pl-PL") : znak
+      wiersze.push([{ znak }, takNie(jestMala(znak)), { znak: wynik }])
+    }
+  } else {
+    kolumny = ["znak", "wynik"]
+    let wynik = ""
+    for (const znak of [...z].reverse()) {
+      wynik += znak
+      wiersze.push([{ znak }, { znak: wynik }])
+    }
+  }
+
+  return przytnij(kolumny, wiersze, pusty)
+}
+
+/** Spacje jako „␣”, żeby było je widać w tabeli. */
+function Widoczny({ znak }: { znak: string }) {
+  if (znak === " ")
+    return (
+      <>
+        <span className="text-muted-foreground" aria-hidden>
+          ␣
+        </span>
+        <span className="sr-only">spacja</span>
+      </>
+    )
+  return <span className="whitespace-pre">{znak.replace(/ /g, "␣")}</span>
+}
+
+/** Pogrubia słowa sterujące, żeby było widać szkielet algorytmu. */
+const STERUJACE = /^(Dla każdego|Jeśli|W przeciwnym razie|Wróć do linii \d+)/
+
+function Pseudokod({ linie }: { linie: Linia[] }) {
+  return (
+    <ol className="flex flex-col font-mono text-xs/relaxed sm:text-[0.8125rem]/relaxed">
+      {linie.map((l, i) => {
+        const m = l.tekst.match(STERUJACE)
+        const wisi = (l.poziom ?? 0) * 4
+        return (
+          <li key={i} className="grid grid-cols-[2.5ch_minmax(0,1fr)] gap-x-3">
+            <span
+              className="text-right text-amber-ink/70 select-none"
+              aria-hidden
+            >
+              {i + 1}
+            </span>
+            <span style={{ paddingLeft: `${wisi}ch` }}>
+              {m ? (
+                <>
+                  <span className="font-semibold text-amber-ink">{m[0]}</span>
+                  {l.tekst.slice(m[0].length)}
+                </>
+              ) : (
+                l.tekst
+              )}
+            </span>
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+function KrokPoKroku({ dane }: { dane: Slad }) {
+  if (dane.pusty && dane.wiersze.length === 0)
+    return <p className="text-xs/relaxed text-muted-foreground">{dane.pusty}</p>
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Table className="font-mono">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-10 text-muted-foreground">krok</TableHead>
+            {dane.kolumny.map((k) => (
+              <TableHead key={k} className="text-muted-foreground">
+                {k}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {dane.wiersze.map((w, i) => (
+            <TableRow key={i}>
+              <TableCell className="text-muted-foreground tabular-nums">
+                {i + 1}
+              </TableCell>
+              {w.map((k, j) => (
+                <TableCell
+                  key={j}
+                  className={cn(
+                    "tabular-nums",
+                    j === w.length - 1 && "font-semibold text-signal-ink"
+                  )}
+                >
+                  {typeof k === "string" ? k : <Widoczny znak={k.znak} />}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {dane.pominiete > 0 ? (
+        <p className="text-xs text-muted-foreground">
+          … i jeszcze {dane.pominiete}{" "}
+          {odmiana(dane.pominiete, "krok", "kroki", "kroków")} według tego
+          samego schematu.
+          {dane.koniec !== undefined ? (
+            <>
+              {" "}
+              Na końcu:{" "}
+              <span className="font-mono font-semibold text-signal-ink">
+                {typeof dane.koniec === "string" ? (
+                  dane.koniec
+                ) : (
+                  <Widoczny znak={dane.koniec.znak} />
+                )}
+              </span>
+            </>
+          ) : null}
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
 /**
  * Model „wejście → czarna skrzynka → wyjście”. Wybierz algorytm, zmień
- * wejście i obserwuj wyjście; „Zajrzyj do środka” odsłania pseudokod.
+ * wejście i obserwuj wyjście; „Zajrzyj do środka” odsłania pseudokod
+ * i tabelę pokazującą, jak algorytm krok po kroku przetwarza wejście.
  *
  * @example <CzarnaSkrzynka />
  */
@@ -141,7 +386,7 @@ export function CzarnaSkrzynka() {
   return (
     <Lab
       tytul="Czarna skrzynka"
-      opis="Wejście trafia do skrzynki, a ze skrzynki wychodzi wyjście. Wybierz algorytm, zmień wejście i zgadnij, co dzieje się w środku."
+      opis="Wejście trafia do skrzynki, a ze skrzynki wychodzi wyjście. Wybierz algorytm, zmień wejście i zgadnij, co dzieje się w środku. Potem zajrzyj do środka i sprawdź, czy dobrze zgadujesz."
       akcje={
         <Button
           variant="ghost"
@@ -221,9 +466,10 @@ export function CzarnaSkrzynka() {
             <LabLabel aria-hidden>Skrzynka</LabLabel>
             <div
               className={cn(
-                "relative flex size-24 flex-col items-center justify-center gap-1 overflow-hidden bg-primary text-primary-foreground shadow-[0_6px_0_-2px_var(--border)] sm:size-28",
-                otwarta &&
-                  "outline-2 outline-offset-4 outline-amber outline-dashed"
+                "relative flex size-24 flex-col items-center justify-center gap-1 overflow-hidden shadow-[0_6px_0_-2px_var(--border)] transition-colors sm:size-28",
+                otwarta
+                  ? "bg-amber-soft text-amber-ink outline-2 outline-offset-4 outline-amber outline-dashed"
+                  : "bg-primary text-primary-foreground"
               )}
               aria-hidden
             >
@@ -233,10 +479,10 @@ export function CzarnaSkrzynka() {
                   przetwarza && "animate-pulse"
                 )}
               >
-                ???
+                {otwarta ? "↓" : "???"}
               </span>
               <span className="font-mono text-[0.625rem] tracking-widest uppercase opacity-70">
-                algorytm
+                {otwarta ? "zajrzyj niżej" : "algorytm"}
               </span>
               {przetwarza ? (
                 <span
@@ -285,7 +531,7 @@ export function CzarnaSkrzynka() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <Button
             variant="outline"
             className="self-start"
@@ -302,13 +548,30 @@ export function CzarnaSkrzynka() {
           </Button>
           <div id={kodId} hidden={!otwarta}>
             {otwarta ? (
-              <p className="border-l-2 border-amber bg-amber-soft px-3 py-2 font-mono text-xs/relaxed sm:text-[0.8125rem]/relaxed">
-                <span className="text-amber-ink select-none" aria-hidden>
-                  {"> "}
-                </span>
-                <span className="sr-only">Pseudokod: </span>
-                {opis.pseudokod}
-              </p>
+              <div className="flex flex-col gap-4 border-l-2 border-amber bg-amber-soft p-3 sm:p-4">
+                <section className="flex flex-col gap-2" aria-label="Pseudokod">
+                  <LabLabel>Pseudokod · {opis.etykieta}</LabLabel>
+                  <Pseudokod linie={opis.pseudokod} />
+                </section>
+                <section
+                  className="flex flex-col gap-2"
+                  aria-label="Krok po kroku dla twojego wejścia"
+                >
+                  <LabLabel>Krok po kroku dla twojego wejścia</LabLabel>
+                  <KrokPoKroku dane={slad(alg, tekst, liczba)} />
+                </section>
+                <p className="text-xs/relaxed text-muted-foreground">
+                  Pseudokod to algorytm zapisany zwykłymi zdaniami, krok po
+                  kroku. Wrócimy do niego w module{" "}
+                  <Link
+                    href="/kurs/lekcja-0/pseudokod"
+                    className="text-foreground underline underline-offset-2 hover:decoration-signal"
+                  >
+                    Pseudokod
+                  </Link>
+                  .
+                </p>
+              </div>
             ) : null}
           </div>
         </div>

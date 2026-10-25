@@ -14,6 +14,8 @@ czas: 10
     ["prompt", "prompt"],
     ["prompt systemowy", "system prompt"],
     ["biblioteka", "library"],
+    ["klucz API", "API key"],
+    ["żądanie HTTP", "HTTP request"],
     ["zintegrowane środowisko programistyczne", "IDE"],
   ]}
 />
@@ -24,13 +26,15 @@ Zaczynamy od sztucznej inteligencji, bo to z nią każda osoba ucząca się dzi�
 
 ## Program, który rozmawia z modelem
 
-Żeby porozmawiać z modelem językowym z poziomu kodu, wystarczy kilka linijek Pythona. Program `chat.py` napisany w edytorze VS Code:
+Żeby porozmawiać z modelem językowym z poziomu kodu, wystarczy kilka linijek Pythona. Na zajęciach używamy **Claude'a**, modelu firmy Anthropic. Program `chat.py` napisany w edytorze VS Code:
 
-1. importuje bibliotekę OpenAI i tworzy klienta,
-2. wysyła do modelu `gpt-5` pytanie „W jednym zdaniu: czym jest programowanie?”,
+1. importuje bibliotekę `anthropic` i tworzy klienta,
+2. wysyła do modelu `claude-opus-5-5` pytanie „W jednym zdaniu: czym jest programowanie?”,
 3. wypisuje odpowiedź.
 
-W kolejnej wersji pytanie zadaje już użytkownik (`input("Prompt: ")`), a na koniec dochodzi **monit systemowy**: „Odpowiadaj jednym zdaniem. Udawaj, że jesteś kotem”. Morał: w około dziesięciu linijkach da się zbudować bardzo potężny program. W praktyce trzeba jeszcze założyć konto, zdobyć klucz API i skonfigurować środowisko, więc na razie traktuj ten przykład poglądowo.
+W kolejnej wersji pytanie zadaje już użytkownik (`input("Prompt: ")`), a na koniec dochodzi **monit systemowy**: „Odpowiadaj jednym zdaniem. Udawaj, że jesteś kotem”. Morał: w kilkunastu linijkach da się zbudować bardzo potężny program.
+
+Pod spodem każdy taki program robi to samo: wysyła przez internet **żądanie HTTP** z treścią w formacie JSON i dostaje odpowiedź, też w JSON-ie. Dlatego w laboratorium poniżej zobaczysz to samo żądanie w trzech postaciach: jako surowy JSON, w Pythonie i w czystym JavaScripcie. Do wysłania żądania potrzebny jest **klucz API**, czyli hasło do usługi. Na zajęciach ma go prowadzący i w zakładce „Na żywo” wyśle żądanie prosto z przeglądarki.
 
 **Monit systemowy** ustala zasady zachowania modelu (rolę, ton, ograniczenia). **Monit użytkownika** to konkretne pytanie. Zobacz, jak oba trafiają do żądania wysyłanego do modelu:
 
@@ -59,8 +63,18 @@ Możesz prosić AI o **wyjaśnienia** pojęć, błędów i przykładów. Nie pro
 </Ramka>
 
 <NaZajeciach tytul="Ten sam czat, dwie instrukcje" czas="7 min">
-Zadajemy to samo pytanie czatowi AI dwa razy: bez instrukcji systemowej i z instrukcją „odpowiadaj jak kot”. Pytanie do sali: co tu jest **wejściem**, co **wyjściem**, a co **czarną skrzynką**?
+Wysyłamy do Claude'a to samo pytanie dwa razy: z monitem systemowym „Udawaj, że jesteś kotem” i bez niego (przełącznik przy polu monitu). Obie odpowiedzi zostają na ekranie, więc łatwo je porównać. Pytania do sali: co tu jest **wejściem**, co **wyjściem**, a co **czarną skrzynką**? Co zmieniło jedno zdanie w monicie systemowym?
 </NaZajeciach>
+
+<DlaProwadzacego tytul="Pokaz na żywo: przygotowanie i plan B">
+- **Klucz API.** W Claude Console (platform.claude.com) utwórz osobny klucz tylko na zajęcia, doładuj konto i ustaw niski limit wydatków. Po semestrze klucz unieważnij.
+- **Koszt.** Jedno pytanie z odpowiedzią to kilkaset tokenów, czyli ułamek centa.
+- **Plan A:** `chat.py` z zakładki „Python” na komputerze prowadzącego.
+- **Plan B:** ten sam program w JavaScripcie: `node chat.mjs` albo konsola przeglądarki (F12). Nie trzeba niczego instalować.
+- **Plan C:** zakładka „Na żywo” w laboratorium. Wystarczy przeglądarka i klucz.
+- **Sieć.** Sprawdź pokaz z sali przed zajęciami: sieć uczelniana bywa blokowana. Zapas to hotspot z telefonu.
+- **Rzutnik.** Pole klucza w zakładce „Na żywo” jest maskowane, ale klucz wpisany w kod JavaScriptu albo w terminal widać w całości. Na czas wklejania zatrzymaj obraz rzutnika.
+</DlaProwadzacego>
 
 <Dociekliwi tytul="Jak zrobić z AI korepetytora">
 Wklej do czatu (albo do pola monitu systemowego) instrukcję w rodzaju:
@@ -72,7 +86,7 @@ pojęcia na prostych przykładach i proś, żebym sam(a) spróbował(a)
 następnego kroku.
 ```
 
-Potem sprawdź w laboratorium powyżej, jak zmienia się żądanie wysyłane do modelu, gdy dopiszesz taki monit.
+Wklej ją w pole monitu systemowego w laboratorium powyżej i zobacz, jak zmienia się żądanie. Z kluczem API sprawdzisz w zakładce „Na żywo”, jak Claude odpowiada w tym trybie.
 </Dociekliwi>
 
 <Quiz>
@@ -85,6 +99,16 @@ Potem sprawdź w laboratorium powyżej, jak zmienia się żądanie wysyłane do 
     ]}
     poprawna={0}
     wyjasnienie="Monit systemowy to „regulamin” rozmowy (np. „odpowiadaj jak kot”), a monit użytkownika to treść pytania."
+  />
+  <Pytanie
+    pytanie="Program w Pythonie i program w JavaScripcie zadają Claude'owi to samo pytanie. Co je łączy?"
+    odpowiedzi={[
+      "Oba wysyłają to samo żądanie HTTP z treścią w JSON-ie",
+      "Nic: każdy język rozmawia z innym modelem",
+      "Oba muszą działać na tym samym systemie operacyjnym",
+    ]}
+    poprawna={0}
+    wyjasnienie="Język programowania to tylko narzędzie. Do serwera trafia zawsze to samo: adres, nagłówki z kluczem API i ciało żądania w JSON-ie."
   />
   <Pytanie
     pytanie="Na czym operuje model językowy w środku?"
