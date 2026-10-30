@@ -1,7 +1,7 @@
 ---
-title: Reprezentacja mediów i granice reprezentacji
+title: Reprezentacja mediów i granice danych
 nav: Media i przepełnienia
-description: Obraz, wideo i dźwięk to też liczby. Ile ważą, po co je kompresujemy i co się dzieje, gdy liczbie zabraknie bitów.
+description: Obraz, wideo i dźwięk to też liczby. Ile "ważą", po co je kompresujemy i co się dzieje, gdy zabraknie nam bitów?
 czas: 16
 ---
 
@@ -23,9 +23,9 @@ czas: 16
 
 ## Wszystko jest liczbą
 
-**Obraz** to siatka pikseli RGB. **Wideo** to sekwencja obrazów wyświetlanych jeden po drugim, jak w kartkowym flipbooku. **Muzykę** zapisuje się bajtami na dwa sposoby: jako nuty-liczby (wysokość, długość, głośność, jak w standardzie MIDI, którego numerów nut używa rozszerzenie „Muzyka” w Scratchu) albo przez **próbkowanie**, czyli wielokrotne mierzenie fali dźwiękowej w każdej sekundzie.
+**Obraz** to siatka pikseli RGB. **Wideo** to sekwencja obrazów wyświetlanych jeden po drugim, jak w narysowanej historyjce na rogu zeszytu (flipbooku). **Muzykę** zapisuje się bajtami na dwa sposoby: jako nuty-liczby (wysokość, długość, głośność, jak w standardzie MIDI, którego numerów nut używa rozszerzenie „Muzyka” w Scratchu) albo przez **próbkowanie**, czyli wielokrotne mierzenie fali dźwiękowej w każdej sekundzie.
 
-Kluczowa idea całej lekcji: `72 73 33` to liczby, napis albo kolor, **zależnie od umowy**. W języku C taką umowę deklaruje się jawnie jako **typ danych**: `int`, `char`, `float`.
+Kluczowa idea całej lekcji: `72 73 33` to liczby, napis albo kolor, **zależnie od umowy**. W języku C taką umowę deklaruje się jawnie jako **typ danych**: `int`, `char`, `float`. Będziemy się o tym uczyli w następnych lekcjach.
 
 ## Ile to waży i po co kompresja
 
@@ -44,7 +44,7 @@ Format płyty CD określa standard „Red Book” firm Sony i Philips z 1980 rok
 Minuta surowego wideo Full HD to ponad 11 GB. Dlatego istnieje **kompresja**:
 
 - **bezstratna** (PNG, ZIP, FLAC): po rozpakowaniu dostajesz dokładnie te same bajty,
-- **stratna** (JPEG, MP3, H.264, HEVC, AV1): wyrzuca to, czego człowiek słabo postrzega, i zyskuje dużo więcej miejsca.
+- **stratna** (JPEG, MP3, H.264, HEVC, AV1): wyrzuca to, co ma niewielki wpływ na odbiór dla człowieka, dzięki temu zyskujemy dużo więcej miejsca.
 
 ## Przepełnienie: gdy zabraknie bitów
 
@@ -74,7 +74,7 @@ JavaScript przechowuje liczby jako 64-bitowe liczby zmiennoprzecinkowe w standar
 Nie porównuj liczb zmiennoprzecinkowych operatorem `==`. Pieniądze licz w groszach, jako liczby całkowite.
 </Wskazowka>
 
-## Most do AI: tokeny
+## A jak to wygląda w AI: tokeny
 
 Modele językowe czytają **tokeny**, czyli fragmenty tekstu z przypisanymi numerami w słowniku modelu. Tokenizacja to kolejne „ASCII”, tyle że wyuczone statystycznie na ogromnych zbiorach tekstów.
 

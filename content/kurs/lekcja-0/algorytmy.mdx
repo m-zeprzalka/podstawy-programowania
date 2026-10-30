@@ -1,7 +1,7 @@
 ---
-title: "Algorytmy: książka telefoniczna"
+title: "Algorytmy"
 nav: Algorytmy
-description: Trzy sposoby szukania nazwiska w książce telefonicznej. Wszystkie znajdą osobę, ale jeden robi to w 20 krokach zamiast miliona.
+description: Możemy używać różnych algorytmów na osiągnięcie tego samego rezultatu. W tym rozdziale porównamy to na przykładzie Trzech sposobów szukania nazwiska w książce telefonicznej. Wszystkie znajdą osobę, ale jeden robi to zdecydowanie bardziej wydajnie niż inny.
 czas: 12
 ---
 
@@ -22,11 +22,11 @@ czas: 12
 
 ## Problem: znaleźć nazwisko
 
-**Algorytm** to instrukcje krok po kroku, które rozwiązują problem. Nasz problem: znaleźć nazwisko w grubej, posortowanej alfabetycznie książce telefonicznej.
+**Algorytm** to instrukcje krok po kroku, które rozwiązują problem. Nasze zadanie: znaleźć nazwisko w grubej, posortowanej alfabetycznie książce telefonicznej.
 
 1. **Strona po stronie.** Algorytm jest poprawny, bo w końcu trafi na nazwisko, ale wolny: przy n stronach w najgorszym razie potrzebuje **n kroków**.
 2. **Po dwie strony naraz.** Dwa razy szybciej (**n/2** kroków), ale **bez poprawki jest niepoprawny**: może przeskoczyć stronę z szukanym nazwiskiem. Poprawka: jeśli „przeskoczyliśmy” literę, cofamy się o jedną stronę.
-3. **Od środka.** Otwieramy książkę na środku i sprawdzamy, czy nazwisko jest w lewej, czy w prawej połowie. Niepotrzebną połowę odrzucamy (na zajęciach można ją dosłownie przedrzeć na pół) i powtarzamy. To **wyszukiwanie binarne**.
+3. **Od środka.** Otwieramy książkę na środku i sprawdzamy, czy nazwisko jest w lewej, czy w prawej połowie. Niepotrzebną połowę odrzucamy i powtarzamy. To **wyszukiwanie binarne**.
 
 ## Jak szybko rosną te algorytmy
 
