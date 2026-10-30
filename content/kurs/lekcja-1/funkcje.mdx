@@ -1,0 +1,116 @@
+---
+title: Własne funkcje
+nav: Funkcje
+description: Odpowiednik własnego bloku ze Scratcha. Funkcja z parametrem, funkcja, która zwraca wynik, i zapowiedź funkcji przed main.
+czas: 10
+---
+
+<Cel>Pisać własne funkcje z parametrami i wartością zwracaną.</Cel>
+
+<Pojecia
+  lista={[
+    ["funkcja", "function"],
+    ["parametr", "parameter"],
+    ["wartość zwracana", "return value"],
+    ["prototyp funkcji", "function prototype"],
+    ["zasięg zmiennej", "scope"],
+  ]}
+/>
+
+## Własny blok w C
+
+W Scratchu zbudowaliśmy własny blok `miau (n) razy`. W C to **funkcja** z **parametrem** `n`:
+
+```c title="miau.c"
+#include <stdio.h>
+
+void miau(int n);
+
+int main(void)
+{
+    miau(3);
+}
+
+void miau(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("miau\n");
+    }
+}
+```
+
+Rozbierzmy to na części:
+
+- `void miau(int n)` to **definicja** funkcji: nazwa `miau`, jeden parametr typu `int`. `void` na początku znaczy, że funkcja niczego nie zwraca, tylko coś robi (wypisuje tekst).
+- `miau(3);` w `main` to **wywołanie**. Parametr `n` dostaje wartość 3.
+- Linijka `void miau(int n);` nad `main` to **prototyp**, czyli zapowiedź funkcji.
+
+Po co zapowiedź? Kompilator czyta plik od góry do dołu. Gdy w `main` trafia na `miau(3)`, musi już wiedzieć, że taka funkcja istnieje i jakie przyjmuje argumenty. Bez prototypu GCC zgłosi `implicit declaration of function ‘miau’`. Można też przenieść całą funkcję nad `main`, ale z prototypami `main` zostaje na górze i od razu widać, co robi program.
+
+Teraz `main` czyta się jak pseudokod: „miaucz trzy razy”. Szczegóły, jak to zrobić, są ukryte w funkcji. To jest **abstrakcja**.
+
+## Funkcja, która zwraca wynik
+
+Funkcja może też coś obliczyć i **zwrócić** wynik, jak owalne klocki w Scratchu:
+
+```c title="kwadrat.c"
+#include <stdio.h>
+
+int kwadrat(int x)
+{
+    return x * x;
+}
+
+int main(void)
+{
+    printf("%d\n", kwadrat(7));            // 49
+    int suma = kwadrat(3) + kwadrat(4);
+    printf("%d\n", suma);                  // 25
+}
+```
+
+`int` przed nazwą mówi, jakiego typu jest wynik. `return` kończy funkcję i oddaje wartość w miejsce wywołania. Wywołanie `kwadrat(7)` można wstawić wszędzie tam, gdzie pasuje liczba: do `printf`, do działania, do zmiennej.
+
+## Zmienne żyją w swoich klamrach
+
+Zmienna istnieje tylko w bloku `{ }`, w którym ją utworzono. To jej **zasięg**. Zmienna `i` z pętli w funkcji `miau` nie istnieje w `main`, a parametr `x` z funkcji `kwadrat` jest widoczny tylko w niej. Dzięki temu dwie funkcje mogą mieć zmienne o tej samej nazwie i nie przeszkadzają sobie nawzajem.
+
+```c
+int main(void)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        printf("%d\n", i);
+    }
+    printf("%d\n", i);    // błąd: ‘i’ undeclared, i już nie istnieje
+}
+```
+
+<NaZajeciach tytul="Funkcja z dwoma parametrami" czas="5 min">
+Rozszerzamy `miau` o drugi parametr: `void powiedz(char tekst[], int n)` wypisuje dowolny tekst n razy. Wywołanie `powiedz("hau", 2);` wypisze dwa razy „hau”. Kto skończy, pisze funkcję `int wieksza(int a, int b)`, która zwraca większą z dwóch liczb.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Co oznacza void przed nazwą funkcji?"
+    odpowiedzi={["Funkcja niczego nie zwraca", "Funkcja nie ma nazwy", "Funkcja jest pusta"]}
+    poprawna={0}
+    wyjasnienie="void (nic) w miejscu typu wyniku znaczy, że funkcja tylko coś robi, ale nie oddaje wartości."
+  />
+  <Pytanie
+    pytanie="Po co piszemy prototyp funkcji nad main?"
+    odpowiedzi={[
+      "Żeby kompilator wiedział o funkcji, zanim trafi na jej wywołanie",
+      "Żeby funkcja działała szybciej",
+      "Żeby można ją było wywołać tylko raz",
+    ]}
+    poprawna={0}
+    wyjasnienie="Kompilator czyta plik od góry. Prototyp zapowiada nazwę, parametry i typ wyniku funkcji zdefiniowanej niżej."
+  />
+  <Pytanie
+    pytanie="Co zwróci kwadrat(kwadrat(2))?"
+    akceptowane={["16"]}
+    wyjasnienie="kwadrat(2) = 4, a kwadrat(4) = 16. Wynik jednej funkcji może być argumentem drugiej."
+  />
+</Quiz>

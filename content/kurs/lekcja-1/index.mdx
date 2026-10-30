@@ -1,14 +1,90 @@
 ---
-title: Język C
+title: "Język C: od klocków do kodu"
 numer: 1
-status: wkrotce
-description: Od klocków do kodu. Pierwszy program w C, typy danych, warunki i pętle, kompilacja. Lekcja w przygotowaniu.
+description: Pierwszy prawdziwy język programowania. Piszemy, kompilujemy i uruchamiamy programy w C, a pomysły ze Scratcha zamieniamy na printf, if, pętle i funkcje.
+zrodla:
+  - tytul: "The C Programming Language – Wikipedia"
+    url: "https://en.wikipedia.org/wiki/The_C_Programming_Language"
+  - tytul: "„Hello, World!” program – Wikipedia"
+    url: "https://en.wikipedia.org/wiki/%22Hello,_World!%22_program"
+  - tytul: "GCC: Options Controlling the Kind of Output"
+    url: "https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html"
+  - tytul: "GCC 14: Porting to GCC 14"
+    url: "https://gcc.gnu.org/gcc-14/porting_to.html"
+  - tytul: "cppreference: printf"
+    url: "https://en.cppreference.com/w/c/io/fprintf"
+  - tytul: "cppreference: scanf"
+    url: "https://en.cppreference.com/w/c/io/fscanf"
+  - tytul: "cppreference: Arithmetic types"
+    url: "https://en.cppreference.com/w/c/language/arithmetic_types"
+  - tytul: "cppreference: Arithmetic operators (overflow)"
+    url: "https://en.cppreference.com/w/c/language/operator_arithmetic"
+  - tytul: "cppreference: Numeric limits (limits.h)"
+    url: "https://en.cppreference.com/w/c/types/limits"
+  - tytul: "Microsoft Learn: Data Type Ranges"
+    url: "https://learn.microsoft.com/en-us/cpp/cpp/data-type-ranges"
+  - tytul: "Dennis M. Ritchie, The Development of the C Language"
+    url: "https://csapp.cs.cmu.edu/2e/docs/chistory.html"
+  - tytul: "cppreference: History of C"
+    url: "https://en.cppreference.com/w/c/language/history"
+  - tytul: "cppreference: C23"
+    url: "https://en.cppreference.com/w/c/23"
+  - tytul: "GCC 15 Release Series: Changes"
+    url: "https://gcc.gnu.org/gcc-15/changes.html"
+  - tytul: "The Linux Kernel documentation: Programming Language"
+    url: "https://docs.kernel.org/process/programming-language.html"
+  - tytul: "PEP 7 – Style Guide for C Code"
+    url: "https://peps.python.org/pep-0007/"
+  - tytul: "SQLite Home Page"
+    url: "https://sqlite.org/"
+  - tytul: "TIOBE Index"
+    url: "https://www.tiobe.com/tiobe-index/"
+  - tytul: "Microsoft Learn: SetConsoleOutputCP"
+    url: "https://learn.microsoft.com/en-us/windows/console/setconsoleoutputcp"
+  - tytul: "Microsoft Learn: Code Page Identifiers"
+    url: "https://learn.microsoft.com/en-us/windows/win32/intl/code-page-identifiers"
+  - tytul: "GCC: Preprocessor Options (kodowanie znaków)"
+    url: "https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html"
+  - tytul: "Visual Studio Code on Windows"
+    url: "https://code.visualstudio.com/docs/setup/windows"
+  - tytul: "WinLibs: GCC for Windows"
+    url: "https://winlibs.com"
+  - tytul: "w64devkit"
+    url: "https://github.com/skeeto/w64devkit"
+  - tytul: "OnlineGDB: Online C Compiler"
+    url: "https://www.onlinegdb.com/online_c_compiler"
+  - tytul: "Compiler Explorer"
+    url: "https://godbolt.org"
+  - tytul: "Microsoft Learn: How to install Linux on Windows with WSL"
+    url: "https://learn.microsoft.com/en-us/windows/wsl/install"
+  - tytul: "The Patriot Missile Failure (University of Minnesota)"
+    url: "https://www-users.cse.umn.edu/~arnold/disasters/patriot.html"
+  - tytul: "GAO/IMTEC-92-26: Patriot Missile Defense"
+    url: "https://www.gao.gov/products/imtec-92-26"
+  - tytul: "Nuclear Gandhi – Wikipedia"
+    url: "https://en.wikipedia.org/wiki/Nuclear_Gandhi"
 ---
 
-## Co nas czeka
+## W skrócie
 
-Lekcja 1 przenosi pomysły ze Scratcha do prawdziwego języka programowania. Klocek `powiedz` zamieni się w `printf`, pętla `powtórz` w `for`, a zmienne dostaną jawne **typy danych** (`int`, `char`, `float`). To właśnie te „umowy” o znaczeniu bitów, które poznajesz w lekcji 0.
+W tej lekcji przesiadamy się ze Scratcha do języka C. Te same pomysły, czyli funkcje, zmienne, warunki, pętle i własne bloki, zapisujemy tekstem, kompilujemy i uruchamiamy w terminalu. Po drodze wracają tematy z lekcji 0: typy danych jako umowa o znaczeniu bitów, granice liczb, ułamki, które nie są dokładne, i polskie znaki w UTF-8.
 
-<Ramka tytul="Lekcja w przygotowaniu">
-Treść pojawi się wkrótce. Zanim to nastąpi, dokończ [Lekcję 0](/kurs/lekcja-0) i zadanie domowe w Scratchu.
-</Ramka>
+- **Potrzebne:** przeglądarka (kompilator online) albo komputer z VS Code i GCC. Szczegóły w module „Gdzie pisać kod”.
+- **Zadanie domowe:** trzy programy w C: powitanie, piramida z gry Mario i automat wydający resztę.
+- **Jak się uczyć:** przepisuj przykłady sam, zamiast je kopiować. Literówki i komunikaty kompilatora to część nauki.
+
+## Mapa lekcji
+
+| moduły | o czym |
+|---|---|
+| Dlaczego C, Gdzie pisać kod | skąd się wziął C i jak go uruchomić |
+| Pierwszy program, Kompilacja | `hello, world`, kompilator i komunikaty błędów |
+| printf i scanf, Typy danych | wypisywanie, wczytywanie i zmienne |
+| Warunki, Pętle, Funkcje | odpowiedniki klocków `if`, `repeat` i własnych bloków |
+| Mario | wszystko razem: pętle w pętli i funkcje |
+| Działania i granice, Polskie znaki | pułapki: dzielenie, przepełnienie, UTF-8 |
+| Styl i debugowanie | jak pisać czytelny kod i szukać błędów |
+
+<DlaProwadzacego tytul="Czas trwania">
+Pełny materiał tej lekcji to około dwóch i pół godziny. W 90 minutach skup się na modułach od „Pierwszego programu” do „Mario”, a resztę zostaw do samodzielnej pracy. Szczegóły są w module „Scenariusz zajęć”.
+</DlaProwadzacego>

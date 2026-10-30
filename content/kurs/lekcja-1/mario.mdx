@@ -1,0 +1,151 @@
+---
+title: "Mario: pętla w pętli"
+nav: Mario
+description: Rysujemy klocki z gry Super Mario Bros. znakami # w terminalu. Pętle zagnieżdżone, rozmiar od użytkownika i własna funkcja.
+czas: 12
+---
+
+<Cel>Używać pętli zagnieżdżonych i dzielić program na funkcje.</Cel>
+
+<Pojecia
+  lista={[
+    ["pętla zagnieżdżona", "nested loop"],
+    ["wiersz", "row"],
+    ["kolumna", "column"],
+  ]}
+/>
+
+## Rząd i kolumna
+
+W grze Super Mario Bros. nad głową Mario wiszą bloki ze znakami zapytania, a na ziemi stoją kolumny cegieł. Narysujmy je w terminalu.
+
+Cztery znaki zapytania w rzędzie to pętla, która wypisuje `?` bez `\n`, a dopiero na końcu przechodzi do nowej linii:
+
+```c
+for (int i = 0; i < 4; i++)
+{
+    printf("?");
+}
+printf("\n");
+```
+
+```txt title="Wynik"
+????
+```
+
+Kolumna trzech cegieł to ta sama pętla, ale z `\n` po każdym znaku:
+
+```c
+for (int i = 0; i < 3; i++)
+{
+    printf("#\n");
+}
+```
+
+```txt title="Wynik"
+#
+#
+#
+```
+
+## Siatka: pętla w pętli
+
+Siatka 3 × 3 to trzy rzędy, a każdy rząd to trzy cegły. Potrzebujemy więc pętli w pętli:
+
+```c
+for (int i = 0; i < 3; i++)          // dla każdego rzędu
+{
+    for (int j = 0; j < 3; j++)      // dla każdej cegły w rzędzie
+    {
+        printf("#");
+    }
+    printf("\n");                    // koniec rzędu
+}
+```
+
+```txt title="Wynik"
+###
+###
+###
+```
+
+Zewnętrzna pętla (`i`) liczy rzędy, wewnętrzna (`j`) cegły w rzędzie. Na każdy obrót zewnętrznej pętli wewnętrzna wykonuje się w całości, więc `#` wypisze się 3 × 3 = 9 razy. Druga pętla potrzebuje innej nazwy licznika, stąd `j`.
+
+## Rozmiar od użytkownika i własna funkcja
+
+Teraz rozmiar podaje użytkownik, a rysowanie rzędu wydzielamy do funkcji:
+
+```c title="mario.c"
+#include <stdio.h>
+
+void rzad(int szerokosc);
+
+int main(void)
+{
+    int n = 0;
+    do
+    {
+        printf("Rozmiar: ");
+        scanf("%d", &n);
+    }
+    while (n < 1);
+
+    for (int i = 0; i < n; i++)
+    {
+        rzad(n);
+    }
+}
+
+void rzad(int szerokosc)
+{
+    for (int j = 0; j < szerokosc; j++)
+    {
+        printf("#");
+    }
+    printf("\n");
+}
+```
+
+Pętla `do while` pilnuje, żeby rozmiar był dodatni. Funkcja `rzad` ukrywa wewnętrzną pętlę, więc `main` czyta się jak przepis: „zapytaj o rozmiar, potem n razy narysuj rząd”.
+
+## Schodki
+
+Co się stanie, gdy szerokość rzędu będzie zależeć od numeru rzędu? Pierwszy rząd ma jedną cegłę, drugi dwie i tak dalej:
+
+```c
+for (int i = 1; i <= 4; i++)
+{
+    rzad(i);
+}
+```
+
+```txt title="Wynik"
+#
+##
+###
+####
+```
+
+To już prawie schody z końca poziomu w Mario. Piramida ustawiona do prawej krawędzi to zadanie domowe.
+
+<NaZajeciach tytul="Najpierw na kartce" czas="5 min">
+Zanim napiszemy kod, rysujemy na kratkach piramidę wysokości 4 ustawioną do prawej. W każdym rzędzie liczymy spacje i cegły. Wypełniamy tabelkę: rząd 1 to 3 spacje i 1 cegła, rząd 2 to 2 spacje i 2 cegły… Jaki jest wzór na liczbę spacji w rzędzie i?
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Ile razy wypisze się # w pętli for (i = 0; i < 4; i++) z wewnętrzną for (j = 0; j < 5; j++)?"
+    akceptowane={["20", "dwadzieścia"]}
+    wyjasnienie="4 obroty zewnętrznej pętli, w każdym 5 obrotów wewnętrznej: 4 × 5 = 20."
+  />
+  <Pytanie
+    pytanie='Co się stanie, jeśli w siatce przesuniesz printf("\n") do wnętrza pętli j?'
+    odpowiedzi={[
+      "Każda cegła trafi do osobnej linijki",
+      "Nic się nie zmieni",
+      "Program się nie skompiluje",
+    ]}
+    poprawna={0}
+    wyjasnienie="Nowa linia po każdej cegle zamiast po każdym rzędzie zmieni siatkę w jedną długą kolumnę."
+  />
+</Quiz>

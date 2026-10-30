@@ -1,0 +1,112 @@
+---
+title: "Kompilacja: co się dzieje po wpisaniu gcc"
+nav: Kompilacja i błędy
+description: Cztery etapy, które zamieniają tekst programu w plik dla procesora. I jak czytać komunikaty kompilatora, zamiast się ich bać.
+czas: 10
+---
+
+<Cel>Wiedzieć, co robi kompilator, i umieć przeczytać jego komunikat o błędzie.</Cel>
+
+<Pojecia
+  lista={[
+    ["preprocesor", "preprocessor"],
+    ["asembler", "assembler"],
+    ["plik obiektowy", "object file"],
+    ["linker, konsolidator", "linker"],
+    ["błąd kompilacji", "compile error"],
+    ["ostrzeżenie", "warning"],
+  ]}
+/>
+
+## Cztery etapy w jednym poleceniu
+
+Polecenie `gcc hello.c -o hello` wygląda na jeden krok, ale kompilator wykonuje po kolei cztery:<Zrodlo n={3} />
+
+| etap | co robi | wynik |
+|---|---|---|
+| 1. **preprocesor** | wykonuje linijki z `#`, np. w miejsce `#include <stdio.h>` wkleja opis funkcji `printf` | dłuższy kod w C |
+| 2. **kompilacja** | tłumaczy C na **asembler**, czyli instrukcje procesora zapisane słowami | plik `.s` |
+| 3. **asemblacja** | zamienia asembler na kod maszynowy (zera i jedynki) | plik obiektowy `.o` |
+| 4. **linkowanie** | dokleja gotowy kod z bibliotek, np. samą funkcję `printf`, i składa jeden program | `hello` albo `hello.exe` |
+
+Zwykle nie trzeba o tym myśleć. Warto jednak wiedzieć, że błąd może się pojawić na różnych etapach. Literówka w nazwie funkcji (`prinft` zamiast `printf`) wychodzi na dwa sposoby. Kompilator ostrzeże o nieznanej funkcji i zapyta: *did you mean ‘printf’?* Nowsze wersje GCC (od 14) zgłoszą tu od razu błąd.<Zrodlo n={4} /> Starsze przepuszczą ten kod dalej, a wtedy linker szuka funkcji `prinft` w bibliotekach, nie znajduje jej i kończy pracę komunikatem `undefined reference to ‘prinft’`.
+
+<Dociekliwi tytul="Zobacz każdy etap na własne oczy">
+Każdy etap da się zatrzymać osobną opcją kompilatora:
+
+```bash title="Terminal"
+gcc -E hello.c          # tylko preprocesor: wypisze kilkaset linijek
+gcc -S hello.c          # zatrzymaj na asemblerze: powstaje hello.s
+gcc -c hello.c          # zatrzymaj przed linkowaniem: powstaje hello.o
+gcc hello.o -o hello    # linkowanie: gotowy program
+```
+
+Fragment pliku `hello.s` z kompilatora GCC na komputerze z procesorem x86-64:
+
+```txt title="hello.s (fragment)"
+.LC0:
+        .string "hello, world"
+main:
+        leaq    .LC0(%rip), %rax
+        movq    %rax, %rdi
+        call    puts@PLT
+        movl    $0, %eax
+        ret
+```
+
+Ciekawostka: zamiast `printf` kompilator wywołał prostszą funkcję `puts`. Napis nie ma żadnych wstawek typu `%d` i kończy się `\n`, więc wynik będzie ten sam, a `puts` działa szybciej. Kompilator często poprawia nasz kod w ten sposób. To samo w przeglądarce, bez instalowania niczego, pokazuje strona [Compiler Explorer](https://godbolt.org).
+</Dociekliwi>
+
+## Jak czytać komunikat o błędzie
+
+Zabierzmy z `hello.c` średnik i skompilujmy:
+
+```txt title="Terminal"
+hello.c: In function ‘main’:
+hello.c:5:29: error: expected ‘;’ before ‘}’ token
+    5 |     printf("hello, world\n")
+      |                             ^
+      |                             ;
+```
+
+Komunikat czyta się od lewej:
+
+- `hello.c:5:29` to plik, **linijka 5** i **kolumna 29**,
+- `error` znaczy błąd: program nie powstanie,
+- `expected ‘;’` to treść: kompilator spodziewał się średnika,
+- pod spodem kompilator pokazuje miejsce strzałką `^`, a często także poprawkę.
+
+Trzy zasady, które oszczędzą wiele nerwów:
+
+1. **Czytaj pierwszy błąd.** Jeden brakujący nawias potrafi wywołać dziesięć kolejnych komunikatów. Popraw pierwszy i skompiluj ponownie.
+2. **Patrz też linijkę wyżej.** Kompilator zauważa brak średnika dopiero na następnym znaku, czasem w następnej linijce.
+3. **Nie ignoruj ostrzeżeń.** `warning` nie zatrzymuje kompilacji, ale zwykle oznacza prawdziwy problem. Kompiluj z opcją `-Wall`, która włącza najważniejsze ostrzeżenia: `gcc -Wall hello.c -o hello`.
+
+<Wskazowka tytul="Komunikat po angielsku i AI">
+Komunikaty kompilatora są po angielsku i bywają zagmatwane. Wklej komunikat do czatu z AI i poproś o **wyjaśnienie**, a nie o poprawiony kod: „Co znaczy ten komunikat i gdzie mam szukać błędu?”. To tryb kaczki z lekcji 0.
+</Wskazowka>
+
+<NaZajeciach tytul="Detektyw błędów" czas="5 min">
+Na slajdzie trzy komunikaty kompilatora bez kodu: brak średnika, `implicit declaration of function ‘printf’` (brak `#include`) i `undefined reference to ‘prinft’` (literówka). Sala zgaduje, co zepsuto i na którym etapie kompilacji wyszedł błąd.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Który etap kompilacji wkleja zawartość pliku stdio.h w miejsce #include?"
+    odpowiedzi={["Preprocesor", "Asembler", "Linker"]}
+    poprawna={0}
+    wyjasnienie="Linijki zaczynające się od # obsługuje preprocesor, zanim zacznie się właściwa kompilacja."
+  />
+  <Pytanie
+    pytanie="Komunikat zaczyna się od hello.c:7:12. Co oznacza 7?"
+    odpowiedzi={["Numer linijki", "Liczbę błędów", "Numer kolumny"]}
+    poprawna={0}
+    wyjasnienie="Najpierw plik, potem linijka (7), potem kolumna (12)."
+  />
+  <Pytanie
+    pytanie="Kompilator zgłosił 12 błędów. Od czego zacząć?"
+    odpowiedzi={["Od pierwszego", "Od ostatniego", "Od najdłuższego"]}
+    poprawna={0}
+    wyjasnienie="Kolejne błędy często są skutkiem pierwszego. Po jego poprawieniu wiele z nich znika."
+  />
+</Quiz>

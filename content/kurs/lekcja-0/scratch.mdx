@@ -30,14 +30,16 @@ czas: 25
 
 **Scratch** stworzyła grupa Lifelong Kindergarten w MIT Media Lab pod kierunkiem prof. Mitchela Resnicka.<Zrodlo n={[36, 37]} /> Wystartował w maju 2007 roku jako aplikacja na komputer. Wersja 2.0 (2013) przeniosła go do przeglądarki, a 3.0 (styczeń 2019) działa bez żadnych wtyczek.<Zrodlo n={38} /> Projekt wspiera Scratch Foundation założona w 2013 roku. Według MIT Media Lab (grudzień 2022) platforma zdobyła 100 milionów użytkowników na całym świecie i jest największą darmową społecznością programowania dla dzieci.
 
-Scratch jest darmowy na [scratch.mit.edu](https://scratch.mit.edu), a język interfejsu zmienia się ikoną globusa na **Polski**. Zaczynamy od niego, bo pozwala bawić się klockami bez nawiasów i średników. W Polsce Scratch jest obecny w szkołach, a Zintegrowana Platforma Edukacyjna (zpe.gov.pl) ma lekcje w Scratchu, np. o algorytmie Euklidesa.<Zrodlo n={39} />
+Scratch jest darmowy na [scratch.mit.edu](https://scratch.mit.edu). Zaczynamy od niego, bo pozwala bawić się klockami bez nawiasów i średników.
+
+Na zajęciach używamy Scratcha **po angielsku**. Nazwy bloków, takie jak `if`, `repeat` czy `forever`, to te same słowa, które za tydzień zobaczysz w języku C. Polską wersję włączysz w edytorze ikoną globusa. Przy każdym przykładzie poniżej przełącznik **EN / PL** pokazuje bloki w obu językach. W Polsce Scratch jest obecny w szkołach, a Zintegrowana Platforma Edukacyjna (zpe.gov.pl) ma lekcje w Scratchu, np. o algorytmie Euklidesa.<Zrodlo n={39} />
 
 ## Interfejs
 
-- **Lewa kolumna** to paleta bloków w kategoriach: Ruch, Wygląd, Dźwięk, Zdarzenia, Kontrola, Czujniki, Wyrażenia, Zmienne, Moje bloki, a także rozszerzenia (Muzyka, Pióro, Czujnik wideo, Tekst na mowę).<Zrodlo n={[38, 40]} />
+- **Lewa kolumna** to paleta bloków w kategoriach: Motion (Ruch), Looks (Wygląd), Sound (Dźwięk), Events (Zdarzenia), Control (Kontrola), Sensing (Czujniki), Operators (Wyrażenia), Variables (Zmienne), My Blocks (Moje bloki), a także rozszerzenia: Music (Muzyka), Pen (Pióro), Video Sensing (Czujnik wideo) i Text to Speech (Tekst na mowę).<Zrodlo n={[38, 40]} />
 - **Środek** to obszar skryptów, gdzie układasz klocki.
 - **Prawa góra** to **scena**, a **prawy dół** to lista duszków i teł.
-- Zakładki nad paletą: **Kod**, **Kostiumy**, **Dźwięki**.
+- Zakładki nad paletą: **Code**, **Costumes**, **Sounds** (Kod, Kostiumy, Dźwięki).
 
 Środek sceny to punkt (0, 0). Współrzędna x biegnie od −240 do 240, a y od −180 do 180.
 
@@ -47,35 +49,37 @@ Te same pojęcia wrócą za tydzień w języku C. Wybierz pojęcie i porównaj:
 
 <TlumaczKlockow />
 
-| pojęcie | Scratch | C (lekcja 1) |
-|---|---|---|
-| funkcja | `powiedz [ ]`, `zagraj dźwięk [ ] i czekaj` | `printf(...)` |
-| argument | tekst w okienku bloku | `"hello, world"` |
-| wartość zwracana | owalne: `odpowiedź`, `połącz [ ] i [ ]`, `losuj od ( ) do ( )` | `get_string(...)` |
-| efekt uboczny | dymek, dźwięk | tekst w terminalu |
-| zmienna | `odpowiedź`, `ustaw [ ] na ( )`, `zmień [ ] o ( )` | `int x = 0;` |
-| wyrażenie logiczne | `dotyka [ ]?`, `klawisz [ ] naciśnięty?`, `i`, `lub`, `nie` | `x < y`, `&&`, `\|\|`, `!` |
-| warunek | `jeżeli < > to … w przeciwnym razie` | `if … else` |
-| pętla | `powtórz (10) razy`, `zawsze`, `powtarzaj aż < >` | `for`, `while` |
-| zdarzenie | `kiedy kliknięto zieloną flagę`, `kiedy otrzymam [ ]` | `main` (zdarzenia wrócą w JS) |
-| wątek | kilka skryptów od tego samego zdarzenia | wielowątkowość, `async` w JS |
-| abstrakcja | Moje bloki → Utwórz blok → `definiuj …` | `void miau(int n)` |
+| pojęcie | Scratch (EN) | Scratch (PL) | C (lekcja 1) |
+|---|---|---|---|
+| funkcja | `say [ ]`, `play sound [ ] until done` | `powiedz [ ]`, `zagraj dźwięk [ ] i czekaj` | `printf(...)` |
+| argument | tekst w okienku bloku | tekst w okienku bloku | `"hello, world"` |
+| wartość zwracana | owalne: `answer`, `join [ ] [ ]`, `pick random ( ) to ( )` | owalne: `odpowiedź`, `połącz [ ] i [ ]`, `losuj od ( ) do ( )` | `strlen(s)`, `rand()` |
+| efekt uboczny | dymek, dźwięk | dymek, dźwięk | tekst w terminalu |
+| zmienna | `answer`, `set [ ] to ( )`, `change [ ] by ( )` | `odpowiedź`, `ustaw [ ] na ( )`, `zmień [ ] o ( )` | `int x = 0;` |
+| wyrażenie logiczne | `touching [ ]?`, `key [ ] pressed?`, `and`, `or`, `not` | `dotyka [ ]?`, `klawisz [ ] naciśnięty?`, `i`, `lub`, `nie` | `x < y`, `&&`, `\|\|`, `!` |
+| warunek | `if < > then … else` | `jeżeli < > to … w przeciwnym razie` | `if … else` |
+| pętla | `repeat (10)`, `forever`, `repeat until < >` | `powtórz (10) razy`, `zawsze`, `powtarzaj aż < >` | `for`, `while` |
+| zdarzenie | `when green flag clicked`, `when I receive [ ]` | `kiedy kliknięto zieloną flagę`, `kiedy otrzymam [ ]` | `main` (zdarzenia wrócą w JS) |
+| wątek | kilka skryptów od tego samego zdarzenia | kilka skryptów od tego samego zdarzenia | wątki; w JS współbieżność (`async`) |
+| abstrakcja | My Blocks → Make a Block → `define …` | Moje bloki → Utwórz blok → `definiuj …` | `void miau(int n)` |
 
 <Ramka>
-Polskie etykiety bloków podajemy według polskiego forum Scratcha i zpe.gov.pl. Część różni się między Scratchem 2 i 3, więc sprawdzaj je w edytorze (więcej w module „Zastrzeżenia”).
+Angielskie etykiety bloków pochodzą z edytora Scratch 3. Polskie podajemy według polskiego forum Scratcha i zpe.gov.pl. Część polskich etykiet różni się między Scratchem 2 i 3, więc sprawdzaj je w edytorze (więcej w module „Zastrzeżenia”). Tekst wpisany w okienka, nazwy zmiennych i własnych bloków zostawiamy po polsku w obu wersjach.
 </Ramka>
 
 ## „Witaj, świecie”
 
-Pierwszy program w każdym języku. Zdarzenie uruchamia skrypt, a funkcja `powiedz` wyświetla dymek:
+Pierwszy program w każdym języku. Zdarzenie uruchamia skrypt, a funkcja `say` (`powiedz`) wyświetla dymek:
 
 <ScratchSkrypt
   duszek="Kot"
   kod={`kiedy kliknięto zieloną flagę        (Zdarzenia)
 powiedz [Witaj, świecie!]            (Wygląd)`}
+  kodEn={`when green flag clicked        (Events)
+say [Witaj, świecie!]          (Looks)`}
 />
 
-**Argument** to tekst „Witaj, świecie!”, **funkcja** to `powiedz`, a **efekt uboczny** to dymek nad kotem.
+**Argument** to tekst „Witaj, świecie!”, **funkcja** to `say`, a **efekt uboczny** to dymek nad kotem.
 
 ## „Witaj, ty”
 
@@ -86,9 +90,12 @@ Teraz program pyta o imię i odpowiada:
   kod={`kiedy kliknięto zieloną flagę
 zapytaj [Jak masz na imię?] i czekaj           (Czujniki)
 powiedz (połącz [Cześć, ] i (odpowiedź))       (Wygląd + Wyrażenia)`}
+  kodEn={`when green flag clicked
+ask [Jak masz na imię?] and wait            (Sensing)
+say (join [Cześć, ] (answer))               (Looks + Operators)`}
 />
 
-Blok `zapytaj` zapisuje wpis w zmiennej `odpowiedź`. Blok `połącz` **zwraca** sklejony tekst, który staje się **argumentem** bloku `powiedz`. Wyjście jednej funkcji jest więc wejściem drugiej. Wariant: rozszerzenie **Tekst na mowę** i blok mówienia (po angielsku `speak`).
+Blok `ask` (`zapytaj`) zapisuje wpis w zmiennej `answer` (`odpowiedź`). Blok `join` (`połącz`) **zwraca** sklejony tekst, który staje się **argumentem** bloku `say`. Wyjście jednej funkcji jest więc wejściem drugiej. Wariant: rozszerzenie **Text to Speech** (Tekst na mowę) i blok `speak`.
 
 <Uwaga tytul="Typowy błąd">
 Brak spacji po „Cześć,”. Bez niej kot powie „Cześć,Ala”. Komputer skleja dokładnie to, co mu dasz.
@@ -96,7 +103,7 @@ Brak spacji po „Cześć,”. Bez niej kot powie „Cześć,Ala”. Komputer sk
 
 ## „Miau”, pętle i abstrakcja
 
-Wersja pierwsza: trzy razy skopiowany blok `zagraj dźwięk [Miau] i czekaj` i `czekaj (1) s`. Działa, ale powtórzenia to sygnał złego projektu. Lepiej użyć pętli:
+Wersja pierwsza: trzy razy skopiowany blok `play sound [Meow] until done` (`zagraj dźwięk [Miau] i czekaj`) i `wait (1) seconds` (`czekaj (1) s`). Działa, ale powtórzenia to sygnał złego projektu. Lepiej użyć pętli:
 
 <ScratchSkrypt
   duszek="Kot"
@@ -104,9 +111,13 @@ Wersja pierwsza: trzy razy skopiowany blok `zagraj dźwięk [Miau] i czekaj` i `
 powtórz (3) razy
     zagraj dźwięk [Miau] i czekaj
     czekaj (1) s`}
+  kodEn={`when green flag clicked
+repeat (3)
+    play sound [Meow] until done
+    wait (1) seconds`}
 />
 
-A jeszcze lepiej: **własny blok z parametrem** (Moje bloki → Utwórz blok → „miau”, pole `n`, etykieta „razy”):
+A jeszcze lepiej: **własny blok z parametrem** (My Blocks → Make a Block → „miau”, pole `n`, etykieta „razy”):
 
 <ScratchSkrypt
   duszek="Kot"
@@ -116,6 +127,13 @@ powtórz (n) razy
     czekaj (1) s
 
 kiedy kliknięto zieloną flagę
+miau (3) razy`}
+  kodEn={`define miau (n) razy
+repeat (n)
+    play sound [Meow] until done
+    wait (1) seconds
+
+when green flag clicked
 miau (3) razy`}
 />
 
@@ -129,9 +147,13 @@ miau (3) razy`}
 zawsze
     jeżeli <dotyka [wskaźnik myszy]?> to
         zagraj dźwięk [Miau] i czekaj`}
+  kodEn={`when green flag clicked
+forever
+    if <touching [mouse-pointer]?> then
+        play sound [Meow] until done`}
 />
 
-Pętla `zawsze` sprawdza warunek w kółko, więc kot miauczy za każdym razem, gdy najedziesz na niego myszą.<Zrodlo n={41} /> Wariant z rozszerzeniem Czujnik wideo: `kiedy ruch wideo > (10)`, a kot miauczy, gdy pomachasz do kamery.
+Pętla `forever` (`zawsze`) sprawdza warunek w kółko, więc kot miauczy, dopóki wskaźnik myszy jest na nim.<Zrodlo n={41} /> Wariant z rozszerzeniem Video Sensing: `when video motion > (10)` (`kiedy ruch wideo > (10)`), a kot miauczy, gdy pomachasz do kamery.
 
 <Wskazowka tytul="Gdy coś nie działa">
 Zadaj sobie trzy pytania: nad jakim konkretnym problemem pracujesz, co już działa, a co nie?
@@ -154,6 +176,13 @@ zawsze
         zmień kostium na [oscar2]
     w przeciwnym razie
         zmień kostium na [oscar1]`}
+  kodEn={`when green flag clicked
+switch costume to [oscar1]
+forever
+    if <touching [mouse-pointer]?> then
+        switch costume to [oscar2]
+    else
+        switch costume to [oscar1]`}
 />
 
 Śmieć ma dwa skrypty startujące od zielonej flagi, czyli dwa **wątki**. Jeden przesuwa go w dół, drugi sprawdza, czy trafił do kosza:
@@ -173,10 +202,24 @@ zawsze
         idź na górę
 
 definiuj idź na górę
-idź do x: (losuj od (0) do (240)) y: (180)`}
+idź do x: (losuj od (-240) do (240)) y: (180)`}
+  kodEn={`when green flag clicked
+set drag mode [draggable]
+idź na górę
+forever
+    change y by (-1)
+
+when green flag clicked
+forever
+    if <touching [Oscar]?> then
+        change [wynik] by (1)
+        idź na górę
+
+define idź na górę
+go to x: (pick random (-240) to (240)) y: (180)`}
 />
 
-Śmieć startuje na górze sceny (y = 180) w losowym miejscu i opada. Powtarzany kod wydzielono do własnego bloku `idź na górę`. Zmienna `wynik` (na starcie `ustaw [wynik] na (0)`) liczy punkty. **Nasze rozszerzenie:** klony (`utwórz klon [siebie]` co 3 s, `kiedy zaczynam jako klon`, `usuń tego klona`) dają wiele spadających śmieci naraz.
+Śmieć startuje na górze sceny (y = 180) w losowym miejscu i opada. Powtarzany kod wydzielono do własnego bloku `idź na górę`. Zmienna `wynik` (na starcie `set [wynik] to (0)`) liczy punkty. **Nasze rozszerzenie:** klony (`create clone of [myself]` co 3 s, `when I start as a clone`, `delete this clone`) dają wiele spadających śmieci naraz. Po polsku to `utwórz klon [siebie]`, `kiedy zaczynam jako klon` i `usuń tego klona`.
 
 ## Ivy’s Hardest Game
 
@@ -202,6 +245,22 @@ jeżeli <dotyka [lewa ściana]?> to
     zmień x o (1)
 jeżeli <dotyka [prawa ściana]?> to
     zmień x o (-1)`}
+  kodEn={`when green flag clicked
+go to x: (0) y: (0)
+forever
+    słuchaj klawiatury
+    wyczuwaj ściany
+
+define słuchaj klawiatury
+if <key [up arrow] pressed?> then
+    change y by (1)
+(analogicznie: w dół → change y by (-1), w prawo → change x by (1), w lewo → change x by (-1))
+
+define wyczuwaj ściany
+if <touching [lewa ściana]?> then
+    change x by (1)
+if <touching [prawa ściana]?> then
+    change x by (-1)`}
 />
 
 Przeciwnicy: Yale chodzi tam i z powrotem, a MIT goni gracza.
@@ -215,6 +274,13 @@ zawsze
     jeżeli <<dotyka [lewa ściana]?> lub <dotyka [prawa ściana]?>> to
         obróć w prawo o (180) stopni
     przesuń o (1) kroków`}
+  kodEn={`when green flag clicked
+go to x: (0) y: (0)
+point in direction (90)
+forever
+    if <<touching [lewa ściana]?> or <touching [prawa ściana]?>> then
+        turn ↻ (180) degrees
+    move (1) steps`}
 />
 
 <ScratchSkrypt
@@ -224,9 +290,14 @@ idź do [losowa pozycja]
 zawsze
     ustaw w stronę [Harvard]
     przesuń o (1) kroków`}
+  kodEn={`when green flag clicked
+go to [random position]
+forever
+    point towards [Harvard]
+    move (1) steps`}
 />
 
-Dzięki abstrakcji główny skrypt Harvarda czyta się jak pseudokod: „zawsze słuchaj klawiatury i wyczuwaj ściany”. **Nasze rozszerzenie:** blok `jeżeli <<dotyka [Yale]?> lub <dotyka [MIT]?>> to` przenosi gracza do (0, 0) i zmienia `[życia] o (-1)`.
+Dzięki abstrakcji główny skrypt Harvarda czyta się jak pseudokod: „zawsze słuchaj klawiatury i wyczuwaj ściany”. **Nasze rozszerzenie:** blok `if <<touching [Yale]?> or <touching [MIT]?>> then` przenosi gracza do (0, 0) i wykonuje `change [życia] by (-1)`.
 
 ## Sprawdź się: klocki i pojęcia
 
@@ -239,9 +310,9 @@ Przykłady „Witaj, świecie”, „Witaj, ty”, „Miau” i warunki budujemy
 <Quiz>
   <Pytanie
     pytanie="Który blok zwraca wartość w programie „Witaj, ty”?"
-    odpowiedzi={["powiedz", "połącz", "kiedy kliknięto zieloną flagę"]}
+    odpowiedzi={["say (powiedz)", "join (połącz)", "when green flag clicked (kiedy kliknięto zieloną flagę)"]}
     poprawna={1}
-    wyjasnienie="„połącz” zwraca sklejony tekst, który trafia jako argument do „powiedz”. „powiedz” niczego nie zwraca, tylko wywołuje efekt uboczny (dymek)."
+    wyjasnienie="„join” zwraca sklejony tekst, który trafia jako argument do „say”. „say” niczego nie zwraca, tylko wywołuje efekt uboczny (dymek)."
   />
   <Pytanie
     pytanie="Dwa skrypty duszka zaczynające się od zielonej flagi to…"

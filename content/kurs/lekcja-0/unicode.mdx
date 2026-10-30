@@ -5,76 +5,138 @@ description: 128 znaków nie jest wystarczające dla wszystkich języków na św
 czas: 14
 ---
 
-<Cel>Odróżniać numer znaku (Unicode) od sposobu zapisu w bajtach (UTF-8) i rozumieć, skąd biorą się „krzaczki”.</Cel>
+<Cel>Zrozumieć dwie rzeczy: Unicode nadaje każdemu znakowi numer, a UTF-8 zapisuje ten numer w bajtach. Wiedzieć, skąd biorą się „krzaczki”.</Cel>
 
 <Pojecia
   lista={[
     ["Unicode"],
     ["punkt kodowy", "code point, U+XXXX"],
+    ["system szesnastkowy", "hexadecimal, hex"],
     ["UTF-8"],
-    ["modyfikator koloru skóry", "skin tone modifier"],
-    ["łącznik zerowej szerokości", "zero width joiner, ZWJ"],
-    ["krzaczki", "mojibake"],
     ["strona kodowa", "code page"],
+    ["krzaczki", "mojibake"],
+    ["łącznik zerowej szerokości", "zero width joiner, ZWJ"],
   ]}
 />
 
-## Za mało miejsca w ASCII
+## ASCII to za mało
 
-128, a nawet 256 znaków to za mało dla wszystkich języków na świecie, w tym dla polskich liter, cyrylicy, chińskich znaków czy emoji. **Unicode** rozszerza liczbę bitów i obejmuje wszystkie te pisma, a także emoji.
+ASCII z poprzedniego modułu ma 128 kodów: angielskie litery, cyfry i kilka symboli. Nie ma w nim „ą”, „ł”, cyrylicy, chińskich znaków ani emoji.
 
-Każdy znak ma w Unicode swój numer, czyli **punkt kodowy**, zapisywany jako `U+` i liczba szesnastkowa. Na przykład 😂 to **U+1F602 FACE WITH TEARS OF JOY**, dodane w Unicode 6.0 w 2010 roku.<Zrodlo n={[3, 4]} /> Unicode standaryzuje numery, ale wygląd zależy od producenta oprogramowania: każdy rysuje emoji trochę inaczej.
+Przez lata każdy kraj i każdy producent radził sobie po swojemu. Bajt ma 256 wartości, a ASCII używa tylko 128, więc wolne kody od 128 do 255 dostawały polskie, czeskie albo rosyjskie litery. Taki przydział nazywa się **stroną kodową**. Kłopot w tym, że ten sam bajt w różnych stronach kodowych oznaczał inną literę. Do tego wrócimy przy „krzaczkach”.
 
-## Emoji złożone z kilku znaków
+## Unicode: jeden numer dla każdego znaku
 
-**Modyfikatory koloru skóry.** Unicode 8.0 (połowa 2015 roku) dodał pięć modyfikatorów U+1F3FB–U+1F3FF opartych na skali Fitzpatricka. Postawiony po emoji postaci tworzy jeden glif: 👍 U+1F44D + U+1F3FD → 👍🏽.<Zrodlo n={[5, 6]} />
+**Unicode** to jedna wspólna tabela znaków dla całego świata. Każdy znak dostaje w niej własny numer, czyli **punkt kodowy**. Numer nie zależy od kraju ani od programu: „ą” ma wszędzie numer 261. Wersja 17.0 z września 2025 roku obejmuje 159 801 znaków.<Zrodlo n={43} />
 
-**Sekwencje ZWJ.** Łącznik zerowej szerokości U+200D „skleja” emoji.<Zrodlo n={7} /> „Rodzina” 👨‍👩‍👧 to 👨 U+1F468 + ZWJ + 👩 U+1F469 + ZWJ + 👧 U+1F467: jeden widoczny znak, ale pięć punktów kodowych.<Zrodlo n={[5, 8]} />
+Pierwsze 128 numerów jest takich samych jak w ASCII, więc „A” to nadal 65.
 
-<RozbieraczEmoji />
+| znak | numer | zapis z U+ |
+|---|---|---|
+| A | 65 | U+0041 |
+| ą | 261 | U+0105 |
+| ł | 322 | U+0142 |
+| ж (cyrylica) | 1078 | U+0436 |
+| 中 (chiński) | 20 013 | U+4E2D |
+| 😂 | 128 514 | U+1F602 |
+
+Numery w Unicode zapisuje się zwykle jako `U+` i liczbę w **systemie szesnastkowym**. To ta sama liczba, tylko zapisana inaczej.
+
+### Zapis szesnastkowy w pigułce
+
+System dziesiętny ma 10 cyfr, dwójkowy 2, a **szesnastkowy** 16: zwykłe cyfry od 0 do 9 i litery od A do F. A znaczy 10, B to 11, C to 12, D to 13, E to 14, a F to 15. Wagi pozycji to potęgi szesnastki: 1, 16, 256, 4096…
+
+| szesnastkowo | obliczenie | dziesiętnie |
+|---|---|---|
+| `41` | 4 × 16 + 1 | 65 (litera A) |
+| `105` | 1 × 256 + 0 × 16 + 5 | 261 (litera ą) |
+| `FF` | 15 × 16 + 15 | 255 (największy bajt) |
+
+Programiści lubią ten zapis z jednego powodu: **jedna cyfra szesnastkowa to dokładnie 4 bity**. Bajt, czyli 8 bitów, to więc zawsze dwie cyfry: od `00` do `FF`. Widać to na żarówkach z modułu o systemie dwójkowym:
+
+```txt title="Liczba 42: dwójkowo i szesnastkowo"
+dwójkowo:      0010   1010
+szesnastkowo:    2      A      →  2 × 16 + 10 = 42
+```
+
+Nie musisz przeliczać tego w pamięci. Wystarczy wiedzieć, że `U+0105` to po prostu numer 261 zapisany krócej. Przedrostki `U+` (w Unicode), `0x` (w kodzie programu) i `#` (w kolorach) mówią jedno: „to liczba szesnastkowa”.
 
 ## UTF-8: jak zapisać numer w bajtach
 
-Unicode mówi, **jaki numer** ma znak. **UTF-8** mówi, **jak zapisać** ten numer w bajtach. Według RFC 3629 znaki od U+0000 do U+10FFFF koduje się w 1–4 bajtach. Znaki U+0000–U+007F (czyli całe ASCII) to pojedyncze bajty 00–7F, więc każdy tekst ASCII jest jednocześnie poprawnym UTF-8.<Zrodlo n={[9, 10]} />
+Unicode mówi, **jaki numer** ma znak. Nie mówi, jak ten numer zapisać w pliku. Do tego służy **UTF-8**, dziś standardowy sposób zapisu tekstu. Zasada jest prosta: im większy numer, tym więcej bajtów.
 
-| zakres | bajty | wzorzec bitów |
+| numery znaków | przykład | bajty w UTF-8 | ile bajtów |
+|---|---|---|---|
+| 0–127 (całe ASCII) | A | `41` | 1 |
+| 128–2047 (m.in. polskie litery, cyrylica) | ą | `C4 85` | 2 |
+| 2048–65 535 (m.in. chiński, znak €) | 中 | `E4 B8 AD` | 3 |
+| od 65 536 (m.in. emoji) | 😂 | `F0 9F 98 82` | 4 |
+
+Zapamiętaj dwie rzeczy:
+
+1. Angielski tekst w UTF-8 wygląda bajt w bajt tak samo jak w ASCII. Dlatego każdy stary plik ASCII jest też poprawnym plikiem UTF-8.<Zrodlo n={[9, 10]} />
+2. Polska litera zajmuje **dwa bajty**. Słowo „Zażółć” ma 6 liter, ale 10 bajtów. Przyda się to w języku C, gdzie długość tekstu liczy się w bajtach.
+
+<Dociekliwi tytul="Jak UTF-8 pakuje numer w bajty">
+Pierwsze bity każdego bajtu mówią, jaką rolę ma ten bajt. `0` na początku oznacza znak jednobajtowy, `110` początek znaku dwubajtowego, `1110` trzybajtowego, a `11110` czterobajtowego. Bajt zaczynający się od `10` to ciąg dalszy znaku. Dzięki temu program zawsze wie, gdzie zaczyna się kolejny znak. Miejsca oznaczone `x` wypełnia się bitami numeru.<Zrodlo n={11} />
+
+| numery znaków | bajty | wzorzec bitów |
 |---|---|---|
 | U+0000–U+007F | 1 | `0xxxxxxx` |
 | U+0080–U+07FF | 2 | `110xxxxx 10xxxxxx` |
 | U+0800–U+FFFF | 3 | `1110xxxx 10xxxxxx 10xxxxxx` |
 | U+10000–U+10FFFF | 4 | `11110xxx 10xxxxxx 10xxxxxx 10xxxxxx` |
 
-Wzorzec pochodzi z RFC 3629.<Zrodlo n={11} /> Zobaczmy go w działaniu na literze **ą = U+0105**:
+Przykład dla **ą**, czyli numeru 261:
 
 ```txt title="ą w UTF-8"
-U+0105  →  11 bitów: 00100 000101
-           110 + 00100   = 11000100 = 0xC4
-           10  + 000101  = 10000101 = 0x85
-wynik:     C4 85
+261 dwójkowo na 11 bitach:   00100 000101
+110 + 00100   = 11000100 = C4
+10  + 000101  = 10000101 = 85
+wynik:          C4 85
 ```
 
 Wynik **C4 85** zgadza się z polskimi tabelami kodów.<Zrodlo n={12} /> Emoji 😂 zajmuje cztery bajty: **F0 9F 98 82**.<Zrodlo n={[13, 14]} />
+</Dociekliwi>
 
-## Długość tekstu ma trzy odpowiedzi
+## Emoji z klocków
 
-Otwórz konsolę przeglądarki (klawisz F12, zakładka *Console*) i wpisz:
+Niektóre emoji to kilka znaków Unicode sklejonych w jeden obrazek.
+
+- **Kolor skóry.** Po emoji postaci albo części ciała (np. dłoni) można dopisać jeden z pięciu znaków koloru skóry. Dodano je w Unicode 8.0 w 2015 roku. 👍 i 🏽 dają razem 👍🏽.<Zrodlo n={[5, 6]} />
+- **Sklejanie.** Niewidoczny znak **ZWJ** (łącznik zerowej szerokości, U+200D) skleja kilka emoji w jedno.<Zrodlo n={7} /> „Rodzina” 👨‍👩‍👧 to mężczyzna, ZWJ, kobieta, ZWJ i dziewczynka. Widzisz jeden obrazek, ale w środku jest pięć znaków.<Zrodlo n={[5, 8]} />
+
+Unicode ustala tylko numery. Wygląd emoji zależy od producenta, dlatego 😂 na iPhonie i na Androidzie wygląda trochę inaczej.
+
+<RozbieraczEmoji />
+
+## Ile znaków ma tekst?
+
+Na pytanie „ile znaków ma 👨‍👩‍👧?” są trzy poprawne odpowiedzi. Człowiek widzi **1** obrazek, Unicode liczy **5** numerów, a JavaScript podaje **8**. Sprawdź to w konsoli przeglądarki (klawisz F12, zakładka *Console*):
 
 ```js title="Konsola przeglądarki"
 "👨‍👩‍👧".length                                   // 8
-[..."👨‍👩‍👧"].length                              // 5  (punkty kodowe)
-[...new Intl.Segmenter().segment("👨‍👩‍👧")].length  // 1  (grafem)
-new TextEncoder().encode("ą").length            // 2
-new TextEncoder().encode("ą")                   // Uint8Array [196, 133] = C4 85
-new TextEncoder().encode("😂")                  // [240, 159, 152, 130]
+[..."👨‍👩‍👧"].length                              // 5  (numery Unicode)
+[...new Intl.Segmenter().segment("👨‍👩‍👧")].length  // 1  (to, co widzi człowiek)
+new TextEncoder().encode("ą")                   // [196, 133], czyli C4 85
 ```
 
-Dlaczego 8? Właściwość `.length` liczy jednostki kodowania UTF-16. Trzy emoji osób leżą poza U+FFFF i zajmują po dwie jednostki (tzw. pary surogatów), a dwa łączniki ZWJ po jednej: 3 × 2 + 2 × 1 = **8**. „Długość tekstu” ma więc trzy różne odpowiedzi: 8, 5 i 1. To dobry wstęp do typów i abstrakcji w JavaScripcie i TypeScripcie.
+Skąd 8? JavaScript przechowuje tekst w 16-bitowych kawałkach (to kodowanie UTF-16). Numer większy niż 65 535, na przykład emoji osoby, nie mieści się w jednym kawałku i zajmuje dwa. Trzy osoby to 3 × 2 = 6 kawałków, do tego dwa łączniki ZWJ po jednym. Razem **8**.
 
-## Polskie kodowania i „krzaczki”
+## Skąd biorą się „krzaczki”
 
-Zanim wszyscy przeszli na UTF-8, polskie litery zapisywano na wiele sposobów. Każdy system miał własną **stronę kodową**:
+„Krzaczki” (po angielsku *mojibake*) pojawiają się, gdy tekst zapisano według jednej umowy, a odczytano według innej. Plik nie jest zepsuty. Program po prostu źle zgadł kodowanie.
 
-| kodowanie | status | ą | ś | ź | Ą |
+Przykład: „ą” w UTF-8 to dwa bajty `C4 85`. Program, który myśli, że plik jest w Windows-1250 (starej stronie kodowej Microsoftu dla Europy Środkowej), czyta każdy bajt jako osobną literę. `C4` to w niej „Ä”, a `85` to „…”. Zamiast „ą” widzisz więc „Ä…”, a zamiast „ó” widzisz „Ăł”.
+
+<GeneratorKrzaczkow />
+
+Do testowania polskich znaków od lat służy zdanie **„Zażółć gęślą jaźń”**. Zawiera wszystkie dziewięć polskich małych liter ze znakami diakrytycznymi: ą, ć, ę, ł, ń, ó, ś, ź i ż.
+
+<Dociekliwi tytul="Jak kiedyś zapisywano polskie litery">
+Zanim wszyscy przeszli na UTF-8, „ą” miało kilka różnych kodów, zależnie od systemu:
+
+| kodowanie | gdzie | ą | ś | ź | Ą |
 |---|---|---|---|---|---|
 | **Mazovia** | popularne w Polsce w czasach DOS | `0x86` | `0x9E` | `0xA6` | `0x8F` |
 | **CP852** | IBM PC Latin 2 (DOS) | `0xA5` | `0x98` | `0xAB` | `0xA4` |
@@ -84,26 +146,28 @@ Zanim wszyscy przeszli na UTF-8, polskie litery zapisywano na wiele sposobów. K
 
 Dane z tabel kodów polskich liter.<Zrodlo n={[12, 15]} />
 
-**Skąd biorą się „krzaczki”?** Bajty odczytano według innej umowy niż ta, w której je zapisano. Tekst w ISO-8859-2 czytany jako Windows-1250 zamienia „ą” w „±”, „ś” w „¶”, a „ź” w „Ľ”.<Zrodlo n={16} /> W drugą stronę „ą” staje się „š”.<Zrodlo n={17} /> Tekst w UTF-8 czytany jako Windows-1250 zamienia „ą” w „Ä…”, a „ó” w „Ăł”.
-
-<GeneratorKrzaczkow />
-
-Pangram **„Zażółć gęślą jaźń”** zawiera wszystkie dziewięć polskich małych liter diakrytycznych (ą, ć, ę, ł, ń, ó, ś, ź, ż), dlatego od lat służy do testowania polskich znaków.
+Najczęściej mylono ISO-8859-2 z Windows-1250. Tekst w ISO-8859-2 czytany jako Windows-1250 zamienia „ą” w „±”, „ś” w „¶”, a „ź” w „Ľ”.<Zrodlo n={16} /> W drugą stronę „ą” staje się „š”.<Zrodlo n={17} />
+</Dociekliwi>
 
 <NaZajeciach tytul="Czy plik się zepsuł?" czas="4 min">
 Plik `zazolc.txt` zapisany w UTF-8 otwieramy z wymuszonym kodowaniem „Środkowoeuropejskie (Windows)”, np. przez import CSV w Excelu. Pytanie: czy plik się zepsuł? Nie. Bajty są te same, zmieniła się tylko umowa odczytu.
 </NaZajeciach>
 
 <NaZajeciach tytul="Konsola przeglądarki" czas="6 min">
-Wspólnie wpisujemy w konsoli polecenia z sekcji „Długość tekstu ma trzy odpowiedzi” i zgadujemy wynik przed naciśnięciem Enter.
+Wspólnie wpisujemy w konsoli polecenia z sekcji „Ile znaków ma tekst?” i zgadujemy wynik przed naciśnięciem Enter.
 </NaZajeciach>
 
 <Quiz>
   <Pytanie
+    pytanie="Jaki numer (dziesiętnie) ma znak U+0041?"
+    akceptowane={["65"]}
+    wyjasnienie="41 szesnastkowo to 4 × 16 + 1 = 65. To litera A, ta sama co w ASCII."
+  />
+  <Pytanie
     pytanie="Ile bajtów w UTF-8 zajmują kolejno „a”, „ą” i „😂”?"
     odpowiedzi={["1, 1, 1", "1, 2, 4", "1, 2, 2", "2, 2, 4"]}
     poprawna={1}
-    wyjasnienie="„a” jest w ASCII (1 bajt), „ą” = U+0105 mieści się w 2 bajtach (C4 85), a 😂 leży poza U+FFFF, więc zajmuje 4 bajty (F0 9F 98 82)."
+    wyjasnienie="„a” jest w ASCII (1 bajt), „ą” ma numer 261, więc zajmuje 2 bajty (C4 85), a 😂 ma numer 128 514, więc zajmuje 4 bajty (F0 9F 98 82)."
   />
   <Pytanie
     pytanie="Zamiast „ą” widzisz „Ä…”. Co się stało?"

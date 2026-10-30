@@ -1,0 +1,142 @@
+---
+title: "Witaj, ty: printf i scanf"
+nav: printf i scanf
+description: Program pyta o imię i wiek, a potem odpowiada. Wstawki %s i %d, znaki specjalne i znak & przy scanf.
+czas: 12
+---
+
+<Cel>Wypisywać tekst z wartościami zmiennych i wczytywać dane od użytkownika.</Cel>
+
+<Pojecia
+  lista={[
+    ["zmienna", "variable"],
+    ["specyfikator formatu", "format specifier"],
+    ["sekwencja ucieczki", "escape sequence"],
+    ["wejście standardowe", "standard input, stdin"],
+    ["adres zmiennej", "address"],
+  ]}
+/>
+
+## Program, który pyta o imię
+
+W Scratchu program „Witaj, ty” używał bloków `ask [ ] and wait` i `say (join [Cześć, ] (answer))`. W C robi to samo para funkcji: `scanf` wczytuje, a `printf` wypisuje.
+
+```c title="witaj.c"
+#include <stdio.h>
+
+int main(void)
+{
+    char imie[50];
+    printf("Jak masz na imię? ");
+    scanf("%49s", imie);
+    printf("Cześć, %s!\n", imie);
+}
+```
+
+```txt title="Terminal"
+Jak masz na imię? Ola
+Cześć, Ola!
+```
+
+Co tu się dzieje:
+
+1. `char imie[50];` tworzy **zmienną** `imie`, czyli miejsce w pamięci na tekst do 49 znaków (ostatnie miejsce zajmuje znak końca napisu). W Scratchu odpowiada jej `answer`.
+2. `printf("Jak masz na imię? ");` wypisuje pytanie. Bez `\n`, żeby odpowiedź pojawiła się w tej samej linijce.
+3. `scanf("%49s", imie);` czeka, aż użytkownik coś wpisze i naciśnie Enter, a potem zapisuje to w `imie`. Liczba 49 pilnuje, żeby tekst się zmieścił.
+4. `printf("Cześć, %s!\n", imie);` wypisuje napis, a w miejsce `%s` wstawia zawartość zmiennej `imie`.
+
+`%s` w drugim `printf` działa jak `join` w Scratchu: skleja stały tekst z wartością zmiennej.
+
+<Uwaga tytul="Jedno słowo">
+`scanf` z `%s` czyta tylko do pierwszej spacji. Po wpisaniu „Anna Maria” w zmiennej będzie samo „Anna”. Na razie to wystarczy, a wczytywanie całych linijek pokażemy w kolejnych lekcjach.
+</Uwaga>
+
+## Wstawki w printf
+
+Znak `%` w napisie dla `printf` oznacza miejsce na wartość. Litera po nim mówi, jakiego rodzaju to wartość:<Zrodlo n={5} />
+
+| wstawka | typ wartości | przykład | wynik |
+|---|---|---|---|
+| `%d` | liczba całkowita (`int`) | `printf("%d", 42)` | `42` |
+| `%f` | liczba z ułamkiem (`double`) | `printf("%f", 3.5)` | `3.500000` |
+| `%.2f` | to samo, 2 cyfry po kropce | `printf("%.2f", 3.5)` | `3.50` |
+| `%c` | jeden znak (`char`) | `printf("%c", 'A')` | `A` |
+| `%s` | napis | `printf("%s", "Ola")` | `Ola` |
+| `%%` | sam znak procentu | `printf("100%%")` | `100%` |
+
+Wstawek może być kilka. Wartości podaje się po przecinku, w tej samej kolejności: `printf("%s ma %d lat\n", imie, wiek);`.
+
+Znaki, których nie da się wpisać wprost, zapisuje się z ukośnikiem `\`:
+
+| zapis | znaczenie |
+|---|---|
+| `\n` | nowa linia |
+| `\t` | tabulator |
+| `\"` | cudzysłów wewnątrz napisu |
+| `\\` | sam ukośnik |
+
+## Liczby i znak &
+
+Wczytanie liczby wygląda prawie tak samo:
+
+```c title="wiek.c"
+#include <stdio.h>
+
+int main(void)
+{
+    int wiek;
+    printf("Ile masz lat? ");
+    scanf("%d", &wiek);
+    printf("Za rok będziesz mieć %d lat.\n", wiek + 1);
+}
+```
+
+`int wiek;` tworzy zmienną na liczbę całkowitą. Nowością jest **`&`** przed `wiek`. Czytaj go jako „adres”: `&wiek` to adres zmiennej `wiek` w pamięci. Funkcja `scanf` musi wiedzieć, **gdzie** zapisać wczytaną liczbę, więc podajemy jej adres szufladki, a nie jej zawartość.<Zrodlo n={6} />
+
+Przy napisie (`imie`) znaku `&` nie piszemy, bo nazwa tablicy znaków już jest adresem. Skąd ta różnica, wyjaśni lekcja o pamięci. Na razie zapamiętaj regułę: **przy liczbach i pojedynczych znakach w scanf piszemy `&`, przy napisach nie.**
+
+<Uwaga tytul="Zapomniany znak &">
+Bez `&` program skompiluje się z ostrzeżeniem, a po wpisaniu liczby najpewniej się wysypie. Dlatego kompiluj z opcją `-Wall`. GCC ostrzeże wtedy: `format ‘%d’ expects argument of type ‘int *’, but argument 2 has type ‘int’`, czyli „spodziewałem się adresu, a dostałem liczbę”.
+</Uwaga>
+
+<NaZajeciach tytul="Wizytówka" czas="6 min">
+Każda osoba pisze program, który pyta o imię, rok urodzenia i ulubioną liczbę, a potem wypisuje wizytówkę w ramce z gwiazdek. Wiek liczymy jako bieżący rok minus rok urodzenia. Kto skończy, dodaje tabulatory `\t`, żeby wyrównać kolumny.
+</NaZajeciach>
+
+<Dociekliwi tytul="Co, jeśli ktoś wpisze litery zamiast liczby?">
+`scanf` zwraca liczbę wartości, które udało mu się wczytać. Gdy zamiast wieku ktoś wpisze „abc”, `scanf("%d", &wiek)` zwróci 0, a zmienna `wiek` zostanie bez zmian. Można to sprawdzić:
+
+```c
+if (scanf("%d", &wiek) != 1)
+{
+    printf("To nie jest liczba.\n");
+    return 1;
+}
+```
+
+`return 1;` kończy program z kodem błędu. Program, który sprawdza dane od użytkownika, jest znacznie trudniejszy do zepsucia.
+</Dociekliwi>
+
+<Quiz>
+  <Pytanie
+    pytanie='Co wypisze printf("%d + %d = %d\n", 2, 3, 2 + 3); ?'
+    akceptowane={["2 + 3 = 5"]}
+    wyjasnienie="Wstawki %d są wypełniane po kolei wartościami 2, 3 i 5."
+  />
+  <Pytanie
+    pytanie="Która wstawka służy do wypisania napisu?"
+    odpowiedzi={["%s", "%d", "%c", "%n"]}
+    poprawna={0}
+    wyjasnienie="%s od string, czyli napis. %d to liczba całkowita, a %c jeden znak."
+  />
+  <Pytanie
+    pytanie='Dlaczego w scanf("%d", &wiek) piszemy &?'
+    odpowiedzi={[
+      "Bo scanf potrzebuje adresu zmiennej, żeby zapisać w niej liczbę",
+      "Bo & oznacza liczbę całkowitą",
+      "To ozdobnik, można go pominąć",
+    ]}
+    poprawna={0}
+    wyjasnienie="&wiek to adres zmiennej w pamięci. Bez niego scanf nie wie, gdzie zapisać wynik."
+  />
+</Quiz>

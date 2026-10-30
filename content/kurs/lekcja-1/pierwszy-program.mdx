@@ -1,0 +1,108 @@
+---
+title: "Pierwszy program: hello, world"
+nav: Pierwszy program
+description: Piszemy, kompilujemy i uruchamiamy pierwszy program w C. Co znaczy każda linijka i dlaczego po każdej zmianie trzeba kompilować od nowa.
+czas: 12
+---
+
+<Cel>Napisać, skompilować i uruchomić pierwszy program w C oraz rozumieć każdą jego linijkę.</Cel>
+
+<Pojecia
+  lista={[
+    ["kod źródłowy", "source code"],
+    ["kod maszynowy", "machine code"],
+    ["kompilator", "compiler"],
+    ["funkcja main", "main function"],
+    ["plik nagłówkowy", "header file"],
+    ["napis", "string"],
+    ["znak nowej linii", "newline"],
+  ]}
+/>
+
+## Od klocka do linijki kodu
+
+W Scratchu pierwszy program miał dwa klocki: `when green flag clicked` i `say [Witaj, świecie!]`. W języku C ten sam program wygląda tak:
+
+```c title="hello.c"
+#include <stdio.h>
+
+int main(void)
+{
+    printf("hello, world\n");
+}
+```
+
+Po uruchomieniu na ekranie pojawi się napis `hello, world`. Dokładnie taki program otwiera książkę „The C Programming Language” Briana Kernighana i Dennisa Ritchiego z 1978 roku. Od tamtej pory „hello, world” to pierwszy program w niemal każdym kursie programowania.<Zrodlo n={[1, 2]} />
+
+## Linijka po linijce
+
+| linijka | co znaczy | w Scratchu |
+|---|---|---|
+| `#include <stdio.h>` | dołącz gotowe funkcje do wypisywania i wczytywania, m.in. `printf` | paleta z blokami |
+| `int main(void)` | tu zaczyna się program | `when green flag clicked` |
+| `{` i `}` | początek i koniec bloku kodu | klocki wewnątrz skryptu |
+| `printf("hello, world\n");` | wypisz tekst na ekranie | `say [ ]` |
+
+`printf` to **funkcja**, a `"hello, world\n"` to jej **argument**. Napis na ekranie to **efekt uboczny**. Te pojęcia znasz już ze Scratcha.
+
+Kilka szczegółów, o które łatwo się potknąć:
+
+- **Cudzysłów.** Napis w C zawsze stoi w zwykłym, prostym cudzysłowie: `"hello"`. Polskie cudzysłowy „ ” nie zadziałają. Dlatego kod piszemy w edytorze kodu, a nie w Wordzie, który sam zamienia cudzysłowy.
+- **Średnik.** Każde polecenie kończy się średnikiem `;`, jak zdanie kropką.
+- **`\n`.** To znak nowej linii. Bez niego kursor zostaje na końcu napisu, a terminal dokleja swój tekst w tej samej linijce. Ukośnik `\` mówi: „następny znak ma specjalne znaczenie”.
+- **Wielkość liter.** `printf` i `Printf` to dla C dwie różne nazwy. Działa tylko pierwsza.
+
+## Skompiluj i uruchom
+
+Procesor nie rozumie tekstu z pliku `hello.c`. Rozumie tylko **kod maszynowy**, czyli instrukcje zapisane zerami i jedynkami. Na kod maszynowy tłumaczy program **kompilator**. W terminalu wygląda to tak:
+
+```bash title="Terminal"
+gcc hello.c -o hello    # skompiluj: z pliku hello.c powstaje program hello
+./hello                 # uruchom program
+hello, world            # wynik
+```
+
+`gcc` to nazwa kompilatora, a `-o hello` (od *output*) to nazwa programu, który ma powstać. Na Windowsie powstaje plik `hello.exe`, a uruchamia się go poleceniem `.\hello`. Gdzie wpisać te polecenia, opisuje moduł „Gdzie pisać kod w C”.
+
+<Uwaga tytul="Najczęstszy błąd na start">
+Zmiana w pliku `hello.c` nie zmienia programu `hello`. Program to „zdjęcie” kodu z chwili kompilacji. Po każdej poprawce trzeba skompilować kod jeszcze raz.
+</Uwaga>
+
+<NaZajeciach tytul="Zepsuj i napraw" czas="5 min">
+Każda para psuje działający `hello.c` na jeden sposób: usuwa średnik, cudzysłów albo linię `#include`, zmienia `main` na `Main` lub `printf` na `print`. Kompilujemy i czytamy komunikat. Którą linijkę wskazuje kompilator? Czy to ta sama linijka, w której jest błąd?
+</NaZajeciach>
+
+<Dociekliwi tytul="Dlaczego int main(void)?">
+`int` mówi, że program po zakończeniu oddaje systemowi liczbę całkowitą. Zero znaczy „wszystko w porządku”, a inna liczba to kod błędu. Jeśli program dojdzie do końca funkcji `main`, C sam zwraca zero. Wynik ostatniego programu pokaże w terminalu polecenie `echo $?` (Linux, macOS).
+
+`void` znaczy „nic”: ta wersja `main` nie przyjmuje żadnych argumentów. Do argumentów z wiersza poleceń wrócimy na kolejnych lekcjach.
+</Dociekliwi>
+
+<Quiz>
+  <Pytanie
+    pytanie="Co robi kompilator?"
+    odpowiedzi={[
+      "Tłumaczy kod źródłowy na kod maszynowy",
+      "Uruchamia program linijka po linijce",
+      "Sprawdza pisownię komentarzy",
+    ]}
+    poprawna={0}
+    wyjasnienie="Kompilator zamienia tekst programu (kod źródłowy) na instrukcje dla procesora (kod maszynowy). Uruchamiasz potem gotowy program."
+  />
+  <Pytanie
+    pytanie='Czego brakuje w linijce printf("hello, world\n") ?'
+    odpowiedzi={["Średnika na końcu", "Nawiasu klamrowego", "Słowa int"]}
+    poprawna={0}
+    wyjasnienie="Każde polecenie w C kończy się średnikiem. Kompilator zgłosi: expected ‘;’."
+  />
+  <Pytanie
+    pytanie="Zmieniasz napis w hello.c i od razu uruchamiasz ./hello. Co zobaczysz?"
+    odpowiedzi={[
+      "Stary napis, bo program nie został skompilowany od nowa",
+      "Nowy napis",
+      "Błąd kompilacji",
+    ]}
+    poprawna={0}
+    wyjasnienie="Program hello powstał z dawnej wersji kodu. Nowa wersja zadziała dopiero po ponownym gcc hello.c -o hello."
+  />
+</Quiz>

@@ -1,0 +1,86 @@
+---
+title: Gdzie pisać kod w C
+nav: Gdzie pisać kod
+description: Kompilator w przeglądarce na komputerze w sali, VS Code z GCC w domu i kilka poleceń terminala, które wystarczą na start.
+czas: 8
+---
+
+<Cel>Mieć działające miejsce do pisania i uruchamiania programów w C: na uczelni i w domu.</Cel>
+
+<Pojecia
+  lista={[
+    ["edytor kodu", "code editor"],
+    ["terminal, wiersz poleceń", "terminal, command line"],
+    ["katalog, folder", "directory, folder"],
+    ["ścieżka", "path"],
+  ]}
+/>
+
+## Do wyboru: przeglądarka albo własny komputer
+
+| sposób | instalacja | dla kogo |
+|---|---|---|
+| kompilator w przeglądarce | żadna | komputery w sali, pierwsze próby |
+| VS Code + GCC na Windowsie | pobranie i rozpakowanie, bez uprawnień administratora | własny laptop z Windowsem |
+| VS Code + kompilator na macOS lub Linuksie | jedno polecenie w terminalu | własny Mac albo Linux |
+
+## W przeglądarce: zero instalacji
+
+Na komputerach uczelnianych zwykle nie da się nic instalować. Wtedy wystarczy przeglądarka:
+
+- **[OnlineGDB](https://www.onlinegdb.com/online_c_compiler)**: wybierz język C, wklej kod i kliknij *Run*. Program może pytać o dane, a odpowiedzi wpisujesz w okienku na dole. Do uruchamiania nie trzeba zakładać konta.<Zrodlo n={25} />
+- **[Compiler Explorer](https://godbolt.org)**: obok kodu pokazuje asembler, który tworzy kompilator. Dane dla `scanf` wpisuje się z góry w osobnym polu, więc lepiej sprawdza się do podglądania kompilacji niż do programów z pytaniami.<Zrodlo n={26} />
+
+<Uwaga tytul="Kod nie zostaje w przeglądarce">
+Zamknięcie karty może skasować kod. Zapisuj programy u siebie, np. w pliku tekstowym albo na dysku w chmurze.
+</Uwaga>
+
+## Na własnym komputerze
+
+Potrzebne są dwie rzeczy: **edytor kodu** i **kompilator**. Jako edytor polecamy darmowy [Visual Studio Code](https://code.visualstudio.com) z rozszerzeniem *C/C++* firmy Microsoft. Na Windowsie wersja „User Installer” instaluje się bez uprawnień administratora.<Zrodlo n={22} />
+
+Kompilator zależy od systemu:
+
+- **Windows.** Pobierz GCC w paczce **[WinLibs](https://winlibs.com)** (wersja UCRT) albo **[w64devkit](https://github.com/skeeto/w64devkit)**. Obie wystarczy rozpakować, niczego nie trzeba instalować.<Zrodlo n={[23, 24]} /> Potem dodaj folder `bin` z kompilatorem do zmiennej środowiskowej `Path`, żeby polecenie `gcc` działało w każdym terminalu.
+- **macOS.** W terminalu wpisz `xcode-select --install`. Zainstaluje się kompilator Clang. Polecenie `gcc` też zadziała, bo na macOS to inna nazwa Clanga.
+- **Linux (Ubuntu, Debian).** W terminalu wpisz `sudo apt install build-essential`.
+
+Sprawdź, czy wszystko działa: `gcc --version` powinno wypisać numer wersji kompilatora.
+
+<Wskazowka tytul="A WSL?">
+Na Windowsie można też zainstalować Linuksa w systemie (WSL). To wygodne rozwiązanie, ale instalacja wymaga uprawnień administratora, więc nie zadziała na komputerach w sali.<Zrodlo n={27} />
+</Wskazowka>
+
+## Terminal w pigułce
+
+Terminal to okno, w którym wydaje się komputerowi polecenia tekstem. W VS Code otworzysz go z menu *Terminal → New Terminal*. Na start wystarczy kilka poleceń:
+
+| polecenie | co robi | przykład |
+|---|---|---|
+| `pwd` | pokazuje, w jakim folderze jesteś | `pwd` |
+| `ls` | wypisuje zawartość folderu | `ls` |
+| `cd` | przechodzi do folderu | `cd projekty`, `cd ..` (folder wyżej) |
+| `mkdir` | tworzy folder | `mkdir lekcja1` |
+| `code` | otwiera plik w VS Code | `code hello.c` |
+| `gcc` | kompiluje program | `gcc -Wall hello.c -o hello` |
+
+Polecenia działają w terminalu Linuksa i macOS oraz w PowerShellu na Windowsie. Klawisz **Tab** podpowiada nazwy plików, a **strzałka w górę** przywołuje poprzednie polecenie, więc nie trzeba przepisywać `gcc` za każdym razem.
+
+<DlaProwadzacego tytul="Przed pierwszymi zajęciami">
+Sprawdź z sali, czy OnlineGDB działa w sieci uczelnianej i czy przeglądarka nie blokuje skryptów. Poproś osoby z laptopami o zainstalowanie VS Code i kompilatora przed zajęciami i o przyniesienie wyniku `gcc --version`. Instalacja na zajęciach potrafi zjeść pół lekcji.
+</DlaProwadzacego>
+
+<Quiz>
+  <Pytanie
+    pytanie="Komputer w sali nie pozwala niczego instalować. Gdzie uruchomisz program w C?"
+    odpowiedzi={["W kompilatorze w przeglądarce, np. OnlineGDB", "Nigdzie, C wymaga instalacji", "W Scratchu"]}
+    poprawna={0}
+    wyjasnienie="Kompilatory w przeglądarce działają na serwerze, więc na komputerze wystarczy przeglądarka."
+  />
+  <Pytanie
+    pytanie="Które polecenie przenosi cię do folderu wyżej?"
+    odpowiedzi={["cd ..", "ls ..", "mkdir ..", "pwd .."]}
+    poprawna={0}
+    wyjasnienie="cd zmienia folder, a .. oznacza folder nadrzędny."
+  />
+</Quiz>

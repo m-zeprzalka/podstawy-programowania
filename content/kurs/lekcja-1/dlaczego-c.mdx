@@ -1,0 +1,63 @@
+---
+title: Dlaczego akurat C?
+nav: Dlaczego C
+description: Język z lat 70., w którym do dziś pisze się systemy operacyjne, bazy danych i interpretery innych języków. Skąd się wziął i czego nas nauczy.
+czas: 6
+---
+
+<Cel>Wiedzieć, skąd się wziął język C, gdzie się go dziś używa i po co uczyć się go na początku.</Cel>
+
+<Pojecia
+  lista={[
+    ["język programowania", "programming language"],
+    ["system operacyjny", "operating system"],
+    ["standard języka", "language standard"],
+    ["język niskiego poziomu", "low-level language"],
+  ]}
+/>
+
+## Ze Scratcha do C
+
+Scratch pozwolił skupić się na pomysłach: funkcjach, pętlach, warunkach i zmiennych. Teraz te same pomysły zapiszemy tekstem, w prawdziwym języku programowania. Zamiast przeciągać klocki, będziemy pisać kod, a zamiast zielonej flagi użyjemy kompilatora i terminala.
+
+Na początek wybieramy **C**, bo jest mały i niczego nie ukrywa. Trzeba w nim samemu zadbać o typy, pamięć i granice liczb, czyli o wszystko, co w lekcji 0 działo się „pod spodem”. Kto zrozumie C, łatwiej nauczy się kolejnych języków. JavaScript, Java czy C# wzorują swoją składnię na C, a najpopularniejsza wersja Pythona jest w C napisana.
+
+## Krótka historia
+
+- **1969–1970.** Ken Thompson w Bell Labs tworzy język B, który wywodzi się z języka BCPL.<Zrodlo n={11} />
+- **Około 1972.** Dennis Ritchie rozbudowuje B o typy danych. Tak powstaje C.<Zrodlo n={11} />
+- **1973.** Jądro systemu Unix zostaje przepisane w C. Wcześniej było napisane w asemblerze, czyli w instrukcjach konkretnego procesora.<Zrodlo n={11} />
+- **1978.** Brian Kernighan i Dennis Ritchie wydają książkę „The C Programming Language”, nazywaną od inicjałów autorów „K&R”.<Zrodlo n={1} />
+- **1989 i później.** C dostaje oficjalne standardy: C89/C90, C99, C11, C17 i C23. Najnowszy, C23, to norma ISO/IEC 9899:2024.<Zrodlo n={12} />
+
+Standardy wnoszą drobne zmiany. Na przykład C99 dodało komentarze `//` i typ `long long`, a C23 słowa `true` i `false` bez dodatkowych plików.<Zrodlo n={[12, 13]} /> Kompilator GCC od wersji 15 domyślnie używa C23.<Zrodlo n={14} /> Dlatego dwa komputery z różnymi wersjami GCC mogą czasem różnie potraktować ten sam kod.
+
+## Gdzie dziś jest C
+
+Pewnie używasz programów w C codziennie, nie wiedząc o tym:
+
+- **Linux.** Jądro systemu Linux jest napisane w C.<Zrodlo n={15} /> Działa na nim m.in. Android i wiele serwerów w internecie.
+- **Python.** Najpopularniejsza wersja interpretera Pythona, CPython, jest napisana w C.<Zrodlo n={16} /> Gdy uruchamiasz program w Pythonie, pod spodem pracuje kod w C.
+- **SQLite.** Baza danych napisana w C, która według jej twórców jest najczęściej używanym silnikiem bazodanowym na świecie. Działa m.in. w telefonach i przeglądarkach internetowych.<Zrodlo n={17} />
+- **Urządzenia.** Pralki, samochody, routery i inne urządzenia z małymi procesorami często mają oprogramowanie w C, bo C działa szybko i potrzebuje mało pamięci.
+
+W rankingu popularności języków TIOBE z października 2026 roku C zajmuje drugie miejsce, za Pythonem.<Zrodlo n={18} /> Ranking zmienia się co miesiąc, ale C od dziesięcioleci nie wypada z czołówki.
+
+<Wskazowka tytul="C to nie C++ ani C#">
+Nazwy są podobne, ale to trzy różne języki. C++ powstał jako rozszerzenie C i ma wiele dodatkowych możliwości. C# to język firmy Microsoft, bliżej mu do Javy niż do C. W tym kursie piszemy w czystym C.
+</Wskazowka>
+
+<Quiz>
+  <Pytanie
+    pytanie="Kto stworzył język C?"
+    odpowiedzi={["Dennis Ritchie", "Linus Torvalds", "Guido van Rossum", "Bill Gates"]}
+    poprawna={0}
+    wyjasnienie="Dennis Ritchie stworzył C w Bell Labs na początku lat 70. Linus Torvalds napisał jądro Linuksa (w C), a Guido van Rossum stworzył Pythona."
+  />
+  <Pytanie
+    pytanie="Który z tych programów jest napisany w C?"
+    odpowiedzi={["Jądro systemu Linux", "Scratch 3.0", "Ten kurs w przeglądarce"]}
+    poprawna={0}
+    wyjasnienie="Jądro Linuksa powstaje w C. Scratch 3.0 i strony internetowe to głównie JavaScript."
+  />
+</Quiz>

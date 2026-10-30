@@ -1,0 +1,84 @@
+---
+title: "Zadanie domowe: piramida i reszta"
+nav: Zadanie domowe
+description: Trzy programy w C. Powitanie na rozgrzewkę, piramida z gry Mario i automat, który wydaje resztę w jak najmniejszej liczbie monet.
+czas: 5
+---
+
+<Cel>Samodzielnie napisać trzy programy, które łączą wczytywanie danych, warunki, pętle i działania na liczbach.</Cel>
+
+## 1. Powitanie (rozgrzewka)
+
+Plik `witaj.c`. Program pyta o imię i odpowiada:
+
+```txt title="Przykład"
+Jak masz na imię? Ola
+Cześć, Ola!
+```
+
+## 2. Piramida
+
+Plik `piramida.c`. Program pyta o wysokość od 1 do 8 i rysuje piramidę dosuniętą do prawej krawędzi, jak schody z końca poziomu w Mario. Przy złej wysokości pyta jeszcze raz.
+
+```txt title="Przykład"
+Wysokość: 9
+Wysokość: 0
+Wysokość: 4
+   #
+  ##
+ ###
+####
+```
+
+Wskazówka: w każdym rzędzie najpierw wypisz spacje, potem cegły. Wzór na liczbę spacji znajdziesz, rysując piramidę na kratkach (ćwiczenie z modułu o Mario).
+
+## 3. Reszta
+
+Plik `reszta.c`. Automat ma wydać resztę w jak najmniejszej liczbie monet. Polskie monety to 5 zł, 2 zł, 1 zł, 50 gr, 20 gr, 10 gr, 5 gr, 2 gr i 1 gr. Program pyta o resztę **w groszach** i wypisuje, ile monet trzeba wydać.
+
+```txt title="Przykład"
+Reszta w groszach: 387
+7
+```
+
+387 gr to 2 zł + 1 zł + 50 gr + 20 gr + 10 gr + 5 gr + 2 gr, czyli 7 monet. Zawsze bierz największą monetę, która jeszcze się mieści. Przy polskich nominałach taka zachłanna strategia daje najmniejszą liczbę monet.
+
+Wskazówki:
+
+- Kwotę trzymaj w groszach jako `int`. Pamiętasz 0.1 + 0.2 z lekcji 0? Pieniądze w `double` to proszenie się o kłopoty.
+- Przydadzą się dzielenie całkowite i reszta z dzielenia: `387 / 200` to 1 moneta dwuzłotowa, a `387 % 200` to 187 gr, które zostały do wydania.
+- Ujemna kwota nie ma sensu: zapytaj jeszcze raz.
+
+**Dla chętnych:** wypisz też, jakie to monety, np. `1 × 2 zł, 1 × 1 zł, 1 × 50 gr…`.
+
+<Ramka tytul="AI w tym zadaniu">
+AI możesz pytać o komunikaty błędów i pojęcia („co robi operator %?”), ale nie o gotowe programy. Na zajęciach poprosimy cię o wytłumaczenie własnego kodu linijka po linijce.
+</Ramka>
+
+<ListaKontrolna
+  id="pset1"
+  tytul="Moja lista przed oddaniem"
+  punkty={[
+    "Wszystkie trzy programy kompilują się poleceniem gcc -Wall bez ostrzeżeń",
+    "Piramida pyta ponownie przy wysokości spoza 1–8",
+    "Piramida dla wysokości 1 i 8 wygląda poprawnie",
+    "Reszta działa dla 0, 1, 99 i 1000 groszy (wyniki: 0, 1, 6, 2)",
+    "Reszta liczy w groszach jako int, bez double",
+    "Kod ma wcięcia, czytelne nazwy i komentarze",
+  ]}
+/>
+
+**Oddanie:** pliki `witaj.c`, `piramida.c` i `reszta.c`.
+
+## Jak oceniamy
+
+| kryterium | punkty |
+|---|---|
+| poprawność: powitanie | 2 |
+| poprawność: piramida, łącznie ze sprawdzaniem wysokości | 6 |
+| poprawność: reszta | 6 |
+| projekt: pętle zamiast kopiowania, rozsądny podział | 3 |
+| styl: wcięcia, nazwy, komentarze | 3 |
+| bonus: lista wydanych monet | +2 |
+
+Razem 20 punktów i 2 punkty bonusowe.

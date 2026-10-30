@@ -12,17 +12,26 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 
+import { PrzelacznikJezyka, useJezykScratcha } from "./scratch-jezyk"
 import { ScratchBloki } from "./scratch-skrypt"
 
 type Id = "funkcja" | "wartosc" | "warunek" | "petla" | "zdarzenie" | "wyrazenie"
 
-const KLOCKI: { id: Id; kod: string }[] = [
-  { id: "funkcja", kod: "powiedz [Cześć!]" },
-  { id: "wartosc", kod: "odpowiedź" },
-  { id: "warunek", kod: "jeżeli <…> to" },
-  { id: "petla", kod: "powtórz (3) razy" },
-  { id: "zdarzenie", kod: "kiedy kliknięto zieloną flagę" },
-  { id: "wyrazenie", kod: "dotyka [wskaźnik myszy]?" },
+const KLOCKI: { id: Id; kod: string; kodEn: string }[] = [
+  { id: "funkcja", kod: "powiedz [Cześć!]", kodEn: "say [Cześć!]" },
+  { id: "wartosc", kod: "odpowiedź", kodEn: "answer" },
+  { id: "warunek", kod: "jeżeli <…> to", kodEn: "if <…> then" },
+  { id: "petla", kod: "powtórz (3) razy", kodEn: "repeat (3)" },
+  {
+    id: "zdarzenie",
+    kod: "kiedy kliknięto zieloną flagę",
+    kodEn: "when green flag clicked",
+  },
+  {
+    id: "wyrazenie",
+    kod: "dotyka [wskaźnik myszy]?",
+    kodEn: "touching [mouse-pointer]?",
+  },
 ]
 
 const NAZWY: Record<Id, string> = {
@@ -92,6 +101,7 @@ function potrzasnij(el: HTMLElement | undefined) {
  */
 export function DopasujPojecia() {
   const uid = React.useId()
+  const [jezyk] = useJezykScratcha()
   const baza = React.useSyncExternalStore(subskrybuj, ziarno, ziarnoSerwera)
   const [runda, setRunda] = React.useState(0)
   const kolejnosc = React.useMemo(
@@ -169,9 +179,12 @@ export function DopasujPojecia() {
       tytul="Dopasuj pojęcia"
       opis="Dotknij klocek, a potem pojęcie, które do niego pasuje (albo odwrotnie). Działa też klawiaturą: Tab i Enter."
       akcje={
-        <Button variant="ghost" size="icon-sm" onClick={odNowa} aria-label="Od nowa">
-          <ArrowCounterClockwiseIcon />
-        </Button>
+        <>
+          <PrzelacznikJezyka />
+          <Button variant="ghost" size="icon-sm" onClick={odNowa} aria-label="Od nowa">
+            <ArrowCounterClockwiseIcon />
+          </Button>
+        </>
       }
     >
       <div className="flex flex-col gap-5">
@@ -190,7 +203,7 @@ export function DopasujPojecia() {
                       type="button"
                       disabled={ok}
                       aria-pressed={wybrany}
-                      aria-label={`Klocek ${i + 1}: ${k.kod}${ok ? ` — ${NAZWY[k.id]}` : ""}`}
+                      aria-label={`Klocek ${i + 1}: ${jezyk === "en" ? k.kodEn : k.kod}${ok ? ` — ${NAZWY[k.id]}` : ""}`}
                       onClick={() => wybierzKlocek(k.id)}
                       className={cn(
                         "flex min-h-16 w-full items-center gap-3 border bg-card py-2 pr-3 pl-2 text-left transition-[background-color,border-color,box-shadow] duration-150",
@@ -215,7 +228,11 @@ export function DopasujPojecia() {
                         {ok ? <CheckIcon weight="bold" className="size-4" /> : i + 1}
                       </span>
                       <span aria-hidden className="min-w-0 flex-1 overflow-hidden">
-                        <ScratchBloki kod={k.kod} className="min-w-0 gap-0" />
+                        <ScratchBloki
+                          kod={jezyk === "en" ? k.kodEn : k.kod}
+                          jezyk={jezyk}
+                          className="min-w-0 gap-0"
+                        />
                       </span>
                       {ok ? (
                         <span className="shrink-0 font-mono text-[0.6875rem] font-medium text-signal-ink">

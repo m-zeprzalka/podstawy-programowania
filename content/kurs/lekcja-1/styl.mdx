@@ -1,0 +1,96 @@
+---
+title: "Dobry kod: poprawność, projekt i styl"
+nav: Styl i debugowanie
+description: Program, który działa, to dopiero początek. Komentarze, wcięcia, nazwy i sposoby na szukanie błędów.
+czas: 8
+---
+
+<Cel>Oceniać kod według trzech kryteriów i znajdować błędy, zamiast zgadywać.</Cel>
+
+<Pojecia
+  lista={[
+    ["poprawność", "correctness"],
+    ["projekt", "design"],
+    ["styl", "style"],
+    ["komentarz", "comment"],
+    ["debugowanie", "debugging"],
+    ["błąd w programie", "bug"],
+  ]}
+/>
+
+## Trzy pytania o każdy program
+
+1. **Poprawność.** Czy program robi to, co ma robić, także dla dziwnych danych, np. zera albo liczby ujemnej?
+2. **Projekt.** Czy jest napisany rozsądnie? Bez kopiowania tych samych linijek, z funkcjami i pętlami tam, gdzie pasują.
+3. **Styl.** Czy łatwo go przeczytać? Wcięcia, nazwy, komentarze.
+
+Te same trzy kryteria służyły do oceny projektu w Scratchu. Komputerowi wszystko jedno, jak wygląda kod. Ale kod czytają też ludzie, w tym ty za miesiąc.
+
+## Styl w praktyce
+
+Ten program działa:
+
+```c
+#include <stdio.h>
+int main(void){int a;scanf("%d",&a);for(int b=0;b<a;b++){printf("#");}printf("\n");}
+```
+
+Ten też, ale da się go przeczytać:
+
+```c
+#include <stdio.h>
+
+int main(void)
+{
+    // Zapytaj o szerokość i narysuj rząd cegieł
+    int szerokosc = 0;
+    scanf("%d", &szerokosc);
+
+    for (int i = 0; i < szerokosc; i++)
+    {
+        printf("#");
+    }
+    printf("\n");
+}
+```
+
+Zasady, których trzymamy się w kursie:
+
+- **Wcięcie o 4 spacje** w każdym bloku `{ }`. Klamry stoją w osobnych linijkach.
+- **Nazwy mówią, co znaczą**: `szerokosc`, a nie `a`. Wyjątek to liczniki pętli: `i`, `j`.
+- **Komentarze** zaczynają się od `//` i kompilator je pomija. Pisz w nich, **po co** jest dany fragment, a nie powtarzaj kodu słowami. Komentarz `// zwiększ i` przy `i++` nic nie wnosi.
+- **Odstępy** wokół operatorów: `x + y`, a nie `x+y`.
+
+VS Code potrafi sam poprawić wcięcia: kliknij prawym przyciskiem w kod i wybierz *Format Document*.
+
+## Szukanie błędów
+
+Błąd w programie po angielsku to *bug*, a jego szukanie to **debugowanie**. Kilka sposobów, od najprostszego:
+
+1. **Przeczytaj komunikat kompilatora.** Moduł o kompilacji pokazuje, jak to robić.
+2. **Wypisz, co się dzieje.** Dodaj tymczasowy `printf`, który pokaże wartość zmiennej w podejrzanym miejscu, np. `printf("i = %d\n", i);` w pętli. Wiele błędów od razu wychodzi na jaw. Pamiętaj, żeby potem go usunąć.
+3. **Rozpisz na kartce.** Tabelka z kolejnymi wartościami zmiennych, jak w module o pętlach, szybko pokazuje błąd o jeden.
+4. **Wytłumacz komuś.** Opowiedz kod linijka po linijce koledze, gumowej kaczce albo AI w trybie kaczki. Często błąd znajdziesz sam w połowie zdania.
+
+<Ramka tytul="AI w tej lekcji">
+Zasada z lekcji 0 dalej obowiązuje: AI może wyjaśniać komunikaty błędów i pojęcia, ale nie pisze za ciebie rozwiązań zadań. Dobre pytanie do AI: „Mój program wypisuje 4 zamiast 3. Nie poprawiaj kodu, tylko zadaj mi pytanie, które pomoże znaleźć błąd”.
+</Ramka>
+
+<NaZajeciach tytul="Przegląd kodu w parach" czas="5 min">
+Pary wymieniają się programem z poprzedniego ćwiczenia i oceniają go w skali 1–3 w każdym z trzech kryteriów: poprawność, projekt, styl. Do każdej oceny jedno zdanie uzasadnienia i jedna konkretna poprawka.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Program działa, ale ta sama pętla jest w nim skopiowana pięć razy. Które kryterium kuleje?"
+    odpowiedzi={["Projekt", "Poprawność", "Styl"]}
+    poprawna={0}
+    wyjasnienie="Program jest poprawny, ale źle zaprojektowany: powtarzany kod powinien trafić do funkcji."
+  />
+  <Pytanie
+    pytanie="Jak zaczyna się komentarz w jednej linijce w C?"
+    odpowiedzi={["//", "#", "--", "%"]}
+    poprawna={0}
+    wyjasnienie="// rozpoczyna komentarz do końca linijki. # w C oznacza polecenie dla preprocesora, np. #include."
+  />
+</Quiz>

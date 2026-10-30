@@ -48,7 +48,11 @@ function tokenizuj(s: string): Token[] {
         return out
       }
       // „>” otoczone spacjami to operator porównania, nie koniec warunku.
-      if (zamyk === ">" && c === ">" && !(s[i - 1] === " " && s[i + 1] === " ")) {
+      if (
+        zamyk === ">" &&
+        c === ">" &&
+        !(s[i - 1] === " " && s[i + 1] === " ")
+      ) {
         i++
         flush()
         return out
@@ -69,7 +73,12 @@ function tokenizuj(s: string): Token[] {
         flush()
         const start = ++i
         const dzieci = czytaj(")")
-        out.push({ t: "grupa", nawias: "(", surowy: s.slice(start, i - 1), dzieci })
+        out.push({
+          t: "grupa",
+          nawias: "(",
+          surowy: s.slice(start, i - 1),
+          dzieci,
+        })
         continue
       }
       if (c === "<") {
@@ -86,7 +95,12 @@ function tokenizuj(s: string): Token[] {
           flush()
           const start = ++i
           const dzieci = czytaj(">")
-          out.push({ t: "grupa", nawias: "<", surowy: s.slice(start, i - 1), dzieci })
+          out.push({
+            t: "grupa",
+            nawias: "<",
+            surowy: s.slice(start, i - 1),
+            dzieci,
+          })
           continue
         }
       }
@@ -115,7 +129,7 @@ function sygnatura(tokeny: Token[]) {
 
 export type ElementScratch =
   | { typ: "tekst"; tekst: string }
-  | { typ: "flaga" }
+  | { typ: "flaga"; tekst: string }
   | { typ: "pole"; tekst: string }
   | { typ: "menu"; tekst: string }
   | { typ: "liczba"; tekst: string }
@@ -143,6 +157,8 @@ export type WezelScratch =
       inaczej?: WezelScratch[]
       /** Komentarz przy linii „w przeciwnym razie”. */
       komentarzInaczej?: KomentarzScratch
+      /** Tekst linii „w przeciwnym razie” / „else”. */
+      etykietaInaczej?: string
       zrodlo: string
     }
   | {
@@ -177,16 +193,20 @@ type Kontekst = {
 const LICZBA = /^-?\d+(?:[.,]\d+)?$/
 
 function tekstNaElementy(tekst: string): ElementScratch[] {
-  const czesci = tekst.split(/(zieloną flagę)/i)
+  const czesci = tekst.split(/(zieloną flagę|green flag)/i)
   const out: ElementScratch[] = []
   for (const c of czesci) {
-    if (/^zieloną flagę$/i.test(c)) out.push({ typ: "flaga" })
+    if (/^(zieloną flagę|green flag)$/i.test(c)) out.push({ typ: "flaga", tekst: c })
     else if (c.trim()) out.push({ typ: "tekst", tekst: c.trim() })
   }
   return out
 }
 
-function rozwiaz(tokeny: Token[], ctx: Kontekst, menu: boolean): ElementScratch[] {
+function rozwiaz(
+  tokeny: Token[],
+  ctx: Kontekst,
+  menu: boolean
+): ElementScratch[] {
   return tokeny.flatMap((t): ElementScratch[] => {
     if (t.t === "tekst") return tekstNaElementy(t.v)
     if (t.t === "pole") return [{ typ: menu ? "menu" : "pole", tekst: t.v }]
@@ -204,7 +224,10 @@ function rozwiazGrupe(
   if (g.nawias === "(" && (surowy === "" || LICZBA.test(surowy))) {
     return { typ: "liczba", tekst: surowy }
   }
-  if (g.nawias === "<" && (surowy === "" || surowy === "…" || surowy === "...")) {
+  if (
+    g.nawias === "<" &&
+    (surowy === "" || surowy === "…" || surowy === "...")
+  ) {
     return { typ: "slot" }
   }
 
@@ -228,7 +251,12 @@ function rozwiazGrupe(
     }
   }
   ctx.kategorie.add(kat)
-  return { typ: "reporter", ksztalt, kat, elementy: rozwiaz(g.dzieci, ctx, menu) }
+  return {
+    typ: "reporter",
+    ksztalt,
+    kat,
+    elementy: rozwiaz(g.dzieci, ctx, menu),
+  }
 }
 
 /* ---------- Linie ---------- */
@@ -252,26 +280,33 @@ function naLinie(kod: string): { linie: (Linia | null)[]; tekst: string } {
     const wciecie = l.length - l.trimStart().length
     const tresc = l.trim()
     const m = KOMENTARZ.exec(tresc)
-    if (m && !NOTKA.test(tresc)) return { wciecie, kod: m[1], komentarz: m[2].trim() }
+    if (m && !NOTKA.test(tresc))
+      return { wciecie, kod: m[1], komentarz: m[2].trim() }
     return { wciecie, kod: tresc }
   })
   return { linie, tekst: przyciete.join("\n") }
 }
 
-const czyKapelusz = (kod: string) => /^(kiedy|definiuj)\s/i.test(kod)
+const czyKapelusz = (kod: string) =>
+  /^(kiedy|definiuj|when|define)\s/i.test(kod)
+const DEFINICJA = /^(definiuj|define)\s+(.+)$/i
 
 /* ---------- Parser ---------- */
 
 /** Parsuje tekst skryptu na stosy bloków. Nie rzuca wyjątków. */
 export function parsujSkrypt(kod: string): SkryptScratch {
   const { linie, tekst } = naLinie(kod)
-  const ctx: Kontekst = { wlasne: new Set(), parametry: new Set(), kategorie: new Set() }
+  const ctx: Kontekst = {
+    wlasne: new Set(),
+    parametry: new Set(),
+    kategorie: new Set(),
+  }
 
   // 1. Własne bloki: sygnatury i nazwy parametrów.
   for (const l of linie) {
-    const m = l && /^definiuj\s+(.+)$/i.exec(l.kod)
+    const m = l && DEFINICJA.exec(l.kod)
     if (!m) continue
-    const tokeny = tokenizuj(m[1])
+    const tokeny = tokenizuj(m[2])
     ctx.wlasne.add(sygnatura(tokeny))
     for (const t of tokeny) {
       if (t.t === "grupa") ctx.parametry.add(t.surowy.trim())
@@ -297,7 +332,8 @@ export function parsujSkrypt(kod: string): SkryptScratch {
     const stos: StosScratch = { wezly: [], komentarze: [] }
 
     const zrobWezel = (l: Linia): WezelScratch => {
-      if (NOTKA.test(l.kod)) return { typ: "notka", tekst: l.kod.slice(1, -1).trim() }
+      if (NOTKA.test(l.kod))
+        return { typ: "notka", tekst: l.kod.slice(1, -1).trim() }
       const wezel = zrobBlok(l.kod, ctx)
 
       if (l.komentarz && wezel.typ !== "notka") {
@@ -313,7 +349,10 @@ export function parsujSkrypt(kod: string): SkryptScratch {
         if (duszek) {
           const bez = k.replace(/^duszek\s+/i, "")
           const [nazwa, ...opis] = bez.split(":")
-          stos.etykieta = { duszek: nazwa.trim(), opis: opis.join(":").trim() || undefined }
+          stos.etykieta = {
+            duszek: nazwa.trim(),
+            opis: opis.join(":").trim() || undefined,
+          }
         } else {
           const komentarz = { tekst: k, nr: ++nr }
           wezel.komentarz = komentarz
@@ -323,7 +362,10 @@ export function parsujSkrypt(kod: string): SkryptScratch {
       return wezel
     }
 
-    const sekwencja = (start: number, baza: number): [WezelScratch[], number] => {
+    const sekwencja = (
+      start: number,
+      baza: number
+    ): [WezelScratch[], number] => {
       const out: WezelScratch[] = []
       let i = start
       while (i < g.length && g[i].wciecie >= baza) {
@@ -344,13 +386,14 @@ export function parsujSkrypt(kod: string): SkryptScratch {
             wezel.dzieci = dzieci
             i = j
           }
-          const jezeli = /^jeżeli\b/i.test(wezel.zrodlo)
+          const jezeli = /^(jeżeli|if)\s/i.test(wezel.zrodlo)
           if (
             jezeli &&
             i < g.length &&
             g[i].wciecie === baza &&
-            /^w przeciwnym razie$/i.test(g[i].kod)
+            /^(w przeciwnym razie|else)$/i.test(g[i].kod)
           ) {
+            wezel.etykietaInaczej = g[i].kod
             const k = g[i].komentarz
             if (k) {
               wezel.komentarzInaczej = { tekst: k, nr: ++nr }
@@ -383,15 +426,15 @@ export function parsujSkrypt(kod: string): SkryptScratch {
 
 function zrobBlok(kod: string, ctx: Kontekst): WezelScratch {
   // Definicja własnego bloku.
-  const def = /^definiuj\s+(.+)$/i.exec(kod)
+  const def = DEFINICJA.exec(kod)
   if (def) {
     ctx.kategorie.add("bloki")
     return {
       typ: "blok",
       kat: "bloki",
       ksztalt: "definicja",
-      elementy: [{ typ: "tekst", tekst: "definiuj" }],
-      prototyp: rozwiaz(tokenizuj(def[1]), ctx, false),
+      elementy: [{ typ: "tekst", tekst: def[1] }],
+      prototyp: rozwiaz(tokenizuj(def[2]), ctx, false),
       zrodlo: kod,
     }
   }
@@ -401,7 +444,8 @@ function zrobBlok(kod: string, ctx: Kontekst): WezelScratch {
   // Cała linia to jeden reporter/warunek, np. „<dotyka [Oscar]?>”.
   if (tokeny.length === 1 && tokeny[0].t === "grupa") {
     const el = rozwiazGrupe(tokeny[0], ctx)
-    if (el.typ === "reporter") return { typ: "samodzielny", element: el, zrodlo: kod }
+    if (el.typ === "reporter")
+      return { typ: "samodzielny", element: el, zrodlo: kod }
   }
 
   const syg = sygnatura(tokeny)

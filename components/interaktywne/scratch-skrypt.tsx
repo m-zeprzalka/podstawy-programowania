@@ -14,6 +14,11 @@ import { Lab } from "@/components/kurs/lab"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
+import {
+  PrzelacznikJezyka,
+  useJezykScratcha,
+  type JezykScratcha,
+} from "./scratch-jezyk"
 import { KATEGORIE, POCHODNE, type KategoriaScratch } from "./scratch-kategorie"
 import {
   parsujSkrypt,
@@ -28,6 +33,14 @@ const DOMYSLNY_KOD = `kiedy kliknięto zieloną flagę
 powiedz [Witaj, świecie!]`
 
 /* ---------- Wygląd bloków (Scratch 3.0, czysty HTML/CSS) ---------- */
+
+/** Język nazw kategorii (podpowiedzi i legenda). */
+const JezykBlokow = React.createContext<JezykScratcha>("pl")
+
+function useNazwaKategorii(kat: KategoriaScratch) {
+  const jezyk = React.useContext(JezykBlokow)
+  return jezyk === "en" ? KATEGORIE[kat].en : KATEGORIE[kat].nazwa
+}
 
 /** Zmienne koloru kategorii: `--sb`, `--sb-c`, `--sb-m`, `--sb-t`. */
 const kolory = (kat: KategoriaScratch) =>
@@ -127,7 +140,7 @@ function Element({ e }: { e: ElementScratch }) {
             weight="fill"
             className="size-5 text-scratch-wyrazenia [filter:drop-shadow(0_0_0.6px_color-mix(in_oklch,var(--color-scratch-wyrazenia)_45%,black))]"
           />
-          <span className="sr-only">zieloną flagę</span>
+          <span className="sr-only">{e.tekst}</span>
         </span>
       )
     case "pole":
@@ -187,10 +200,11 @@ function Reporter({
   e: Extract<ElementScratch, { typ: "reporter" }>
   className?: string
 }) {
+  const nazwa = useNazwaKategorii(e.kat)
   if (e.ksztalt === "warunek") {
     return (
       <span
-        title={KATEGORIE[e.kat].nazwa}
+        title={nazwa}
         className={cn(
           "inline-flex bg-(--sb-c) p-px",
           SZESCIOKAT,
@@ -211,7 +225,7 @@ function Reporter({
   }
   return (
     <span
-      title={KATEGORIE[e.kat].nazwa}
+      title={nazwa}
       className={cn(
         "inline-flex min-h-7 items-center gap-1.5 rounded-full border border-(--sb-c) bg-(--sb) px-2.5 py-0.5",
         kolory(e.kat),
@@ -228,7 +242,7 @@ function Reporter({
 type WezelBlok = Extract<WezelScratch, { typ: "blok" }>
 
 function Blok({ w, pierwszy }: { w: WezelBlok; pierwszy: boolean }) {
-  const nazwa = KATEGORIE[w.kat].nazwa
+  const nazwa = useNazwaKategorii(w.kat)
 
   if (w.ksztalt === "c" || w.ksztalt === "c-koniec") {
     return (
@@ -258,7 +272,7 @@ function Blok({ w, pierwszy }: { w: WezelBlok; pierwszy: boolean }) {
                 title={nazwa}
                 className={cn(KORPUS, TEKST, "rounded-r-[4px]")}
               >
-                w przeciwnym razie
+                {w.etykietaInaczej ?? "w przeciwnym razie"}
               </div>
               {w.komentarzInaczej ? <Komentarz k={w.komentarzInaczej} /> : null}
             </div>
@@ -465,24 +479,35 @@ function Stos({ stos, nr }: { stos: StosScratch; nr: number }) {
 export function ScratchBloki({
   kod = DOMYSLNY_KOD,
   skrypt,
+  jezyk = "pl",
   className,
 }: {
   kod?: string
   /** Gotowy wynik `parsujSkrypt` (pomija parsowanie `kod`). */
   skrypt?: SkryptScratch
+  /** Język nazw kategorii w podpowiedziach. */
+  jezyk?: JezykScratcha
   className?: string
 }) {
   const wynik = React.useMemo(() => skrypt ?? parsujSkrypt(kod), [kod, skrypt])
   return (
-    <div className={cn("flex w-max min-w-full flex-col gap-8", className)}>
-      {wynik.stosy.map((s, i) => (
-        <Stos key={i} stos={s} nr={i + 1} />
-      ))}
-    </div>
+    <JezykBlokow.Provider value={jezyk}>
+      <div className={cn("flex w-max min-w-full flex-col gap-8", className)}>
+        {wynik.stosy.map((s, i) => (
+          <Stos key={i} stos={s} nr={i + 1} />
+        ))}
+      </div>
+    </JezykBlokow.Provider>
   )
 }
 
-function Legenda({ kategorie }: { kategorie: KategoriaScratch[] }) {
+function Legenda({
+  kategorie,
+  jezyk,
+}: {
+  kategorie: KategoriaScratch[]
+  jezyk: JezykScratcha
+}) {
   return (
     <ul
       className="flex flex-wrap gap-x-3 gap-y-1.5"
@@ -494,7 +519,7 @@ function Legenda({ kategorie }: { kategorie: KategoriaScratch[] }) {
             aria-hidden
             className={cn("size-2.5 rounded-[2px]", KATEGORIE[k].tlo)}
           />
-          {KATEGORIE[k].nazwa}
+          {jezyk === "en" ? KATEGORIE[k].en : KATEGORIE[k].nazwa}
         </li>
       ))}
     </ul>
@@ -505,7 +530,8 @@ function Legenda({ kategorie }: { kategorie: KategoriaScratch[] }) {
  * Skrypt Scratcha zapisany tekstem (polska składnia z lekcji) i narysowany
  * jak bloki Scratcha 3.0: kolory kategorii, kapelusze, bloki C, pola,
  * reportery, warunki i komentarze. Przycisk „Pokaż tekst” przełącza na
- * zwykły tekst do skopiowania.
+ * zwykły tekst do skopiowania. Z `kodEn` dochodzi przełącznik EN / PL,
+ * wspólny dla wszystkich bloków na stronie (domyślnie EN).
  *
  * Składnia: `[tekst]`, `(liczba)`, `(reporter …)`, `<warunek>`, wcięcie 4 spacje
  * dla dzieci bloków C, pusta linia = nowy skrypt, `blok  (komentarz)`.
@@ -516,19 +542,26 @@ function Legenda({ kategorie }: { kategorie: KategoriaScratch[] }) {
  */
 export function ScratchSkrypt({
   kod = DOMYSLNY_KOD,
+  kodEn,
   duszek,
   kompaktowy = false,
   className,
 }: {
   /** Tekst skryptu (polska składnia jak w lekcji). */
   kod?: string
+  /** Ten sam skrypt z angielskimi etykietami bloków. */
+  kodEn?: string
   /** Nazwa duszka — tytuł ramki (domyślnie „Skrypt”). */
   duszek?: string
   /** Same bloki na płótnie, bez ramki Lab i przycisków. */
   kompaktowy?: boolean
   className?: string
 }) {
-  const skrypt = React.useMemo(() => parsujSkrypt(kod), [kod])
+  const [wybranyJezyk] = useJezykScratcha()
+  const jezyk: JezykScratcha =
+    wybranyJezyk === "en" && kodEn !== undefined ? "en" : "pl"
+  const zrodlo = jezyk === "en" ? (kodEn ?? kod) : kod
+  const skrypt = React.useMemo(() => parsujSkrypt(zrodlo), [zrodlo])
   const [tekst, setTekst] = React.useState(false)
   const [skopiowano, setSkopiowano] = React.useState(false)
   const timer = React.useRef<number | undefined>(undefined)
@@ -557,7 +590,7 @@ export function ScratchSkrypt({
         kompaktowy ? "p-3" : "p-4"
       )}
     >
-      <ScratchBloki skrypt={skrypt} />
+      <ScratchBloki skrypt={skrypt} jezyk={jezyk} />
     </div>
   )
 
@@ -571,6 +604,7 @@ export function ScratchSkrypt({
       className={className}
       akcje={
         <>
+          {kodEn !== undefined ? <PrzelacznikJezyka /> : null}
           {tekst ? (
             <Button
               variant="ghost"
@@ -581,17 +615,24 @@ export function ScratchSkrypt({
               {skopiowano ? <CheckIcon /> : <CopyIcon />}
             </Button>
           ) : null}
-          <Button variant="ghost" size="sm" onClick={() => setTekst((t) => !t)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setTekst((t) => !t)}
+            aria-label={tekst ? "Pokaż klocki" : "Pokaż tekst"}
+          >
             {tekst ? (
               <PuzzlePieceIcon data-icon="inline-start" />
             ) : (
               <CodeIcon data-icon="inline-start" />
             )}
-            {tekst ? "Pokaż klocki" : "Pokaż tekst"}
+            <span className="hidden sm:inline">
+              {tekst ? "Pokaż klocki" : "Pokaż tekst"}
+            </span>
           </Button>
         </>
       }
-      stopka={<Legenda kategorie={skrypt.kategorie} />}
+      stopka={<Legenda kategorie={skrypt.kategorie} jezyk={jezyk} />}
     >
       {tekst ? (
         <pre className="overflow-x-auto border bg-muted/40 p-4 font-mono text-[0.8125rem]/relaxed">

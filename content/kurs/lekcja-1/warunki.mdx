@@ -1,0 +1,155 @@
+---
+title: "Warunki: if, else if, else"
+nav: Warunki
+description: Program wybiera jedną z dróg. Porównania, operatory „i”, „lub”, „nie” oraz pułapka z pojedynczym znakiem równości.
+czas: 10
+---
+
+<Cel>Pisać warunki z porównaniami i operatorami logicznymi.</Cel>
+
+<Pojecia
+  lista={[
+    ["warunek", "conditional"],
+    ["wyrażenie logiczne", "Boolean expression"],
+    ["operator porównania", "comparison operator"],
+    ["operator logiczny", "logical operator"],
+    ["nawiasy klamrowe", "curly braces"],
+  ]}
+/>
+
+## Od klocka if do if w C
+
+Klocek `if < > then … else` ze Scratcha wygląda w C bardzo podobnie. Program porównuje dwie liczby:
+
+```c title="porownaj.c"
+#include <stdio.h>
+
+int main(void)
+{
+    int x;
+    int y;
+    printf("Podaj x: ");
+    scanf("%d", &x);
+    printf("Podaj y: ");
+    scanf("%d", &y);
+
+    if (x < y)
+    {
+        printf("x jest mniejsze od y\n");
+    }
+    else if (x > y)
+    {
+        printf("x jest większe od y\n");
+    }
+    else
+    {
+        printf("x jest równe y\n");
+    }
+}
+```
+
+Warunek stoi w nawiasach okrągłych, a to, co ma się wykonać, w klamrowych. Komputer sprawdza warunki po kolei i wykonuje **tylko pierwszą** pasującą gałąź. Ostatnie `else` nie potrzebuje warunku: jeśli x nie jest ani mniejsze, ani większe od y, to musi być równe.
+
+<Wskazowka tytul="Dlaczego nie trzy osobne if?">
+Można napisać trzy niezależne `if`: `x < y`, `x > y` i `x == y`. Program działałby poprawnie, ale zawsze sprawdzałby wszystkie trzy warunki, nawet gdy pierwszy już się spełnił. `else if` oszczędza pracy i lepiej pokazuje, że gałęzie się wykluczają. To różnica w **projekcie** programu, a nie w jego poprawności.
+</Wskazowka>
+
+## Porównania
+
+| operator | znaczenie | przykład |
+|---|---|---|
+| `<` | mniejsze | `x < 10` |
+| `>` | większe | `x > 0` |
+| `<=` | mniejsze lub równe | `wiek <= 18` |
+| `>=` | większe lub równe | `punkty >= 50` |
+| `==` | równe | `x == y` |
+| `!=` | różne | `odpowiedz != 'n'` |
+
+<Uwaga tytul="Jeden znak = to nie porównanie">
+`if (x = 5)` nie sprawdza, czy x równa się 5. Wpisuje do x piątkę, a warunek jest wtedy zawsze spełniony. Porównanie to **dwa** znaki: `if (x == 5)`. GCC z opcją `-Wall` ostrzeże przed tym błędem.
+</Uwaga>
+
+## I, lub, nie
+
+Warunki można łączyć jak klocki `and`, `or` i `not` w Scratchu:
+
+| C | znaczenie | przykład |
+|---|---|---|
+| `&&` | i (oba warunki) | `wiek >= 18 && wiek <= 65` |
+| `\|\|` | lub (co najmniej jeden) | `c == 't' \|\| c == 'T'` |
+| `!` | nie (odwraca) | `!(x == 0)` |
+
+Przykład: program pyta o zgodę i przyjmuje małą albo wielką literę.
+
+```c title="zgoda.c"
+#include <stdio.h>
+
+int main(void)
+{
+    char c;
+    printf("Zgadzasz się? (t/n) ");
+    scanf(" %c", &c);
+
+    if (c == 't' || c == 'T')
+    {
+        printf("Zgoda.\n");
+    }
+    else if (c == 'n' || c == 'N')
+    {
+        printf("Brak zgody.\n");
+    }
+}
+```
+
+Spacja przed `%c` w `scanf` każe pominąć spacje i znaki nowej linii, które mogły zostać po wcześniejszym wczytywaniu. Znaki porównujemy w **pojedynczym** cudzysłowie: `'t'`.
+
+<NaZajeciach tytul="Bramka w kinie" czas="5 min">
+Piszemy warunek wpuszczania na film: można wejść, jeśli widz ma co najmniej 16 lat albo przyszedł z rodzicem. Na tablicy zapisujemy to najpierw zdaniem, potem pseudokodem, a na końcu w C: `if (wiek >= 16 || z_rodzicem)`. Jak zmienić warunek, żeby seans był tylko dla osób od 16 do 26 lat?
+</NaZajeciach>
+
+<Dociekliwi tytul="switch: wiele przypadków naraz">
+Gdy jedną zmienną porównujesz z wieloma konkretnymi wartościami, wygodniejsze bywa `switch`:
+
+```c
+switch (c)
+{
+    case 't':
+    case 'T':
+        printf("Zgoda.\n");
+        break;
+    case 'n':
+    case 'N':
+        printf("Brak zgody.\n");
+        break;
+    default:
+        printf("Nie rozumiem.\n");
+}
+```
+
+`break` kończy dany przypadek. Bez niego program „przeleci” do następnego `case`. To częsty błąd, więc na początku zostań przy `if`.
+</Dociekliwi>
+
+<Quiz>
+  <Pytanie
+    pytanie="Jak w C zapisać „x jest różne od zera”?"
+    odpowiedzi={["x != 0", "x <> 0", "x =! 0", "x ≠ 0"]}
+    poprawna={0}
+    wyjasnienie="!= to operator „różne”. W C nie ma operatora <>."
+  />
+  <Pytanie
+    pytanie="Co sprawdza warunek (wiek >= 18 && wiek < 26)?"
+    odpowiedzi={[
+      "Czy wiek jest od 18 do 25 włącznie",
+      "Czy wiek jest mniejszy od 18 albo większy od 26",
+      "Czy wiek jest równy 18 albo 26",
+    ]}
+    poprawna={0}
+    wyjasnienie="&& wymaga spełnienia obu warunków: co najmniej 18 i mniej niż 26, czyli 18–25."
+  />
+  <Pytanie
+    pytanie="Ile gałęzi wykona się w łańcuchu if / else if / else?"
+    odpowiedzi={["Dokładnie jedna", "Wszystkie pasujące", "Zawsze ostatnia"]}
+    poprawna={0}
+    wyjasnienie="Komputer wykonuje pierwszą gałąź, której warunek jest spełniony (albo else), i pomija resztę."
+  />
+</Quiz>

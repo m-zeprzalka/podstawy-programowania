@@ -1,4 +1,23 @@
 {
   "title": "Język C",
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "dlaczego-c",
+    "srodowisko",
+    "pierwszy-program",
+    "kompilacja",
+    "printf-i-scanf",
+    "typy-danych",
+    "warunki",
+    "petle",
+    "funkcje",
+    "mario",
+    "operatory",
+    "polskie-znaki",
+    "styl",
+    "slowniczek",
+    "zadanie-domowe",
+    "scenariusz-zajec",
+    "materialy"
+  ]
 }

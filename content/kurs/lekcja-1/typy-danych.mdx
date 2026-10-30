@@ -1,0 +1,133 @@
+---
+title: Zmienne i typy danych
+nav: Typy danych
+description: int, double, char i bool. Ile miejsca zajmuje każdy typ, jak duże liczby mieści i dlaczego w C każda zmienna musi mieć typ.
+czas: 12
+---
+
+<Cel>Tworzyć zmienne odpowiedniego typu i zmieniać ich wartość.</Cel>
+
+<Pojecia
+  lista={[
+    ["typ danych", "data type"],
+    ["deklaracja", "declaration"],
+    ["przypisanie", "assignment"],
+    ["inkrementacja", "increment"],
+    ["stała", "constant"],
+    ["słowo kluczowe", "keyword"],
+  ]}
+/>
+
+## Zmienna to podpisana szufladka
+
+W lekcji 0 pamięć była rzędem ponumerowanych szufladek. **Zmienna** to szufladka (albo kilka sąsiednich) z nazwą. W C trzeba z góry powiedzieć, co w niej będzie leżeć. To jest **typ danych**. Pamiętasz, że te same bity mogą być liczbą, literą albo kolorem? Typ to właśnie ta umowa: mówi komputerowi, jak czytać bity w szufladce.
+
+```c
+int licznik = 0;
+```
+
+Ta linijka ma cztery części: typ (`int`), nazwę (`licznik`), wartość początkową (`= 0`) i średnik.
+
+## Najważniejsze typy
+
+| typ | co przechowuje | rozmiar | zakres albo dokładność | w printf |
+|---|---|---|---|---|
+| `int` | liczbę całkowitą | 4 B | od −2 147 483 648 do 2 147 483 647 | `%d` |
+| `long long` | dużą liczbę całkowitą | 8 B | ok. ±9,2 tryliona | `%lld` |
+| `double` | liczbę z ułamkiem | 8 B | ok. 15–16 cyfr znaczących | `%f` |
+| `float` | liczbę z ułamkiem, mniej dokładnie | 4 B | ok. 7 cyfr znaczących | `%f` |
+| `char` | jeden znak, czyli jeden bajt | 1 B | znaki ASCII | `%c` |
+| `bool` | prawdę albo fałsz | 1 B | `true` albo `false` | `%d` (1 albo 0) |
+
+Rozmiary w tabeli są typowe dla współczesnych komputerów. Standard języka C podaje tylko minimalne rozmiary, więc na nietypowym sprzęcie mogą być inne.<Zrodlo n={[7, 9]} /> Rozmiar sprawdzisz operatorem `sizeof`:
+
+```c title="rozmiary.c"
+#include <stdio.h>
+
+int main(void)
+{
+    printf("int: %zu B\n", sizeof(int));          // int: 4 B
+    printf("double: %zu B\n", sizeof(double));    // double: 8 B
+}
+```
+
+Zakresy znasz z modułu o przepełnieniu w lekcji 0: `int` ma 32 bity, więc mieści liczby do 2³¹ − 1.
+
+<Uwaga tytul="Pułapka: long">
+Istnieje też typ `long`. Na Linuksie i macOS ma 8 bajtów, ale na Windowsie tylko 4, tyle co `int`.<Zrodlo n={10} /> Ten sam program może więc działać na jednym komputerze, a na drugim się przepełnić. Gdy potrzebujesz dużych liczb, używaj `long long`.
+</Uwaga>
+
+### Znak to też liczba
+
+Typ `char` przechowuje jeden bajt, czyli kod ASCII znaku:
+
+```c
+char c = 'A';
+printf("%c %d %c\n", c, c, c + 1);    // A 65 B
+```
+
+Ten sam bajt wypisany przez `%c` to litera, a przez `%d` liczba 65. Do tego `'A' + 1` daje `'B'`, bo kody liter idą po kolei. Zwróć uwagę na cudzysłowy: **pojedynczy** `'A'` to jeden znak, **podwójny** `"A"` to napis.
+
+### Prawda i fałsz
+
+Typ `bool` ma tylko dwie wartości: `true` (prawda) i `false` (fałsz). W starszych wersjach C trzeba na początku pliku dopisać `#include <stdbool.h>`. Od standardu C23 nie jest to potrzebne, a GCC od wersji 15 używa go domyślnie.<Zrodlo n={[13, 14]} /> Żeby kod działał wszędzie, dopisuj `#include <stdbool.h>`.
+
+### A gdzie napisy?
+
+W C nie ma osobnego typu na napis. Napis to ciąg znaków `char` ułożonych w pamięci jeden za drugim, np. `char imie[50];` z poprzedniego modułu. Dokładnie przyjrzymy się temu w lekcji o tablicach.
+
+## Zmiana wartości
+
+Te trzy linijki robią to samo, czyli zwiększają `licznik` o jeden:
+
+```c
+licznik = licznik + 1;
+licznik += 1;
+licznik++;
+```
+
+Znak `=` w C to **przypisanie**, a nie równość. `licznik = licznik + 1` czytaj: „weź obecną wartość licznika, dodaj jeden i wpisz wynik z powrotem do licznika”. Do sprawdzania równości służy podwójny znak `==`, który poznasz w module o warunkach.
+
+<Uwaga tytul="Zmienna bez wartości">
+Zmienna, której nie nadano wartości, zawiera przypadkowe resztki z pamięci. `int x; printf("%d", x);` może wypisać cokolwiek. Nadawaj wartość od razu: `int x = 0;`.
+</Uwaga>
+
+## Nazwy zmiennych
+
+- Nazwa składa się z liter, cyfr i podkreślnika `_` i nie może zaczynać się od cyfry: `wynik2` tak, `2wynik` nie.
+- Wielkość liter ma znaczenie: `wiek` i `Wiek` to dwie różne zmienne.
+- Nie można użyć słów kluczowych języka, takich jak `int`, `if` czy `return`.
+- **Nie używaj polskich liter**: `zolw`, a nie `żółw`. Część kompilatorów je przyjmie, część nie.
+- Nazwa ma mówić, co jest w środku: `liczba_osob` zamiast `x`.
+
+Wartość, która nie powinna się zmieniać, oznacz słowem `const`. Taką **stałą** zwykle zapisuje się wielkimi literami:
+
+```c
+const int DNI_W_TYGODNIU = 7;
+```
+
+Próba zmiany stałej skończy się błędem kompilacji. Zamiast wpisywać w kodzie „magiczną” liczbę 7, piszesz nazwę, która tłumaczy, skąd ta liczba się wzięła.
+
+<NaZajeciach tytul="Jaki typ?" czas="4 min">
+Sala dobiera typ do danych: wiek, cena w złotych, temperatura za oknem, pierwsza litera imienia, „czy użytkownik jest zalogowany”, liczba ludzi na Ziemi. Pułapki: cenę lepiej trzymać w groszach jako `int` (pamiętasz 0.1 + 0.2?), a ponad 8 miliardów ludzi nie zmieści się w `int`.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Jakiego typu użyjesz do zapisania liczby ludzi na Ziemi (ponad 8 miliardów)?"
+    odpowiedzi={["long long", "int", "char", "bool"]}
+    poprawna={0}
+    wyjasnienie="int mieści liczby tylko do ok. 2,1 miliarda. long long ma 8 bajtów i mieści liczby do ok. 9,2 tryliona."
+  />
+  <Pytanie
+    pytanie={`Co wypisze kod: char c = 'B'; printf("%d", c);`}
+    akceptowane={["66"]}
+    wyjasnienie="%d wypisuje znak jako liczbę, czyli jego kod ASCII. B ma kod 66."
+  />
+  <Pytanie
+    pytanie="Która linijka NIE zmienia wartości zmiennej licznik?"
+    odpowiedzi={["licznik + 1;", "licznik++;", "licznik += 1;", "licznik = licznik + 1;"]}
+    poprawna={0}
+    wyjasnienie="licznik + 1 oblicza wynik, ale nigdzie go nie zapisuje. GCC z opcją -Wall ostrzeże: statement with no effect."
+  />
+</Quiz>

@@ -1,0 +1,113 @@
+---
+title: Polskie znaki w C
+nav: Polskie znaki
+description: Dlaczego „Zażółć” ma w C 10 znaków, „ą” nie mieści się w char, a terminal na Windowsie potrafi pokazać krzaczki. I gdzie zgubił się przecinek w 3,5.
+czas: 8
+---
+
+<Cel>Rozumieć, skąd biorą się problemy z polskimi znakami w C, i umieć je obejść.</Cel>
+
+<Pojecia
+  lista={[
+    ["kodowanie znaków", "character encoding"],
+    ["strona kodowa", "code page"],
+    ["ustawienia regionalne", "locale"],
+    ["separator dziesiętny", "decimal separator"],
+  ]}
+/>
+
+## C liczy bajty, a nie litery
+
+W lekcji 0 poznaliśmy UTF-8: angielska litera zajmuje jeden bajt, a polska litera ze znakiem diakrytycznym dwa. Język C nic nie wie o literach, liczy tylko bajty. Funkcja `strlen` z biblioteki `string.h` zwraca długość napisu:
+
+```c title="dlugosc.c"
+#include <stdio.h>
+#include <string.h>
+
+int main(void)
+{
+    printf("%zu\n", strlen("Zazolc"));    // 6
+    printf("%zu\n", strlen("Zażółć"));    // 10
+}
+```
+
+„Zażółć” ma 6 liter, ale 10 bajtów: Z i a po jednym bajcie, a ż, ó, ł i ć po dwa. GCC domyślnie zapisuje napisy z kodu w UTF-8.<Zrodlo n={21} />
+
+Z tego samego powodu **„ą” nie zmieści się w zmiennej `char`**, która ma jeden bajt:
+
+```c
+char c = 'ą';    // ostrzeżenie: multi-character character constant
+```
+
+Kompilator ostrzeże, że między apostrofami stoi więcej niż jeden znak, i zostawi w `c` tylko jeden z dwóch bajtów. Polską literę trzeba trzymać jako napis: `"ą"`.
+
+Także funkcje do zmiany wielkości liter, np. `toupper` z `ctype.h`, działają na pojedynczych bajtach. Zamiana „zażółć” bajt po bajcie daje „ZAżółć”: angielskie litery urosły, polskie zostały małe.
+
+## Krzaczki w terminalu na Windowsie
+
+Na Linuksie, macOS i w kompilatorach w przeglądarce `printf("Zażółć\n");` zwykle działa od razu. Na Windowsie klasyczny terminal domyślnie nie używa UTF-8, tylko starej strony kodowej, więc bajty UTF-8 wyświetlą się jako krzaczki. Znasz to z modułu o Unicode: bajty są dobre, zła jest umowa odczytu.
+
+Najprostsza poprawka to przełączenie terminala na UTF-8 przed uruchomieniem programu. W tym samym oknie terminala wpisz:
+
+```bash title="Terminal na Windowsie"
+chcp 65001
+.\program
+```
+
+65001 to numer strony kodowej UTF-8 w systemie Windows.<Zrodlo n={20} /> Ustawienie działa, dopóki nie zamkniesz okna.
+
+<Dociekliwi tytul="Poprawka w kodzie programu">
+Program może sam przełączyć terminal na UTF-8 funkcją `SetConsoleOutputCP` z biblioteki Windows:<Zrodlo n={19} />
+
+```c
+#include <stdio.h>
+#include <windows.h>
+
+int main(void)
+{
+    SetConsoleOutputCP(CP_UTF8);
+    printf("Zażółć gęślą jaźń\n");
+}
+```
+
+Taki kod skompiluje się tylko na Windowsie, bo plik `windows.h` istnieje tylko tam. Wczytywanie polskich liter z klawiatury w terminalu Windows też bywa zawodne, więc w programach na zajęcia trzymaj się liter bez ogonków przy danych od użytkownika.
+
+Osoby, które piszą w Visual Studio (kompilator Microsoftu), powinny dodać opcję `/utf-8`. Bez niej kompilator może źle odczytać polskie litery już w samym pliku z kodem.
+</Dociekliwi>
+
+## Przecinek czy kropka?
+
+W Polsce piszemy 3,5, ale C domyślnie oczekuje kropki. Program wczytuje liczbę `scanf("%lf", &x)` i wypisuje ją przez `printf`:
+
+```txt title="Terminal"
+Podaj liczbę: 3,5
+Wczytano: 3.000000
+```
+
+`scanf` przeczytał „3”, zatrzymał się na przecinku i uznał, że liczba się skończyła. Nie było żadnego błędu, tylko zły wynik. Dlatego przy danych od użytkownika pisz w poleceniu wprost: „podaj liczbę z kropką, np. 3.5”.
+
+<Uwaga tytul="%lf w scanf, %f w printf">
+Do wczytania `double` przez `scanf` służy `%lf`, a do wypisania przez `printf` wystarczy `%f`. Ta niekonsekwencja to częsty błąd: `scanf("%f", &x)` z `double x` wczyta śmieci.
+</Uwaga>
+
+<NaZajeciach tytul="Ile bajtów?" czas="3 min">
+Zgadujemy wynik `strlen` dla napisów: „kot”, „żółw”, „źdźbło”, „Łódź”, „€”, „😂”. Potem sprawdzamy w programie. Odpowiedzi: 3, 7, 9, 7, 3 i 4.
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie='Co zwróci strlen("żółw") dla kodu zapisanego w UTF-8?'
+    akceptowane={["7", "siedem"]}
+    wyjasnienie="ż, ó i ł zajmują po 2 bajty, w jeden: 2 + 2 + 2 + 1 = 7."
+  />
+  <Pytanie
+    pytanie="Użytkownik wpisał 2,5, a program wczytał 2. Dlaczego?"
+    odpowiedzi={[
+      "scanf oczekuje kropki i zatrzymał się na przecinku",
+      "Typ double nie mieści ułamków",
+      "Program ma błąd w printf",
+    ]}
+    poprawna={0}
+    wyjasnienie="Domyślnie C używa kropki jako separatora dziesiętnego. Przecinek kończy liczbę."
+  />
+</Quiz>

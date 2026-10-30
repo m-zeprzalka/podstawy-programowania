@@ -5,6 +5,7 @@ import * as React from "react"
 import { Lab, LabLabel } from "@/components/kurs/lab"
 import { cn } from "@/lib/utils"
 
+import { PrzelacznikJezyka, useJezykScratcha } from "./scratch-jezyk"
 import { ScratchSkrypt } from "./scratch-skrypt"
 
 type Pojecie = {
@@ -12,8 +13,12 @@ type Pojecie = {
   nazwa: string
   /** Przykładowy blok w polskiej składni Scratcha. */
   kod: string
+  /** Ten sam przykład w angielskim Scratchu. */
+  kodEn: string
   /** Etykieta bloku w angielskim Scratchu. */
   en: string
+  /** Etykieta bloku w polskim Scratchu. */
+  pl: string
   /** Odpowiednik w C. */
   c: string
   opis: string
@@ -27,7 +32,9 @@ const POJECIA: Pojecie[] = [
     id: "funkcja",
     nazwa: "funkcja",
     kod: "powiedz [Cześć!]",
-    en: "say [Hello!]",
+    kodEn: "say [Cześć!]",
+    en: "say [Cześć!]",
+    pl: "powiedz [Cześć!]",
     c: 'printf("Cześć!\\n");',
     opis: "Funkcja to klocek-czasownik, który coś robi; w C wywołujesz ją nazwą z nawiasami.",
   },
@@ -35,7 +42,9 @@ const POJECIA: Pojecie[] = [
     id: "argument",
     nazwa: "argument",
     kod: "powiedz [Witaj, świecie!]",
-    en: "say [Hello, world!]",
+    kodEn: "say [Witaj, świecie!]",
+    en: "say [Witaj, świecie!]",
+    pl: "powiedz [Witaj, świecie!]",
     c: 'printf("hello, world\\n");',
     opis: "Argument to dane wpisane w okienko klocka — w C trafiają w nawiasy wywołania funkcji.",
   },
@@ -43,15 +52,19 @@ const POJECIA: Pojecie[] = [
     id: "wartosc",
     nazwa: "wartość zwracana",
     kod: "powiedz (połącz [Cześć, ] i (odpowiedź))",
-    en: "say (join [Hello, ] (answer))",
-    c: 'string imie = get_string("Imię? ");',
-    opis: "Owalny klocek oddaje wynik, który wkładasz w okienko innego klocka — jak wynik get_string zapisany w zmiennej.",
+    kodEn: "say (join [Cześć, ] (answer))",
+    en: "say (join [Cześć, ] (answer))",
+    pl: "powiedz (połącz [Cześć, ] i (odpowiedź))",
+    c: "int n = strlen(imie);",
+    opis: "Owalny klocek oddaje wynik, który wkładasz w okienko innego klocka — jak wynik funkcji strlen (długość tekstu) zapisany w zmiennej.",
   },
   {
     id: "efekt",
     nazwa: "efekt uboczny",
     kod: "zagraj dźwięk [Miau] i czekaj",
+    kodEn: "play sound [Meow] until done",
     en: "play sound [Meow] until done",
+    pl: "zagraj dźwięk [Miau] i czekaj",
     c: 'printf("Miau!\\n");',
     opis: "Efekt uboczny to widoczny skutek działania — dźwięk, dymek, tekst w terminalu — a nie wartość do dalszego użycia.",
   },
@@ -59,7 +72,9 @@ const POJECIA: Pojecie[] = [
     id: "zmienna",
     nazwa: "zmienna",
     kod: "ustaw [wynik] na (0)\nzmień [wynik] o (1)",
-    en: "set [score] to (0)\nchange [score] by (1)",
+    kodEn: "set [wynik] to (0)\nchange [wynik] by (1)",
+    en: "set [wynik] to (0)\nchange [wynik] by (1)",
+    pl: "ustaw [wynik] na (0)\nzmień [wynik] o (1)",
     c: "int wynik = 0;\nwynik = wynik + 1;",
     opis: "Zmienna to nazwane pudełko na wartość, którą można odczytać i zmienić w trakcie programu.",
   },
@@ -67,7 +82,9 @@ const POJECIA: Pojecie[] = [
     id: "wyrazenie",
     nazwa: "wyrażenie logiczne",
     kod: "<dotyka [wskaźnik myszy]?>",
+    kodEn: "<touching [mouse-pointer]?>",
     en: "<touching [mouse-pointer]?>",
+    pl: "<dotyka [wskaźnik myszy]?>",
     c: "x < y",
     opis: "Wyrażenie logiczne ma odpowiedź „tak” albo „nie” (prawda/fałsz); w Scratchu poznasz je po sześciokątnym kształcie.",
   },
@@ -75,7 +92,9 @@ const POJECIA: Pojecie[] = [
     id: "warunek",
     nazwa: "warunek",
     kod: "jeżeli <dotyka [Oscar]?> to\n    powiedz [Mam cię!]\nw przeciwnym razie\n    powiedz [Pudło]",
+    kodEn: "if <touching [Oscar]?> then\n    say [Mam cię!]\nelse\n    say [Pudło]",
     en: "if <> then … else",
+    pl: "jeżeli < > to … w przeciwnym razie",
     c: "if (x < y)\n{\n    …\n}\nelse\n{\n    …\n}",
     opis: "Warunek wybiera jedną z dróg zależnie od wartości wyrażenia logicznego.",
   },
@@ -83,7 +102,9 @@ const POJECIA: Pojecie[] = [
     id: "petla",
     nazwa: "pętla",
     kod: "powtórz (3) razy\n    zagraj dźwięk [Miau] i czekaj",
-    en: "repeat (3)",
+    kodEn: "repeat (3)\n    play sound [Meow] until done",
+    en: "repeat ( )",
+    pl: "powtórz ( ) razy",
     c: "for (int i = 0; i < 3; i++)\n{\n    …\n}",
     opis: "Pętla powtarza zamknięte w niej klocki: określoną liczbę razy, w nieskończoność albo aż spełni się warunek.",
   },
@@ -91,7 +112,9 @@ const POJECIA: Pojecie[] = [
     id: "zdarzenie",
     nazwa: "zdarzenie",
     kod: "kiedy kliknięto zieloną flagę\npowiedz [Start!]",
+    kodEn: "when green flag clicked\nsay [Start!]",
     en: "when green flag clicked",
+    pl: "kiedy kliknięto zieloną flagę",
     c: "int main(void)",
     opis: "Zdarzenie uruchamia skrypt. Program w C zaczyna się od funkcji main, a zdarzenia wrócą przy JavaScripcie.",
   },
@@ -99,15 +122,19 @@ const POJECIA: Pojecie[] = [
     id: "watek",
     nazwa: "wątek",
     kod: "kiedy kliknięto zieloną flagę\nzawsze\n    zmień y o (-1)\n\nkiedy kliknięto zieloną flagę\nzawsze\n    jeżeli <dotyka [Oscar]?> to\n        zmień [wynik] o (1)",
+    kodEn: "when green flag clicked\nforever\n    change y by (-1)\n\nwhen green flag clicked\nforever\n    if <touching [Oscar]?> then\n        change [wynik] by (1)",
     en: "when green flag clicked  (×2)",
-    c: "// wielowątkowość, async w JS",
+    pl: "kiedy kliknięto zieloną flagę  (×2)",
+    c: "// wątki; w JS: współbieżność (async)",
     opis: "Kilka skryptów od tego samego zdarzenia działa jednocześnie — każdy z nich to osobny wątek.",
   },
   {
     id: "abstrakcja",
     nazwa: "abstrakcja",
     kod: "definiuj miau (n) razy\npowtórz (n) razy\n    zagraj dźwięk [Miau] i czekaj\n\nkiedy kliknięto zieloną flagę\nmiau (3) razy",
-    en: "define meow (n) times",
+    kodEn: "define miau (n) razy\nrepeat (n)\n    play sound [Meow] until done\n\nwhen green flag clicked\nmiau (3) razy",
+    en: "define miau (n) razy",
+    pl: "definiuj miau (n) razy",
     c: "void miau(int n)",
     opis: "Własny blok ukrywa szczegóły pod jedną nazwą — tak jak funkcja, którą sam definiujesz w C.",
   },
@@ -123,11 +150,14 @@ export function TlumaczKlockow() {
   const id = React.useId()
   const [wybrane, setWybrane] = React.useState(POJECIA[0].id)
   const p = POJECIA.find((x) => x.id === wybrane) ?? POJECIA[0]
+  const [jezyk] = useJezykScratcha()
+  const en = jezyk === "en"
 
   return (
     <Lab
       tytul="Tłumacz klocków"
-      opis="Wybierz pojęcie: zobaczysz klocek ze Scratcha po polsku, jego angielską etykietę i odpowiednik w C."
+      opis="Wybierz pojęcie: zobaczysz klocek ze Scratcha, jego nazwę w drugim języku i odpowiednik w C."
+      akcje={<PrzelacznikJezyka />}
     >
       <div className="grid gap-4 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-6">
         <div
@@ -162,13 +192,21 @@ export function TlumaczKlockow() {
             {p.nazwa}
           </h4>
           <div className="flex flex-col gap-2">
-            <LabLabel>Scratch (PL)</LabLabel>
-            <ScratchSkrypt key={p.id} kod={p.kod} duszek={p.nazwa} kompaktowy />
+            <LabLabel>Scratch ({en ? "EN" : "PL"})</LabLabel>
+            <ScratchSkrypt
+              key={p.id}
+              kod={p.kod}
+              kodEn={p.kodEn}
+              duszek={p.nazwa}
+              kompaktowy
+            />
           </div>
           <dl className="grid gap-px border bg-border sm:grid-cols-2">
             <div className="flex min-w-0 flex-col gap-1.5 bg-card p-3">
-              <dt className={ETYKIETA}>Scratch (EN)</dt>
-              <dd className="font-mono text-sm whitespace-pre-wrap">{p.en}</dd>
+              <dt className={ETYKIETA}>Scratch ({en ? "PL" : "EN"})</dt>
+              <dd className="font-mono text-sm whitespace-pre-wrap">
+                {en ? p.pl : p.en}
+              </dd>
             </div>
             <div className="flex min-w-0 flex-col gap-1.5 bg-card p-3">
               <dt className={ETYKIETA}>C</dt>

@@ -21,11 +21,16 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatPL } from "@/lib/bity"
 import { cn } from "@/lib/utils"
 
+/**
+ * Zalecana przepływność filmów przesyłanych na YouTube (Mbit/s, SDR):
+ * [24–30 fps, 48–60 fps]. Dla 4K środek przedziałów 35–45 i 53–68.
+ * https://support.google.com/youtube/answer/1722171
+ */
 const ROZDZIELCZOSCI = [
-  { id: "720p", w: 1280, h: 720, strumien: 3 },
-  { id: "1080p", w: 1920, h: 1080, strumien: 5 },
-  { id: "1440p", w: 2560, h: 1440, strumien: 9 },
-  { id: "4K", w: 3840, h: 2160, strumien: 16 },
+  { id: "720p", w: 1280, h: 720, strumien: [5, 7.5] },
+  { id: "1080p", w: 1920, h: 1080, strumien: [8, 12] },
+  { id: "1440p", w: 2560, h: 1440, strumien: [16, 24] },
+  { id: "4K", w: 3840, h: 2160, strumien: [40, 60] },
 ] as const
 
 type RozdzielczoscId = (typeof ROZDZIELCZOSCI)[number]["id"]
@@ -90,7 +95,9 @@ export function KalkulatorMediow() {
   const klatka = r.w * r.h * BAJTY_NA_PIKSEL
   const sekundaWideo = klatka * fps
   const caloscWideo = sekundaWideo * czasWideo
-  const strumienBity = r.strumien * 1e6
+  const duzoKlatek = fps > 30
+  const strumienMbit = r.strumien[duzoKlatek ? 1 : 0]
+  const strumienBity = strumienMbit * 1e6
   const strumienBajty = (strumienBity * czasWideo) / 8
   const surowyBitrate = sekundaWideo * 8
 
@@ -123,7 +130,8 @@ export function KalkulatorMediow() {
       stopka={
         <>
           Jednostki dziesiętne: 1&nbsp;kB = 1000&nbsp;B, 1&nbsp;MB = 10⁶&nbsp;B,
-          1&nbsp;GB = 10⁹&nbsp;B.
+          1&nbsp;GB = 10⁹&nbsp;B. Przepływność wideo po kompresji: zalecenia
+          YouTube dla przesyłanych filmów.
         </>
       }
     >
@@ -201,12 +209,16 @@ export function KalkulatorMediow() {
                 bajty: caloscWideo,
               },
               {
-                nazwa: `Strumień ${r.id} (H.264/HEVC)`,
-                przeplywnosc: `ok.\u00a0${formatPL(r.strumien)}\u00a0Mbit/s`,
+                nazwa: `YouTube ${r.id}, ${fps} fps (H.264)`,
+                przeplywnosc: `${r.id === "4K" ? "ok.\u00a0" : ""}${formatPL(strumienMbit)}\u00a0Mbit/s`,
                 bajty: strumienBajty,
               },
             ]}
-            wniosek={`Kompresja stratna zmniejsza to wideo ok. ${formatPL(okolo(surowyBitrate / strumienBity))}×.`}
+            wniosek={`Kompresja stratna zmniejsza to wideo ok. ${formatPL(okolo(surowyBitrate / strumienBity))}×. ${
+              duzoKlatek
+                ? `Klatek jest 2× więcej niż przy 30 fps, a strumień rośnie tylko ${formatPL(r.strumien[1] / r.strumien[0])}×: kolejne klatki są do siebie podobne, więc kodek zapisuje głównie różnice.`
+                : "Dla 24 i 30 fps YouTube zaleca tę samą przepływność: kodek zapisuje głównie różnice między klatkami, więc kilka klatek więcej prawie nic nie kosztuje."
+            }`}
           />
         </TabsContent>
 

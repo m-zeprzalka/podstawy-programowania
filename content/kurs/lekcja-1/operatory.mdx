@@ -1,0 +1,149 @@
+---
+title: "Kalkulator: działania, dzielenie i przepełnienie"
+nav: Działania i granice
+description: Dlaczego 7 / 2 daje w C 3, do czego służy reszta z dzielenia i co się dzieje, gdy liczba przestaje się mieścić w int.
+czas: 12
+---
+
+<Cel>Liczyć w C bez niespodzianek: rozumieć dzielenie całkowite, rzutowanie i granice typów.</Cel>
+
+<Pojecia
+  lista={[
+    ["operator arytmetyczny", "arithmetic operator"],
+    ["dzielenie całkowite", "integer division"],
+    ["reszta z dzielenia", "remainder, modulo"],
+    ["rzutowanie", "cast"],
+    ["obcięcie", "truncation"],
+    ["przepełnienie", "overflow"],
+    ["zachowanie niezdefiniowane", "undefined behavior"],
+  ]}
+/>
+
+## Pięć działań
+
+```c title="kalkulator.c"
+#include <stdio.h>
+
+int main(void)
+{
+    int x = 7;
+    int y = 2;
+    printf("%d\n", x + y);    // 9
+    printf("%d\n", x - y);    // 5
+    printf("%d\n", x * y);    // 14
+    printf("%d\n", x / y);    // 3, a nie 3.5!
+    printf("%d\n", x % y);    // 1
+}
+```
+
+Dwa ostatnie wyniki wymagają wyjaśnienia.
+
+**Dzielenie liczb całkowitych daje liczbę całkowitą.** Gdy oba składniki są typu `int`, C odcina część ułamkową: 7 / 2 = 3, a 1 / 3 = 0. To **obcięcie**, a nie zaokrąglenie: 9 / 10 też daje 0.
+
+**`%` to reszta z dzielenia.** 7 dzielone przez 2 to 3 i reszta 1. Reszta przydaje się częściej, niż się wydaje:
+
+- `x % 2 == 0` sprawdza, czy liczba jest parzysta,
+- `x % 10` daje ostatnią cyfrę liczby,
+- `minuty % 60` zamienia minuty na „minuty po pełnej godzinie”.
+
+## Jak dostać 3.5
+
+Żeby dostać wynik z ułamkiem, przynajmniej jedna z liczb musi mieć typ z ułamkiem. Można to wymusić **rzutowaniem**, czyli typem w nawiasie przed wartością:
+
+```c
+printf("%f\n", (double) x / y);      // 3.500000
+printf("%.2f\n", (double) x / y);    // 3.50
+```
+
+`(double) x` znaczy: „potraktuj x jako double”. Wtedy całe dzielenie odbywa się na liczbach z ułamkiem. `%.2f` w `printf` wypisuje dwie cyfry po kropce.
+
+<Uwaga tytul="Rzutowanie w złym miejscu">
+`(double) (x / y)` daje 3.000000. Nawias sprawia, że najpierw liczy się dzielenie całkowite (3), a dopiero gotowy wynik zamienia się na `double`. Rzutuj liczbę przed dzieleniem, a nie wynik.
+</Uwaga>
+
+## Ułamki nie są dokładne
+
+W lekcji 0 widzieliśmy, że w JavaScripcie 0.1 + 0.2 nie daje dokładnie 0.3. W C jest tak samo, bo `double` to ten sam 64-bitowy format IEEE 754. Wystarczy poprosić `printf` o więcej cyfr:
+
+```c
+printf("%.20f\n", 0.1);           // 0.10000000000000000555
+printf("%.20f\n", 1.0 / 3);       // 0.33333333333333331483
+```
+
+Typ `float` ma tylko 32 bity, więc błąd pojawia się dużo wcześniej:
+
+```c
+float f = 1.0f / 3;
+printf("%.20f\n", f);             // 0.33333334326744079590
+```
+
+Dlatego domyślnie używaj `double`, a pieniądze licz w groszach jako liczby całkowite.
+
+## Przepełnienie w praktyce
+
+Podwajajmy liczbę w pętli:
+
+```c title="podwajaj.c"
+#include <stdio.h>
+
+int main(void)
+{
+    int n = 1;
+    for (int i = 0; i < 33; i++)
+    {
+        printf("2^%d = %d\n", i, n);
+        n = n * 2;
+    }
+}
+```
+
+```txt title="Koniec wyniku"
+2^29 = 536870912
+2^30 = 1073741824
+2^31 = -2147483648
+2^32 = 0
+```
+
+Liczba 2³¹ nie mieści się w `int`, którego maksimum to 2 147 483 647. Wynik „przekręca się” na liczbę ujemną, a potem na zero, zupełnie jak licznik kilometrów z lekcji 0.
+
+<Uwaga tytul="W C to coś gorszego niż przekręcenie">
+Formalnie przepełnienie liczby ze znakiem (`int`) to w C **zachowanie niezdefiniowane**. Standard nie mówi, co ma się wtedy stać, więc kompilator ma prawo założyć, że to się nigdy nie zdarzy, i tak przerobić kod, że wynik będzie zupełnie inny.<Zrodlo n={8} /> Wynik powyżej to tylko to, co zwykle widać w praktyce. Przekręcanie jest gwarantowane jedynie dla typów bez znaku (`unsigned`).
+</Uwaga>
+
+Jak się bronić? Wybierać typ z zapasem. Ten sam program z `long long` i wstawką `%lld` doliczy bez problemu do 2⁶²:
+
+```c
+long long n = 1;
+printf("2^%d = %lld\n", i, n);    // 2^31 = 2147483648, 2^32 = 4294967296
+```
+
+Granice typów są zapisane w pliku `limits.h`: `INT_MAX` to największy `int`, a `LLONG_MAX` największy `long long`.<Zrodlo n={9} />
+
+<Dociekliwi tytul="Przepełnienia z prawdziwego życia">
+Historie Boeinga 787, Ariane 5, roku 2038 i Gangnam Style znasz z modułu o przepełnieniu w lekcji 0. Jeszcze jedna, z błędem zaokrąglenia: 25 lutego 1991 roku w Dhahranie bateria rakiet Patriot nie przechwyciła rakiety Scud, która zabiła 28 żołnierzy. Zegar systemu liczył czas w dziesiątych częściach sekundy, a 1/10 zapisywano w 24-bitowym rejestrze z obcięciem, czyli nieco za mało. Po około 100 godzinach pracy błąd urósł do około 0,34 sekundy, a w tym czasie Scud przelatuje ponad pół kilometra.<Zrodlo n={[28, 29]} />
+
+Z kolei słynna opowieść o „nuklearnym Gandhim” z gry Civilization, któremu przepełnienie miało podbić agresję do maksimum, to mit. Twórcy gry zaprzeczyli, że taki błąd kiedykolwiek istniał.<Zrodlo n={30} /> Dobra okazja, żeby sprawdzać źródła także w informatyce.
+</Dociekliwi>
+
+<NaZajeciach tytul="Zgadnij wynik" czas="5 min">
+Na slajdzie wyrażenia, sala zgaduje wynik przed uruchomieniem: `17 / 5`, `17 % 5`, `(double) 17 / 5`, `(double) (17 / 5)`, `-7 / 2` (w C: −3, obcięcie w stronę zera), `2147483647 + 1`. Kto trafi wszystkie sześć?
+</NaZajeciach>
+
+<Quiz>
+  <Pytanie
+    pytanie="Ile w C wynosi 9 / 4, gdy obie liczby są typu int?"
+    akceptowane={["2"]}
+    wyjasnienie="Dzielenie całkowite obcina część ułamkową: 9 / 4 = 2,25 → 2."
+  />
+  <Pytanie
+    pytanie="Ile wynosi 14 % 4?"
+    akceptowane={["2"]}
+    wyjasnienie="14 = 3 × 4 + 2, więc reszta z dzielenia wynosi 2."
+  />
+  <Pytanie
+    pytanie="Jak dostać wynik 3.5 z dzielenia int x = 7 przez int y = 2?"
+    odpowiedzi={["(double) x / y", "(double) (x / y)", "x / y + 0.5"]}
+    poprawna={0}
+    wyjasnienie="Trzeba zamienić typ przed dzieleniem. (double) (x / y) najpierw liczy 7 / 2 = 3, a dopiero potem zamienia 3 na 3.0."
+  />
+</Quiz>
