@@ -134,14 +134,14 @@ W tokenizerze OpenAI (platform.openai.com/tokenizer) porównujemy „I met a hug
 <Quiz>
   <Pytanie
     pytanie="Ile różnych wartości zmieści się w 16 bitach?"
-    odpowiedzi={["16", "256", "65 536", "65 535"]}
-    poprawna={2}
+    odpowiedzi={["16", "256", "65 535", "65 536"]}
+    poprawna={3}
     wyjasnienie="16 bitów to 2¹⁶ = 65 536 wartości. Największa liczba bez znaku to 65 535, bo liczymy też zero."
   />
   <Pytanie
     pytanie="Jaka jest największa 32-bitowa liczba całkowita ze znakiem?"
-    odpowiedzi={["4 294 967 295", "2 147 483 647", "65 535", "32 767"]}
-    poprawna={1}
+    odpowiedzi={["32 767", "65 535", "2 147 483 647", "4 294 967 295"]}
+    poprawna={2}
     wyjasnienie="2³¹ − 1 = 2 147 483 647. Jeden z 32 bitów przypada na znak, więc na wartość zostaje 31."
   />
   <Pytanie
@@ -156,11 +156,11 @@ W tokenizerze OpenAI (platform.openai.com/tokenizer) porównujemy „I met a hug
   <Pytanie
     pytanie="Dlaczego 0.1 + 0.2 nie daje dokładnie 0.3?"
     odpowiedzi={[
-      "Bo JavaScript ma błąd",
       "Bo 0,1 nie da się dokładnie zapisać w systemie dwójkowym",
+      "Bo JavaScript ma błąd",
       "Bo dodawanie ułamków jest w komputerze losowe",
     ]}
-    poprawna={1}
+    poprawna={0}
     wyjasnienie="0,1 ma w systemie dwójkowym nieskończone rozwinięcie, więc jest zaokrąglana. Małe błędy zaokrągleń sumują się."
   />
 </Quiz>

@@ -132,18 +132,18 @@ switch (c)
 <Quiz>
   <Pytanie
     pytanie="Jak w C zapisać „x jest różne od zera”?"
-    odpowiedzi={["x != 0", "x <> 0", "x =! 0", "x ≠ 0"]}
-    poprawna={0}
+    odpowiedzi={["x <> 0", "x ≠ 0", "x != 0", "x =! 0"]}
+    poprawna={2}
     wyjasnienie="!= to operator „różne”. W C nie ma operatora <>."
   />
   <Pytanie
     pytanie="Co sprawdza warunek (wiek >= 18 && wiek < 26)?"
     odpowiedzi={[
-      "Czy wiek jest od 18 do 25 włącznie",
       "Czy wiek jest mniejszy od 18 albo większy od 26",
+      "Czy wiek jest od 18 do 25 włącznie",
       "Czy wiek jest równy 18 albo 26",
     ]}
-    poprawna={0}
+    poprawna={1}
     wyjasnienie="&& wymaga spełnienia obu warunków: co najmniej 18 i mniej niż 26, czyli 18–25."
   />
   <Pytanie

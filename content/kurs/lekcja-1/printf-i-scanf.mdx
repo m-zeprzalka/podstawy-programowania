@@ -1,8 +1,8 @@
 ---
-title: "Witaj, ty: printf i scanf"
+title: "Witaj, Ty: printf i scanf"
 nav: printf i scanf
-description: Program pyta o imię i wiek, a potem odpowiada. Wstawki %s i %d, znaki specjalne i znak & przy scanf.
-czas: 12
+description: Program pyta o imię i wiek, a potem odpowiada. Wstawki %s i %d, napis jako rząd znaków, typy zmiennych i znak & przy scanf.
+czas: 15
 ---
 
 <Cel>Wypisywać tekst z wartościami zmiennych i wczytywać dane od użytkownika.</Cel>
@@ -10,6 +10,9 @@ czas: 12
 <Pojecia
   lista={[
     ["zmienna", "variable"],
+    ["deklaracja", "declaration"],
+    ["tablica", "array"],
+    ["znak końca napisu", "null terminator"],
     ["specyfikator formatu", "format specifier"],
     ["sekwencja ucieczki", "escape sequence"],
     ["wejście standardowe", "standard input, stdin"],
@@ -19,7 +22,7 @@ czas: 12
 
 ## Program, który pyta o imię
 
-W Scratchu program „Witaj, ty” używał bloków `ask [ ] and wait` i `say (join [Cześć, ] (answer))`. W C robi to samo para funkcji: `scanf` wczytuje, a `printf` wypisuje.
+W Scratchu program „Witaj, Ty” używał bloków `ask [ ] and wait` i `say (join [Cześć, ] (answer))`. W C robi to samo para funkcji: `scanf` wczytuje, a `printf` wypisuje.
 
 ```c title="witaj.c"
 #include <stdio.h>
@@ -28,7 +31,7 @@ int main(void)
 {
     char imie[50];
     printf("Jak masz na imię? ");
-    scanf("%49s", imie);
+    scanf("%s", imie);
     printf("Cześć, %s!\n", imie);
 }
 ```
@@ -40,20 +43,46 @@ Cześć, Ola!
 
 Co tu się dzieje:
 
-1. `char imie[50];` tworzy **zmienną** `imie`, czyli miejsce w pamięci na tekst do 49 znaków (ostatnie miejsce zajmuje znak końca napisu). W Scratchu odpowiada jej `answer`.
+1. `char imie[50];` tworzy **zmienną** `imie`, czyli miejsce w pamięci na napis. W Scratchu odpowiada jej `answer`. Co znaczą `char` i `[50]`, wyjaśniamy niżej.
 2. `printf("Jak masz na imię? ");` wypisuje pytanie. Bez `\n`, żeby odpowiedź pojawiła się w tej samej linijce.
-3. `scanf("%49s", imie);` czeka, aż użytkownik coś wpisze i naciśnie Enter, a potem zapisuje to w `imie`. Liczba 49 pilnuje, żeby tekst się zmieścił.
-4. `printf("Cześć, %s!\n", imie);` wypisuje napis, a w miejsce `%s` wstawia zawartość zmiennej `imie`.
+3. `scanf("%s", imie);` czeka, aż użytkownik coś wpisze i naciśnie Enter. Potem zapisuje wpisany tekst w zmiennej `imie`. `%s` mówi funkcji `scanf`, że ma wczytać napis.
+4. `printf("Cześć, %s!\n", imie);` wypisuje powitanie z imieniem.
 
-`%s` w drugim `printf` działa jak `join` w Scratchu: skleja stały tekst z wartością zmiennej.
+### Co znaczy %s
 
-<Uwaga tytul="Jedno słowo">
-`scanf` z `%s` czyta tylko do pierwszej spacji. Po wpisaniu „Anna Maria” w zmiennej będzie samo „Anna”. Na razie to wystarczy, a wczytywanie całych linijek pokażemy w kolejnych lekcjach.
+`%s` nie jest zmienną. To **wstawka**, czyli zarezerwowane miejsce w napisie. `printf` wypisuje napis znak po znaku, a gdy trafi na wstawkę, wkleja w to miejsce wartość zmiennej podanej **po przecinku**:
+
+| w napisie | na ekranie |
+|---|---|
+| `Cześć, ` | `Cześć, ` (bez zmian) |
+| `%s` | zawartość zmiennej `imie`, np. `Ola` |
+| `!` | `!` |
+| `\n` | przejście do nowej linii |
+
+Razem: `Cześć, Ola!`. Litera `s` pochodzi od *string*, czyli napis. Inne litery oznaczają inne rodzaje wartości, np. `%d` liczbę całkowitą. Pełna lista jest niżej. Wstawka działa jak `join` w Scratchu: skleja stały tekst z wartością zmiennej.
+
+### Napis to rząd znaków
+
+`char` (od angielskiego *character*, czyli znak) to typ na **jeden znak**: literę, cyfrę, spację albo inny symbol. Pojedynczy znak zapisuje się w apostrofach, np. `'A'` albo `'7'`.
+
+Jeden znak nie wystarczy na imię. Dlatego piszemy `char imie[50]`. Nawiasy kwadratowe `[50]` znaczą: 50 znaków ustawionych w rzędzie, jeden obok drugiego. Taki rząd to **tablica**. W C napis to właśnie tablica znaków.
+
+```txt title="Zmienna imie po wpisaniu „Ola”"
+[O][l][a][\0][ ][ ][ ] ... [ ]    razem 50 miejsc
+```
+
+Za ostatnią literą `scanf` dopisuje specjalny znak `\0`, czyli **znak końca napisu**. Dzięki niemu `printf` wie, gdzie skończyć wypisywanie. Ten znak też zajmuje jedno miejsce, więc w 50 miejscach zmieści się napis do 49 znaków.
+
+Czy w takiej zmiennej można trzymać coś innego niż tekst? Nie. Możesz w niej zapisać „123”, ale to będą trzy znaki, a nie liczba sto dwadzieścia trzy. Nie dodasz do niej 1 i nie porównasz jej z inną liczbą. Do liczb służą typy `int` i `double`, o których za chwilę.
+
+<Uwaga tytul="Dwie pułapki %s w scanf">
+- **Tylko jedno słowo.** `scanf` z `%s` czyta do pierwszej spacji. Po wpisaniu „Anna Maria” w zmiennej będzie samo „Anna”. Wczytywanie całych linijek pokażemy w kolejnych lekcjach.
+- **Za długi tekst.** `scanf` nie wie, ile miejsca ma zmienna. Gdy ktoś wpisze więcej niż 49 znaków, nadmiar trafi do pamięci za zmienną i nadpisze inne dane. Program może wtedy działać dziwnie albo się wysypać. To **przepełnienie bufora**, jeden z najgroźniejszych błędów w C. Dlatego w prawdziwych programach podaje się limit: `scanf("%49s", imie);` wczyta najwyżej 49 znaków. Dlaczego 49, a nie 50? Jedno miejsce trzeba zostawić na `\0`.
 </Uwaga>
 
 ## Wstawki w printf
 
-Znak `%` w napisie dla `printf` oznacza miejsce na wartość. Litera po nim mówi, jakiego rodzaju to wartość:<Zrodlo n={5} />
+Każda wstawka zaczyna się od znaku `%`. Litera po nim mówi, jakiego rodzaju wartość wstawić:<Zrodlo n={5} />
 
 | wstawka | typ wartości | przykład | wynik |
 |---|---|---|---|
@@ -91,7 +120,20 @@ int main(void)
 }
 ```
 
-`int wiek;` tworzy zmienną na liczbę całkowitą. Nowością jest **`&`** przed `wiek`. Czytaj go jako „adres”: `&wiek` to adres zmiennej `wiek` w pamięci. Funkcja `scanf` musi wiedzieć, **gdzie** zapisać wczytaną liczbę, więc podajemy jej adres szufladki, a nie jej zawartość.<Zrodlo n={6} />
+`int wiek;` to **deklaracja**, czyli utworzenie zmiennej. Zapis jest zawsze taki sam: najpierw typ, potem nazwa, na końcu średnik. Typ `int` (od *integer*) oznacza liczbę całkowitą, czyli bez ułamka, np. 18, 0 albo −5. Zaraz po deklaracji zmienna nie ma jeszcze sensownej wartości. Wpisze ją dopiero `scanf`.
+
+Najczęściej będziesz tworzyć zmienne czterech rodzajów:
+
+| typ | co przechowuje | przykład | w printf | w scanf |
+|---|---|---|---|---|
+| `int` | liczbę całkowitą | `int wiek;` | `%d` | `%d` i `&wiek` |
+| `double` | liczbę z ułamkiem | `double wzrost;` | `%f` | `%lf` i `&wzrost` |
+| `char` | jeden znak | `char litera;` | `%c` | `" %c"` i `&litera` |
+| tablica `char` | napis | `char imie[50];` | `%s` | `%s` i `imie`, bez `&` |
+
+Zwróć uwagę na dwie różnice. Przy `double` funkcja `printf` używa `%f`, a `scanf` używa `%lf`. Przy jednym znaku w `scanf` stawiamy spację przed `%c`. Bez niej `scanf` wczyta Enter, który został po poprzedniej odpowiedzi. Więcej typów, ich rozmiary i zakresy poznasz w następnym module, „Typy danych”.
+
+Nowością w `scanf` jest **`&`** przed `wiek`. Czytaj go jako „adres”: `&wiek` to adres zmiennej `wiek` w pamięci. Funkcja `scanf` musi wiedzieć, **gdzie** zapisać wczytaną liczbę, więc podajemy jej adres szufladki, a nie jej zawartość.<Zrodlo n={6} />
 
 Przy napisie (`imie`) znaku `&` nie piszemy, bo nazwa tablicy znaków już jest adresem. Skąd ta różnica, wyjaśni lekcja o pamięci. Na razie zapamiętaj regułę: **przy liczbach i pojedynczych znakach w scanf piszemy `&`, przy napisach nie.**
 
@@ -125,8 +167,8 @@ if (scanf("%d", &wiek) != 1)
   />
   <Pytanie
     pytanie="Która wstawka służy do wypisania napisu?"
-    odpowiedzi={["%s", "%d", "%c", "%n"]}
-    poprawna={0}
+    odpowiedzi={["%d", "%s", "%c", "%n"]}
+    poprawna={1}
     wyjasnienie="%s od string, czyli napis. %d to liczba całkowita, a %c jeden znak."
   />
   <Pytanie

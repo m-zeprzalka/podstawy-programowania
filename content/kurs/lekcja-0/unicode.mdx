@@ -165,28 +165,28 @@ Wspólnie wpisujemy w konsoli polecenia z sekcji „Ile znaków ma tekst?” i z
   />
   <Pytanie
     pytanie="Ile bajtów w UTF-8 zajmują kolejno „a”, „ą” i „😂”?"
-    odpowiedzi={["1, 1, 1", "1, 2, 4", "1, 2, 2", "2, 2, 4"]}
-    poprawna={1}
+    odpowiedzi={["1, 1, 1", "1, 2, 2", "1, 2, 4", "2, 2, 4"]}
+    poprawna={2}
     wyjasnienie="„a” jest w ASCII (1 bajt), „ą” ma numer 261, więc zajmuje 2 bajty (C4 85), a 😂 ma numer 128 514, więc zajmuje 4 bajty (F0 9F 98 82)."
   />
   <Pytanie
     pytanie="Zamiast „ą” widzisz „Ä…”. Co się stało?"
     odpowiedzi={[
-      "Plik jest uszkodzony",
       "Tekst w UTF-8 odczytano jako Windows-1250",
       "Tekst w Windows-1250 odczytano jako UTF-8",
+      "Plik jest uszkodzony",
     ]}
-    poprawna={1}
+    poprawna={0}
     wyjasnienie="Bajty C4 85 (ą w UTF-8) w Windows-1250 oznaczają „Ä” i „…”. Plik jest w porządku, zawiodła umowa odczytu."
   />
   <Pytanie
     pytanie="Czym różni się Unicode od UTF-8?"
     odpowiedzi={[
-      "Unicode nadaje znakom numery, a UTF-8 określa, jak zapisać je w bajtach",
       "To dwie nazwy tego samego",
+      "Unicode nadaje znakom numery, a UTF-8 określa, jak zapisać je w bajtach",
       "UTF-8 to starsza wersja Unicode",
     ]}
-    poprawna={0}
+    poprawna={1}
     wyjasnienie="Unicode to „katalog” znaków z numerami (punktami kodowymi), a UTF-8 to jeden ze sposobów ich zapisu w bajtach."
   />
 </Quiz>

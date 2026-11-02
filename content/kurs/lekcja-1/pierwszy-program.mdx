@@ -2,7 +2,7 @@
 title: "Pierwszy program: hello, world"
 nav: Pierwszy program
 description: Piszemy, kompilujemy i uruchamiamy pierwszy program w C. Co znaczy każda linijka i dlaczego po każdej zmianie trzeba kompilować od nowa.
-czas: 12
+czas: 15
 ---
 
 <Cel>Napisać, skompilować i uruchomić pierwszy program w C oraz rozumieć każdą jego linijkę.</Cel>
@@ -13,7 +13,9 @@ czas: 12
     ["kod maszynowy", "machine code"],
     ["kompilator", "compiler"],
     ["funkcja main", "main function"],
+    ["biblioteka standardowa", "standard library"],
     ["plik nagłówkowy", "header file"],
+    ["kod wyjścia", "exit status"],
     ["napis", "string"],
     ["znak nowej linii", "newline"],
   ]}
@@ -42,10 +44,50 @@ Po uruchomieniu na ekranie pojawi się napis `hello, world`. Dokładnie taki pro
 | `int main(void)` | tu zaczyna się program | `when green flag clicked` |
 | `{` i `}` | początek i koniec bloku kodu | klocki wewnątrz skryptu |
 | `printf("hello, world\n");` | wypisz tekst na ekranie | `say [ ]` |
+| `\n` na końcu napisu | przejdź do nowej linii, jak po naciśnięciu Enter | brak odpowiednika |
+
+### Biblioteka stdio.h
+
+Nazwa `stdio.h` to skrót od *standard input/output*, czyli „standardowe wejście i wyjście”. **Wejście** to dane, które trafiają do programu, np. z klawiatury. **Wyjście** to to, co program pokazuje, np. tekst na ekranie.
+
+Sam język C nie ma polecenia do wypisywania tekstu. Robią to gotowe funkcje z **biblioteki standardowej**, czyli zestawu funkcji dołączonego do każdego kompilatora. Plik `stdio.h` to **plik nagłówkowy**: spis funkcji wejścia i wyjścia razem z opisem, jakich danych potrzebują. Linijka `#include <stdio.h>` wkleja ten spis na początek programu. Dzięki temu kompilator wie, że `printf` istnieje i jak jej używać. Sam kod funkcji dołącza do programu linker, o czym więcej w module o kompilacji.
+
+Kilka funkcji z `stdio.h`:
+
+| funkcja | co robi | przykład |
+|---|---|---|
+| `printf` | wypisuje tekst, także z wartościami zmiennych | `printf("Wynik: %d\n", 42);` |
+| `scanf` | wczytuje dane z klawiatury | `scanf("%d", &wiek);` |
+| `puts` | wypisuje napis i sama dodaje `\n` na końcu | `puts("hello, world");` |
+| `putchar` | wypisuje jeden znak | `putchar('A');` |
+
+`printf` i `scanf` poznasz dokładnie w module „printf i scanf”. W `stdio.h` są też funkcje do pracy z plikami, do których wrócimy w kolejnych lekcjach.
+
+Znak `#` na początku linijki oznacza polecenie dla preprocesora, czyli pierwszego etapu kompilacji. Nawiasy ostre `< >` mówią: szukaj tego pliku wśród plików kompilatora. Biblioteka standardowa ma więcej plików nagłówkowych, np. `string.h` do pracy z napisami. Wszystkie są w zestawie z kompilatorem, więc niczego nie trzeba doinstalowywać. Ten sam program działa tak samo w kompilatorze w przeglądarce i na twoim komputerze.
+
+Bez linijki `#include` kompilator nie wie, czym jest `printf`. GCC podpowie wtedy: `include ‘<stdio.h>’ or provide a declaration of ‘printf’`, czyli „dołącz stdio.h albo sam opisz funkcję printf”.
+
+### Funkcja main
+
+Każdy program w C ma dokładnie jedną funkcję `main`. Od niej komputer zaczyna wykonywanie programu, tak jak skrypt w Scratchu zaczyna się od zielonej flagi. Polecenia w nawiasach klamrowych `{ }` pod `main` wykonują się po kolei, z góry na dół. Gdy się skończą, kończy się program.
+
+Linijka `int main(void)` ma trzy części:
+
+| część | co znaczy |
+|---|---|
+| `int` | co funkcja oddaje po zakończeniu: liczbę całkowitą (po angielsku *integer*) |
+| `main` | nazwa funkcji, po angielsku „główna”. Trzeba ją napisać dokładnie tak, małymi literami |
+| `(void)` | co funkcja dostaje na start. `void` znaczy „nic”, więc nasz program niczego nie dostaje |
+
+Ten sam układ, czyli **co oddaje, nazwa, (co dostaje)**, ma każda funkcja w C. Zobaczysz go znowu w module o funkcjach, gdy będziemy pisać własne.
+
+A co oddaje `main`? Liczbę, która jest krótkim raportem dla systemu: **0 znaczy „wszystko w porządku”**, a inna liczba oznacza błąd. Taki raport to **kod wyjścia**. Nie trzeba go pisać samemu: gdy program dojdzie do końca `main`, C sam zwraca 0. W starszych książkach i w kodzie z internetu na końcu `main` często stoi `return 0;`. Robi to samo, tylko wprost.
+
+### Funkcja printf
 
 `printf` to **funkcja**, a `"hello, world\n"` to jej **argument**. Napis na ekranie to **efekt uboczny**. Te pojęcia znasz już ze Scratcha.
 
-Kilka szczegółów, o które łatwo się potknąć:
+Kilka szczegółów, w których łatwo się pomylić:
 
 - **Cudzysłów.** Napis w C zawsze stoi w zwykłym, prostym cudzysłowie: `"hello"`. Polskie cudzysłowy „ ” nie zadziałają. Dlatego kod piszemy w edytorze kodu, a nie w Wordzie, który sam zamienia cudzysłowy.
 - **Średnik.** Każde polecenie kończy się średnikiem `;`, jak zdanie kropką.
@@ -72,27 +114,39 @@ Zmiana w pliku `hello.c` nie zmienia programu `hello`. Program to „zdjęcie”
 Każda para psuje działający `hello.c` na jeden sposób: usuwa średnik, cudzysłów albo linię `#include`, zmienia `main` na `Main` lub `printf` na `print`. Kompilujemy i czytamy komunikat. Którą linijkę wskazuje kompilator? Czy to ta sama linijka, w której jest błąd?
 </NaZajeciach>
 
-<Dociekliwi tytul="Dlaczego int main(void)?">
-`int` mówi, że program po zakończeniu oddaje systemowi liczbę całkowitą. Zero znaczy „wszystko w porządku”, a inna liczba to kod błędu. Jeśli program dojdzie do końca funkcji `main`, C sam zwraca zero. Wynik ostatniego programu pokaże w terminalu polecenie `echo $?` (Linux, macOS).
+<Dociekliwi tytul="Sprawdź kod wyjścia">
+Program może sam zgłosić błąd. Wystarczy, że zakończy się poleceniem `return` z liczbą inną niż 0:
 
-`void` znaczy „nic”: ta wersja `main` nie przyjmuje żadnych argumentów. Do argumentów z wiersza poleceń wrócimy na kolejnych lekcjach.
+```c title="blad.c"
+#include <stdio.h>
+
+int main(void)
+{
+    printf("Coś poszło nie tak\n");
+    return 1;
+}
+```
+
+Uruchom program, a potem wpisz `echo $?` (Linux, macOS) albo `echo $LASTEXITCODE` (PowerShell na Windowsie). Zobaczysz `1`, czyli kod wyjścia ostatniego programu. Z takich kodów korzystają inne programy, np. narzędzia, które sprawdzają, czy kompilacja się udała.
+
+Istnieje też druga wersja: `int main(int argc, char *argv[])`. Dostaje ona to, co wpiszesz w terminalu po nazwie programu, np. `./hello Ola`. Wrócimy do niej w kolejnych lekcjach.
 </Dociekliwi>
 
 <Quiz>
   <Pytanie
     pytanie="Co robi kompilator?"
     odpowiedzi={[
-      "Tłumaczy kod źródłowy na kod maszynowy",
       "Uruchamia program linijka po linijce",
+      "Tłumaczy kod źródłowy na kod maszynowy",
       "Sprawdza pisownię komentarzy",
     ]}
-    poprawna={0}
+    poprawna={1}
     wyjasnienie="Kompilator zamienia tekst programu (kod źródłowy) na instrukcje dla procesora (kod maszynowy). Uruchamiasz potem gotowy program."
   />
   <Pytanie
     pytanie='Czego brakuje w linijce printf("hello, world\n") ?'
-    odpowiedzi={["Średnika na końcu", "Nawiasu klamrowego", "Słowa int"]}
-    poprawna={0}
+    odpowiedzi={["Nawiasu klamrowego", "Słowa int", "Średnika na końcu"]}
+    poprawna={2}
     wyjasnienie="Każde polecenie w C kończy się średnikiem. Kompilator zgłosi: expected ‘;’."
   />
   <Pytanie

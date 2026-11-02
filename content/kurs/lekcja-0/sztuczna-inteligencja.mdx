@@ -93,27 +93,27 @@ Wklej ją w pole monitu systemowego w laboratorium powyżej i zobacz, jak zmieni
   <Pytanie
     pytanie="Czym różni się monit systemowy od monitu użytkownika?"
     odpowiedzi={[
-      "Systemowy ustala zasady zachowania modelu, a użytkownika to konkretne pytanie",
       "Systemowy pisze komputer, a użytkownika pisze człowiek",
+      "Systemowy ustala zasady zachowania modelu, a użytkownika to konkretne pytanie",
       "Nie ma różnicy, to dwie nazwy tego samego",
     ]}
-    poprawna={0}
+    poprawna={1}
     wyjasnienie="Monit systemowy to „regulamin” rozmowy (np. „odpowiadaj jak kot”), a monit użytkownika to treść pytania."
   />
   <Pytanie
     pytanie="Program w Pythonie i program w JavaScripcie zadają Claude'owi to samo pytanie. Co je łączy?"
     odpowiedzi={[
-      "Oba wysyłają to samo żądanie HTTP z treścią w JSON-ie",
       "Nic: każdy język rozmawia z innym modelem",
       "Oba muszą działać na tym samym systemie operacyjnym",
+      "Oba wysyłają to samo żądanie HTTP z treścią w JSON-ie",
     ]}
-    poprawna={0}
+    poprawna={2}
     wyjasnienie="Język programowania to tylko narzędzie. Do serwera trafia zawsze to samo: adres, nagłówki z kluczem API i ciało żądania w JSON-ie."
   />
   <Pytanie
     pytanie="Na czym operuje model językowy w środku?"
-    odpowiedzi={["Na literach", "Na liczbach (tokenach i wektorach)", "Na obrazkach słów"]}
-    poprawna={1}
+    odpowiedzi={["Na liczbach (tokenach i wektorach)", "Na literach", "Na obrazkach słów"]}
+    poprawna={0}
     wyjasnienie="Tekst jest zamieniany na tokeny, czyli liczby, a znaczenia słów na wektory liczb (embeddingi)."
   />
   <Pytanie

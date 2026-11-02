@@ -1,11 +1,11 @@
 ---
 title: "Kompilacja: co się dzieje po wpisaniu gcc"
 nav: Kompilacja i błędy
-description: Cztery etapy, które zamieniają tekst programu w plik dla procesora. I jak czytać komunikaty kompilatora, zamiast się ich bać.
+description: Cztery etapy, które zamieniają tekst programu w plik dla procesora. Jak czytać komunikaty kompilatora?
 czas: 10
 ---
 
-<Cel>Wiedzieć, co robi kompilator, i umieć przeczytać jego komunikat o błędzie.</Cel>
+<Cel>Wiedzieć, co robi kompilator i umieć przeczytać jego komunikat o błędzie.</Cel>
 
 <Pojecia
   lista={[
@@ -29,7 +29,7 @@ Polecenie `gcc hello.c -o hello` wygląda na jeden krok, ale kompilator wykonuje
 | 3. **asemblacja** | zamienia asembler na kod maszynowy (zera i jedynki) | plik obiektowy `.o` |
 | 4. **linkowanie** | dokleja gotowy kod z bibliotek, np. samą funkcję `printf`, i składa jeden program | `hello` albo `hello.exe` |
 
-Zwykle nie trzeba o tym myśleć. Warto jednak wiedzieć, że błąd może się pojawić na różnych etapach. Literówka w nazwie funkcji (`prinft` zamiast `printf`) wychodzi na dwa sposoby. Kompilator ostrzeże o nieznanej funkcji i zapyta: *did you mean ‘printf’?* Nowsze wersje GCC (od 14) zgłoszą tu od razu błąd.<Zrodlo n={4} /> Starsze przepuszczą ten kod dalej, a wtedy linker szuka funkcji `prinft` w bibliotekach, nie znajduje jej i kończy pracę komunikatem `undefined reference to ‘prinft’`.
+Zwykle nie trzeba o tym myśleć. Warto jednak wiedzieć, że błąd może się pojawić na różnych etapach. Literówka w nazwie funkcji (`prinft` zamiast `printf`) jest postrzegana na dwa sposoby. Kompilator ostrzeże o nieznanej funkcji i zapyta: *did you mean ‘printf’?* Nowsze wersje GCC (od 14) zgłoszą tu od razu błąd.<Zrodlo n={4} /> Starsze przepuszczą ten kod dalej, a wtedy linker szuka funkcji `prinft` w bibliotekach, nie znajduje jej i kończy pracę komunikatem `undefined reference to ‘prinft’`.
 
 <Dociekliwi tytul="Zobacz każdy etap na własne oczy">
 Każdy etap da się zatrzymać osobną opcją kompilatora:
@@ -83,7 +83,7 @@ Trzy zasady, które oszczędzą wiele nerwów:
 3. **Nie ignoruj ostrzeżeń.** `warning` nie zatrzymuje kompilacji, ale zwykle oznacza prawdziwy problem. Kompiluj z opcją `-Wall`, która włącza najważniejsze ostrzeżenia: `gcc -Wall hello.c -o hello`.
 
 <Wskazowka tytul="Komunikat po angielsku i AI">
-Komunikaty kompilatora są po angielsku i bywają zagmatwane. Wklej komunikat do czatu z AI i poproś o **wyjaśnienie**, a nie o poprawiony kod: „Co znaczy ten komunikat i gdzie mam szukać błędu?”. To tryb kaczki z lekcji 0.
+Komunikaty kompilatora są po angielsku i bywają zagmatwane. Wklej komunikat do czatu z AI i poproś o **wyjaśnienie**, a nie o poprawiony kod: „Co znaczy ten komunikat i gdzie mam szukać błędu?”. To tryb nauki i rozwiązywania problemu, a nie jedynie bezmyślnego przeklejania kodu.
 </Wskazowka>
 
 <NaZajeciach tytul="Detektyw błędów" czas="5 min">
@@ -93,8 +93,8 @@ Na slajdzie trzy komunikaty kompilatora bez kodu: brak średnika, `implicit decl
 <Quiz>
   <Pytanie
     pytanie="Który etap kompilacji wkleja zawartość pliku stdio.h w miejsce #include?"
-    odpowiedzi={["Preprocesor", "Asembler", "Linker"]}
-    poprawna={0}
+    odpowiedzi={["Asembler", "Linker", "Preprocesor"]}
+    poprawna={2}
     wyjasnienie="Linijki zaczynające się od # obsługuje preprocesor, zanim zacznie się właściwa kompilacja."
   />
   <Pytanie
@@ -105,8 +105,8 @@ Na slajdzie trzy komunikaty kompilatora bez kodu: brak średnika, `implicit decl
   />
   <Pytanie
     pytanie="Kompilator zgłosił 12 błędów. Od czego zacząć?"
-    odpowiedzi={["Od pierwszego", "Od ostatniego", "Od najdłuższego"]}
-    poprawna={0}
+    odpowiedzi={["Od ostatniego", "Od pierwszego", "Od najdłuższego"]}
+    poprawna={1}
     wyjasnienie="Kolejne błędy często są skutkiem pierwszego. Po jego poprawieniu wiele z nich znika."
   />
 </Quiz>

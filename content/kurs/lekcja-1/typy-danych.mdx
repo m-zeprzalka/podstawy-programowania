@@ -115,8 +115,8 @@ Sala dobiera typ do danych: wiek, cena w złotych, temperatura za oknem, pierwsz
 <Quiz>
   <Pytanie
     pytanie="Jakiego typu użyjesz do zapisania liczby ludzi na Ziemi (ponad 8 miliardów)?"
-    odpowiedzi={["long long", "int", "char", "bool"]}
-    poprawna={0}
+    odpowiedzi={["int", "long long", "char", "bool"]}
+    poprawna={1}
     wyjasnienie="int mieści liczby tylko do ok. 2,1 miliarda. long long ma 8 bajtów i mieści liczby do ok. 9,2 tryliona."
   />
   <Pytanie
@@ -126,8 +126,8 @@ Sala dobiera typ do danych: wiek, cena w złotych, temperatura za oknem, pierwsz
   />
   <Pytanie
     pytanie="Która linijka NIE zmienia wartości zmiennej licznik?"
-    odpowiedzi={["licznik + 1;", "licznik++;", "licznik += 1;", "licznik = licznik + 1;"]}
-    poprawna={0}
+    odpowiedzi={["licznik++;", "licznik += 1;", "licznik = licznik + 1;", "licznik + 1;"]}
+    poprawna={3}
     wyjasnienie="licznik + 1 oblicza wynik, ale nigdzie go nie zapisuje. GCC z opcją -Wall ostrzeże: statement with no effect."
   />
 </Quiz>
