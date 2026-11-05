@@ -1,11 +1,11 @@
 ---
 title: Zmienne i typy danych
 nav: Typy danych
-description: int, double, char i bool. Ile miejsca zajmuje każdy typ, jak duże liczby mieści i dlaczego w C każda zmienna musi mieć typ.
-czas: 12
+description: int, double, char i bool. Ile miejsca zajmuje każdy typ, czym różni się 'A' od "A", jak wpisać napis na sztywno i jak nazywać zmienne.
+czas: 18
 ---
 
-<Cel>Tworzyć zmienne odpowiedniego typu i zmieniać ich wartość.</Cel>
+<Cel>Tworzyć zmienne odpowiedniego typu, zmieniać ich wartość i nadawać im czytelne nazwy.</Cel>
 
 <Pojecia
   lista={[
@@ -15,8 +15,26 @@ czas: 12
     ["inkrementacja", "increment"],
     ["stała", "constant"],
     ["słowo kluczowe", "keyword"],
+    ["konwencja nazw", "naming convention"],
   ]}
 />
+
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| `int`, `double`, `char`, `bool` | liczba całkowita, liczba z ułamkiem, jeden znak, prawda albo fałsz |
+| `int licznik;` | utwórz zmienną (deklaracja) |
+| `int licznik = 0;` | utwórz zmienną i od razu wpisz do niej 0 |
+| `licznik = 5;` | przypisanie: wpisz do zmiennej nową wartość |
+| `licznik++;` | zwiększ o 1 |
+| `'A'` | jeden znak, zawsze w apostrofach |
+| `"Ala"` | napis, zawsze w cudzysłowie |
+| `char imie[] = "Ola";` | zmienna z napisem wpisanym na sztywno |
+| `const int DNI = 7;` | stała: wartości nie da się zmienić |
+| `liczba_osob` | nazwa z kilku słów: małe litery i podkreślnik |
+
+</Sciaga>
 
 ## Zmienna to podpisana szufladka
 
@@ -27,6 +45,17 @@ int licznik = 0;
 ```
 
 Ta linijka ma cztery części: typ (`int`), nazwę (`licznik`), wartość początkową (`= 0`) i średnik.
+
+Wartość można wpisać od razu albo później:
+
+```c
+int wiek;         // deklaracja: zmienna jest, ale bez sensownej wartości
+wiek = 20;        // przypisanie: teraz w zmiennej wiek jest 20
+
+int punkty = 0;   // deklaracja z wartością początkową: oba kroki naraz
+```
+
+Typ piszesz tylko raz, przy tworzeniu zmiennej. Potem używasz już samej nazwy: `wiek = 21;`, a nie `int wiek = 21;`. Drugie `int wiek` to próba utworzenia drugiej zmiennej o tej samej nazwie. GCC zgłosi wtedy błąd `redeclaration of ‘wiek’`, czyli „ponowna deklaracja”.
 
 ## Najważniejsze typy
 
@@ -46,6 +75,7 @@ Rozmiary w tabeli są typowe dla współczesnych komputerów. Standard języka C
 
 int main(void)
 {
+    // sizeof podaje rozmiar w bajtach, a %zu to wstawka na taki rozmiar
     printf("int: %zu B\n", sizeof(int));          // int: 4 B
     printf("double: %zu B\n", sizeof(double));    // double: 8 B
 }
@@ -62,28 +92,114 @@ Istnieje też typ `long`. Na Linuksie i macOS ma 8 bajtów, ale na Windowsie tyl
 Typ `char` przechowuje jeden bajt, czyli kod ASCII znaku:
 
 ```c
-char c = 'A';
-printf("%c %d %c\n", c, c, c + 1);    // A 65 B
+char litera = 'A';
+// %c wypisze znak, %d jego kod, a litera + 1 to następny kod
+printf("%c %d %c\n", litera, litera, litera + 1);    // A 65 B
 ```
 
-Ten sam bajt wypisany przez `%c` to litera, a przez `%d` liczba 65. Do tego `'A' + 1` daje `'B'`, bo kody liter idą po kolei. Zwróć uwagę na cudzysłowy: **pojedynczy** `'A'` to jeden znak, **podwójny** `"A"` to napis.
+Ten sam bajt wypisany przez `%c` to litera, a przez `%d` liczba 65. Do tego `'A' + 1` daje `'B'`, bo kody liter idą po kolei.
+
+### Apostrof czy cudzysłów?
+
+W C apostrof i cudzysłów to dwie różne rzeczy, a nie kwestia gustu:
+
+| zapis | co to jest | co leży w pamięci | przykład |
+|---|---|---|---|
+| `'t'` | jeden znak, typ `char` | jeden bajt: liczba 116, czyli kod litery t | `char odpowiedz = 't';` |
+| `"t"` | napis | dwa bajty: litera `t` i znak końca napisu `\0` | `printf("t");` |
+
+Reguła na co dzień: **apostrof to dokładnie jeden znak, cudzysłów to napis**, dowolnie długi, nawet pusty (`""`). Dlatego tekst w `printf` zawsze stoi w cudzysłowie, a pojedynczy znak, np. odpowiedź t albo n, w apostrofach.
+
+To nie jest tylko formalność. Warunek `odpowiedz == 't'` porównuje dwie liczby: kod wpisanej litery i kod litery t. Za to `odpowiedz == "t"` porównuje znak z adresem napisu w pamięci, więc nigdy nie będzie spełniony. GCC z opcją `-Wall` ostrzeże: `comparison between pointer and integer`, czyli „porównujesz adres z liczbą”.
+
+Z tego samego powodu nie zadziała `'ą'`. Polska litera zajmuje w UTF-8 dwa bajty, a w apostrofach mieści się jeden. Więcej o tym w module „Polskie znaki”.
 
 ### Prawda i fałsz
 
 Typ `bool` ma tylko dwie wartości: `true` (prawda) i `false` (fałsz). W starszych wersjach C trzeba na początku pliku dopisać `#include <stdbool.h>`. Od standardu C23 nie jest to potrzebne, a GCC od wersji 15 używa go domyślnie.<Zrodlo n={[13, 14]} /> Żeby kod działał wszędzie, dopisuj `#include <stdbool.h>`.
 
-### A gdzie napisy?
+```c
+#include <stdbool.h>
+
+bool zalogowany = false;    // na start: użytkownik nie jest zalogowany
+```
+
+## Napisy i wstawka %s
 
 W C nie ma osobnego typu na napis. Napis to ciąg znaków `char` ułożonych w pamięci jeden za drugim, np. `char imie[50];` z poprzedniego modułu. Dokładnie przyjrzymy się temu w lekcji o tablicach.
+
+Łatwo pomylić dwie rzeczy, które często stoją obok siebie: zmienną `imie` i wstawkę `%s`. To nie to samo:
+
+| | `char imie[50];` | `%s` |
+|---|---|---|
+| co to jest | zmienna, czyli miejsce w pamięci na napis | znak w tekście dla `printf` albo `scanf` |
+| co robi | przechowuje napis, np. „Ola” | pokazuje, **gdzie** w tekście wstawić napis |
+| gdzie stoi | w osobnej linijce, zanim użyjesz zmiennej | wewnątrz cudzysłowu |
+
+Jeśli znasz korespondencję seryjną z Worda albo scalanie danych z InDesigna, znasz już ten mechanizm. W szablonie stoi pole „Imię”, a dane trafiają do niego z tabeli. `%s` to takie pole w szablonie, a zmienna podana po przecinku to dane.
+
+### Imię na sztywno
+
+Imię nie musi pochodzić od użytkownika. Można wpisać je prosto w kod, czyli „na sztywno”:
+
+```c title="witaj_na_sztywno.c"
+#include <stdio.h>
+
+int main(void)
+{
+    // Puste [] znaczą: kompilatorze, policz miejsca sam.
+    // "Ola" to 3 litery i znak końca \0, czyli 4 miejsca.
+    char imie[] = "Ola";
+
+    // %s to pole w szablonie, a imie to dane, które w nie trafią
+    printf("Cześć, %s!\n", imie);
+}
+```
+
+```txt title="Terminal"
+Cześć, Ola!
+```
+
+Wartość można też podać prosto w `printf`, bez zmiennej: `printf("Cześć, %s!\n", "Ola");`. Wynik będzie ten sam.
+
+### Wizytówka: wszystkie typy naraz
+
+```c title="wizytowka.c"
+#include <stdio.h>
+
+int main(void)
+{
+    char imie[] = "Ola";     // napis
+    char inicjal = 'O';      // jeden znak
+    int wiek = 20;           // liczba całkowita
+    double wzrost = 1.68;    // liczba z ułamkiem
+
+    // Wstawki wypełniają się po kolei wartościami podanymi po przecinku
+    printf("%s (%c), %d lat, %.2f m\n", imie, inicjal, wiek, wzrost);
+}
+```
+
+```txt title="Terminal"
+Ola (O), 20 lat, 1.68 m
+```
+
+| wstawka | wartość po przecinku | na ekranie |
+|---|---|---|
+| `%s` | `imie` | `Ola` |
+| `%c` | `inicjal` | `O` |
+| `%d` | `wiek` | `20` |
+| `%.2f` | `wzrost` | `1.68` |
+
+Liczy się kolejność: pierwsza wstawka bierze pierwszą wartość po przecinku, druga drugą i tak dalej. Liczy się też typ: `%d` do `int`, `%s` do napisu. Gdy pomylisz wstawkę z typem, GCC z opcją `-Wall` ostrzeże.
 
 ## Zmiana wartości
 
 Te trzy linijki robią to samo, czyli zwiększają `licznik` o jeden:
 
 ```c
-licznik = licznik + 1;
-licznik += 1;
-licznik++;
+licznik = licznik + 1;    // weź licznik, dodaj 1, wpisz wynik z powrotem
+licznik += 1;             // to samo, krócej
+licznik++;                // to samo, najkrócej
 ```
 
 Znak `=` w C to **przypisanie**, a nie równość. `licznik = licznik + 1` czytaj: „weź obecną wartość licznika, dodaj jeden i wpisz wynik z powrotem do licznika”. Do sprawdzania równości służy podwójny znak `==`, który poznasz w module o warunkach.
@@ -91,6 +207,26 @@ Znak `=` w C to **przypisanie**, a nie równość. `licznik = licznik + 1` czyta
 <Uwaga tytul="Zmienna bez wartości">
 Zmienna, której nie nadano wartości, zawiera przypadkowe resztki z pamięci. `int x; printf("%d", x);` może wypisać cokolwiek. Nadawaj wartość od razu: `int x = 0;`.
 </Uwaga>
+
+## Stałe
+
+Wartość, która nie powinna się zmieniać, oznacz słowem `const`. Taką **stałą** zwykle zapisuje się wielkimi literami:
+
+```c
+const int DNI_W_TYGODNIU = 7;
+```
+
+Czym stała różni się od zmiennej? Zapisem i jedną zasadą:
+
+| | zmienna | stała |
+|---|---|---|
+| zapis | typ i nazwa: `int dni;` | `const`, typ, nazwa i wartość: `const int DNI = 7;` |
+| wartość | możesz zmieniać, ile razy chcesz | nadajesz raz, przy tworzeniu |
+| nazwa (zwyczaj) | małe litery: `liczba_dni` | wielkie litery: `DNI_W_TYGODNIU` |
+
+Poza tym stała działa jak zwykła zmienna: ma typ, zajmuje miejsce w pamięci i można jej używać w działaniach. Próba zmiany kończy się błędem kompilacji: `assignment of read-only variable ‘DNI_W_TYGODNIU’`, czyli „przypisanie do zmiennej tylko do odczytu”.
+
+Po co to wszystko? Zamiast wpisywać w kodzie „magiczną” liczbę 7, piszesz nazwę, która tłumaczy, skąd ta liczba się wzięła. A kompilator pilnuje, żeby nikt jej przypadkiem nie zmienił.
 
 ## Nazwy zmiennych
 
@@ -100,16 +236,34 @@ Zmienna, której nie nadano wartości, zawiera przypadkowe resztki z pamięci. `
 - **Nie używaj polskich liter**: `zolw`, a nie `żółw`. Część kompilatorów je przyjmie, część nie.
 - Nazwa ma mówić, co jest w środku: `liczba_osob` zamiast `x`.
 
-Wartość, która nie powinna się zmieniać, oznacz słowem `const`. Taką **stałą** zwykle zapisuje się wielkimi literami:
+### Nazwy z kilku słów
 
-```c
-const int DNI_W_TYGODNIU = 7;
-```
+Spacji w nazwie użyć nie można, więc programiści umawiają się, jak łączyć słowa. Taka umowa to **konwencja nazw**. Kompilator przyjmie każdą z nich, ale w jednym programie trzymaj się jednej.
 
-Próba zmiany stałej skończy się błędem kompilacji. Zamiast wpisywać w kodzie „magiczną” liczbę 7, piszesz nazwę, która tłumaczy, skąd ta liczba się wzięła.
+| konwencja | przykład | gdzie się jej używa |
+|---|---|---|
+| snake_case: małe litery i podkreślnik | `liczba_osob` | zmienne i funkcje w C, Python |
+| camelCase: każde kolejne słowo wielką literą | `liczbaOsob` | zmienne i funkcje w JavaScripcie i Javie |
+| WIELKIE_LITERY i podkreślnik | `DNI_W_TYGODNIU` | stałe |
+| kebab-case: łącznik | `liczba-osob` | klasy w CSS, nazwy plików. **W C nie zadziała**: dla C to działanie „liczba minus osob” |
+
+W tym kursie piszemy tak jak większość programistów C: zmienne i funkcje małymi literami z podkreślnikiem, stałe wielkimi. Skąd ten zwyczaj? Z samego języka. Funkcje z biblioteki standardowej mają nazwy pisane małymi literami, np. `printf`, `strlen` czy `toupper`. Przewodnik stylu jądra Linuksa wprost odradza nazwy, w których małe i wielkie litery się przeplatają.<Zrodlo n={31} /> W JavaScripcie zwyczaj jest odwrotny: przewodnik MDN każe pisać `currencyName`, a nie `currency_name`.<Zrodlo n={32} /> Oba sposoby są poprawne. Ważne, żeby pisać tak, jak przyjęło się w danym języku.
+
+### Krótkie nazwy: i, j, x, n
+
+Zasada „nazwa mówi, co jest w środku” ma kilka wyjątków. Niektóre jednoliterowe nazwy są tak popularne, że każdy programista rozumie je od razu:
+
+| nazwa | zwyczajowo oznacza | przykład |
+|---|---|---|
+| `i`, `j`, `k` | licznik pętli: pierwszej, drugiej (wewnętrznej) i trzeciej | `for (int i = 0; i < 3; i++)` |
+| `x`, `y` | liczby w działaniach albo współrzędne, jak w matematyce | `int x = 7;` |
+| `n` | ile czegoś jest albo ile razy powtórzyć | `miau(n)` |
+| `c` | jeden znak (od *character*) | `char c = 'A';` |
+
+Krótka nazwa jest w porządku, gdy zmienna żyje kilka linijek, a jej rola jest oczywista, np. licznik w pętli. Przewodnik stylu Linuksa radzi nazwać licznik pętli po prostu `i`, a nie `loop_counter`.<Zrodlo n={31} /> Gdy zmienna żyje dłużej albo jej rola nie jest oczywista, nazwa ma ją opisywać. Dlatego w kursie piszemy `odpowiedz` zamiast `c` i `szerokosc` zamiast `a`.
 
 <NaZajeciach tytul="Jaki typ?" czas="4 min">
-Sala dobiera typ do danych: wiek, cena w złotych, temperatura za oknem, pierwsza litera imienia, „czy użytkownik jest zalogowany”, liczba ludzi na Ziemi. Pułapki: cenę lepiej trzymać w groszach jako `int` (pamiętasz 0.1 + 0.2?), a ponad 8 miliardów ludzi nie zmieści się w `int`.
+Sala dobiera typ do danych: wiek, cena w złotych, temperatura za oknem, pierwsza litera imienia, „czy użytkownik jest zalogowany”, liczba ludzi na Ziemi. Pułapki: cenę lepiej trzymać w groszach jako `int` (pamiętasz 0.1 + 0.2?), a ponad 8 miliardów ludzi nie zmieści się w `int`. Na koniec każda osoba wymyśla nazwę dla każdej zmiennej w stylu snake_case.
 </NaZajeciach>
 
 <Quiz>
@@ -120,7 +274,7 @@ Sala dobiera typ do danych: wiek, cena w złotych, temperatura za oknem, pierwsz
     wyjasnienie="int mieści liczby tylko do ok. 2,1 miliarda. long long ma 8 bajtów i mieści liczby do ok. 9,2 tryliona."
   />
   <Pytanie
-    pytanie={`Co wypisze kod: char c = 'B'; printf("%d", c);`}
+    pytanie={`Co wypisze kod: char litera = 'B'; printf("%d", litera);`}
     akceptowane={["66"]}
     wyjasnienie="%d wypisuje znak jako liczbę, czyli jego kod ASCII. B ma kod 66."
   />
@@ -129,5 +283,17 @@ Sala dobiera typ do danych: wiek, cena w złotych, temperatura za oknem, pierwsz
     odpowiedzi={["licznik++;", "licznik += 1;", "licznik = licznik + 1;", "licznik + 1;"]}
     poprawna={3}
     wyjasnienie="licznik + 1 oblicza wynik, ale nigdzie go nie zapisuje. GCC z opcją -Wall ostrzeże: statement with no effect."
+  />
+  <Pytanie
+    pytanie="Który warunek poprawnie sprawdza, czy użytkownik wpisał literę t?"
+    odpowiedzi={["odpowiedz == 't'", 'odpowiedz == "t"', "odpowiedz = 't'"]}
+    poprawna={0}
+    wyjasnienie="Jeden znak zapisuje się w apostrofach. W cudzysłowie jest napis, a pojedynczy znak = oznacza przypisanie, a nie porównanie."
+  />
+  <Pytanie
+    pytanie="Która nazwa zmiennej pasuje do stylu przyjętego w C?"
+    odpowiedzi={["liczbaOsob", "liczba-osob", "liczba_osob", "LICZBA_OSOB"]}
+    poprawna={2}
+    wyjasnienie="W C zmienne piszemy małymi literami z podkreślnikiem. liczbaOsob to styl JavaScriptu, liczba-osob C odczyta jako odejmowanie, a wielkimi literami pisze się stałe."
   />
 </Quiz>

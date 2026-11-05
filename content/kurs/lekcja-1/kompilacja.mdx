@@ -18,6 +18,20 @@ czas: 10
   ]}
 />
 
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| `gcc plik.c -o program` | skompiluj `plik.c` do programu o nazwie `program` |
+| `-Wall` | włącz najważniejsze ostrzeżenia, używaj zawsze |
+| `error` | błąd: program nie powstanie |
+| `warning` | ostrzeżenie: program powstanie, ale coś jest podejrzane |
+| `hello.c:5:29` | plik, linijka 5, kolumna 29 |
+| `#` na początku linijki | polecenie dla preprocesora, np. `#include` |
+| preprocesor, kompilacja, asemblacja, linkowanie | cztery etapy, które wykonuje jedno polecenie `gcc` |
+
+</Sciaga>
+
 ## Cztery etapy w jednym poleceniu
 
 Polecenie `gcc hello.c -o hello` wygląda na jeden krok, ale kompilator wykonuje po kolei cztery:<Zrodlo n={3} />

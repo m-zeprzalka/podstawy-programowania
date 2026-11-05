@@ -16,6 +16,20 @@ czas: 8
   ]}
 />
 
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| `#include <string.h>` | dołącz funkcje do pracy z napisami |
+| `strlen("Zażółć")` | długość napisu w bajtach: 10, a nie 6 |
+| `%zu` | wstawka na wynik `strlen` i `sizeof` |
+| `"ą"` | polską literę trzymaj jako napis, nie jako `char` |
+| `chcp 65001` | Windows: przełącz terminal na UTF-8 |
+| `3.5` | ułamki wpisuj z kropką, nie z przecinkiem |
+| `scanf("%lf", &x)` | wczytaj `double` |
+
+</Sciaga>
+
 ## C liczy bajty, a nie litery
 
 W lekcji 0 poznaliśmy UTF-8: angielska litera zajmuje jeden bajt, a polska litera ze znakiem diakrytycznym dwa. Język C nic nie wie o literach, liczy tylko bajty. Funkcja `strlen` z biblioteki `string.h` zwraca długość napisu:
@@ -26,6 +40,7 @@ W lekcji 0 poznaliśmy UTF-8: angielska litera zajmuje jeden bajt, a polska lite
 
 int main(void)
 {
+    // strlen liczy bajty, a %zu to wstawka na jej wynik
     printf("%zu\n", strlen("Zazolc"));    // 6
     printf("%zu\n", strlen("Zażółć"));    // 10
 }
@@ -36,10 +51,10 @@ int main(void)
 Z tego samego powodu **„ą” nie zmieści się w zmiennej `char`**, która ma jeden bajt:
 
 ```c
-char c = 'ą';    // ostrzeżenie: multi-character character constant
+char litera = 'ą';    // ostrzeżenie: multi-character character constant
 ```
 
-Kompilator ostrzeże, że między apostrofami stoi więcej niż jeden znak, i zostawi w `c` tylko jeden z dwóch bajtów. Polską literę trzeba trzymać jako napis: `"ą"`.
+Kompilator ostrzeże, że między apostrofami stoi więcej niż jeden znak, i zostawi w zmiennej `litera` tylko jeden z dwóch bajtów. Polską literę trzeba trzymać jako napis: `"ą"`.
 
 Także funkcje do zmiany wielkości liter, np. `toupper` z `ctype.h`, działają na pojedynczych bajtach. Zamiana „zażółć” bajt po bajcie daje „ZAżółć”: angielskie litery urosły, polskie zostały małe.
 
@@ -65,7 +80,7 @@ Program może sam przełączyć terminal na UTF-8 funkcją `SetConsoleOutputCP` 
 
 int main(void)
 {
-    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);    // przełącz terminal na UTF-8
     printf("Zażółć gęślą jaźń\n");
 }
 ```

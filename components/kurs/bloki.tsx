@@ -1,6 +1,7 @@
 import * as React from "react"
 import {
   ChalkboardTeacherIcon,
+  ClipboardTextIcon,
   InfoIcon,
   KeyIcon,
   LightbulbIcon,
@@ -68,6 +69,31 @@ export function Pojecia({ lista }: { lista: [string, string?][] }) {
         ))}
       </ul>
     </div>
+  )
+}
+
+/**
+ * 📋 Ściąga: najważniejsze zapisy modułu. W środku zwykła tabela Markdown.
+ *
+ * @example <Sciaga>| zapis | co znaczy |…</Sciaga>
+ */
+export function Sciaga({
+  tytul = "Ściąga do modułu",
+  children,
+}: {
+  tytul?: string
+  children: React.ReactNode
+}) {
+  return (
+    <section
+      aria-label={tytul}
+      className="my-6 border-2 border-foreground/80 px-4 pt-3.5 pb-1 md:px-5 [&_[role=region]]:my-3"
+    >
+      <Eyebrow icon={ClipboardTextIcon} className="text-foreground">
+        {tytul}
+      </Eyebrow>
+      {children}
+    </section>
   )
 }
 

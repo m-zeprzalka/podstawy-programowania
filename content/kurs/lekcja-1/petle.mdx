@@ -1,8 +1,8 @@
 ---
 title: "Pętle: while, for i do while"
 nav: Pętle
-description: Kot miauczy trzy razy, a potem dowolnie wiele razy. Trzy rodzaje pętli w C, licznik od zera i pętla, która pilnuje poprawnych danych.
-czas: 12
+description: Trzy rodzaje pętli w C. Nie powielaj swojego kodu, stosuj liczniki do wykonania odpowiedniej ilości iteracji.
+czas: 15
 ---
 
 <Cel>Powtarzać kod pętlami `while`, `for` i `do while` oraz dobierać pętlę do zadania.</Cel>
@@ -17,6 +17,20 @@ czas: 12
   ]}
 />
 
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| `while (warunek) { … }` | powtarzaj, dopóki warunek jest spełniony |
+| `for (int i = 0; i < 3; i++) { … }` | powtórz 3 razy: początek, warunek, krok |
+| `do { … } while (warunek);` | zrób raz, a potem powtarzaj, dopóki warunek jest spełniony |
+| `i++` | zwiększ `i` o 1, czyli `i = i + 1` |
+| `while (true)` | pętla bez końca |
+| Ctrl+C | przerwij działający program w terminalu |
+| iteracja | jeden obrót pętli |
+
+</Sciaga>
+
 ## Trzy razy miau
 
 Najprostszy sposób to skopiować linijkę trzy razy:
@@ -27,20 +41,20 @@ printf("miau\n");
 printf("miau\n");
 ```
 
-Działa, ale to zły projekt. Gdyby kot miał miauczeć sto razy albo inaczej, trzeba by zmieniać sto linijek. W Scratchu użylibyśmy klocka `repeat (3)`. W C mamy kilka rodzajów pętli.
+Działa, ale to zły projekt. Gdyby kot miał miauczeć sto razy, trzeba by wpisać sto linijek. W Scratchu użylibyśmy klocka `repeat (3)`. W C mamy kilka rodzajów pętli.
 
 ## while: dopóki warunek jest spełniony
 
 ```c
-int licznik = 0;
-while (licznik < 3)
+int licznik = 0;       // ile razy już miauczał kot, na start 0
+while (licznik < 3)    // dopóki licznik jest mniejszy od 3
 {
     printf("miau\n");
-    licznik++;
+    licznik++;         // licznik = licznik + 1
 }
 ```
 
-Pętla `while` sprawdza warunek **przed** każdym obrotem. Prześledźmy ją krok po kroku:
+Pętla `while` sprawdza warunek **przed** każdym obrotem. Jeden obrót pętli to **iteracja**. Prześledźmy ją krok po kroku:
 
 | licznik | `licznik < 3`? | co się dzieje |
 |---|---|---|
@@ -51,18 +65,35 @@ Pętla `while` sprawdza warunek **przed** każdym obrotem. Prześledźmy ją kro
 
 Programiści liczą od zera, więc trzy obroty to wartości 0, 1 i 2. Warunek `licznik < 3` czytaj: „dopóki licznik jest mniejszy od 3”.
 
+To samo możesz obejrzeć na żywo. Klikaj „Dalej” i patrz, która linijka działa i jak zmienia się licznik:
+
+<KrokPoKroku program="while" />
+
 ## for: wszystko w jednej linijce
 
 To samo da się zapisać krócej:
 
 ```c
+// for (początek; warunek; krok po każdym obrocie)
 for (int i = 0; i < 3; i++)
 {
     printf("miau\n");
 }
 ```
 
-W nawiasie są trzy części oddzielone średnikami: **początek** (`int i = 0`), **warunek** (`i < 3`) i **krok** po każdym obrocie (`i++`). Zmienna licznika w pętli `for` zwyczajowo nazywa się `i`. Pętla `for` to najczęstszy wybór, gdy wiadomo z góry, ile razy coś powtórzyć.
+W nawiasie są trzy części oddzielone średnikami:
+
+| część | co robi | kiedy działa |
+|---|---|---|
+| `int i = 0` | **początek**: tworzy licznik i wpisuje 0 | raz, przed pierwszym obrotem |
+| `i < 3` | **warunek**: czy robić kolejny obrót | przed każdym obrotem |
+| `i++` | **krok**: zwiększa licznik o 1 | po każdym obrocie |
+
+Najtrudniejsze w pętli `for` jest to, że trzy części stoją obok siebie, a działają w różnych chwilach. Zobacz to w laboratorium:
+
+<KrokPoKroku program="for" />
+
+Zmienna licznika w pętli `for` zwyczajowo nazywa się `i`. Pętla `for` to najczęstszy wybór, gdy wiadomo z góry, ile razy coś powtórzyć.
 
 <Uwaga tytul="Błąd o jeden">
 `for (int i = 0; i < 3; i++)` wykona się 3 razy, ale `for (int i = 0; i <= 3; i++)` już 4 razy. Taki „błąd o jeden” to jeden z najczęstszych błędów w programowaniu. Gdy nie masz pewności, rozpisz pętlę w tabelce jak wyżej.
@@ -73,9 +104,9 @@ W nawiasie są trzy części oddzielone średnikami: **początek** (`int i = 0`)
 Klocek `forever` też ma swój odpowiednik:
 
 ```c
-#include <stdbool.h>
+#include <stdbool.h>    // true i false
 
-while (true)
+while (true)            // warunek zawsze spełniony
 {
     printf("miau\n");
 }
@@ -92,13 +123,14 @@ Czasem trzeba coś zrobić **co najmniej raz**, np. zapytać użytkownika o dane
 
 int main(void)
 {
+    // Wartość 0 na start, żeby w n nie było przypadkowych resztek
     int n = 0;
     do
     {
         printf("Podaj liczbę dodatnią: ");
-        scanf("%d", &n);
+        scanf("%d", &n);    // &n: adres, pod który scanf zapisze liczbę
     }
-    while (n < 1);
+    while (n < 1);          // pytaj jeszcze raz, dopóki n jest mniejsze od 1
 
     printf("Dziękuję, %d.\n", n);
 }
@@ -111,7 +143,7 @@ Podaj liczbę dodatnią: 4
 Dziękuję, 4.
 ```
 
-Pętla `do while` sprawdza warunek **po** obrocie, więc pytanie pada zawsze przynajmniej raz. To najprostszy sposób na pilnowanie poprawnych danych.
+Pętla `do while` sprawdza warunek **po** obrocie, więc pytanie pada zawsze przynajmniej raz. To najprostszy sposób na pilnowanie poprawnych danych. Zwróć uwagę na średnik po `while (n < 1)`: w pętli `do while` jest obowiązkowy.
 
 <Uwaga tytul="Litery zamiast liczby">
 Jeśli w tym programie wpiszesz literę, pętla będzie bez końca wypisywać pytanie. `scanf` nie umie zamienić litery na liczbę, więc nie zmienia `n` (zostaje 0), a literę zostawia w kolejce. Przy następnym obrocie trafia na nią znowu. Przerwij program skrótem Ctrl+C. Jak się przed tym zabezpieczyć, pokazuje moduł „printf i scanf” (blok dla dociekliwych).
@@ -149,5 +181,11 @@ Jedna osoba jest „procesorem” i wykonuje na głos pętlę z tablicy: `for (i
     odpowiedzi={["Zwiększyć licznik w pętli", "Średnika po while", "Nawiasów wokół printf"]}
     poprawna={0}
     wyjasnienie="Bez licznik++ licznik zostaje 0, więc warunek licznik < 3 jest zawsze prawdziwy."
+  />
+  <Pytanie
+    pytanie="Kiedy wykonuje się część i++ w pętli for (int i = 0; i < 3; i++)?"
+    odpowiedzi={["Raz, przed pierwszym obrotem", "Przed każdym obrotem", "Po każdym obrocie"]}
+    poprawna={2}
+    wyjasnienie="Krok działa po każdym obrocie, a zaraz potem pętla sprawdza warunek. Raz na początku działa tylko int i = 0."
   />
 </Quiz>

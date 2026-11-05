@@ -21,6 +21,23 @@ czas: 15
   ]}
 />
 
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| `#include <stdio.h>` | dołącz gotowe funkcje do wypisywania i wczytywania |
+| `int main(void)` | tu zaczyna się program |
+| `{ … }` | początek i koniec bloku kodu |
+| `printf("tekst");` | wypisz tekst na ekranie |
+| `"tekst"` | napis, zawsze w prostym cudzysłowie |
+| `\n` | przejdź do nowej linii |
+| `;` | koniec polecenia, jak kropka w zdaniu |
+| `// komentarz` | notatka dla ludzi, kompilator ją pomija |
+| `gcc hello.c -o hello` | skompiluj plik `hello.c` do programu `hello` |
+| `./hello` | uruchom program (na Windowsie `.\hello`) |
+
+</Sciaga>
+
 ## Od klocka do linijki kodu
 
 W Scratchu pierwszy program miał dwa klocki: `when green flag clicked` i `say [Witaj, świecie!]`. W języku C ten sam program wygląda tak:
@@ -94,6 +111,22 @@ Kilka szczegółów, w których łatwo się pomylić:
 - **`\n`.** To znak nowej linii. Bez niego kursor zostaje na końcu napisu, a terminal dokleja swój tekst w tej samej linijce. Ukośnik `\` mówi: „następny znak ma specjalne znaczenie”.
 - **Wielkość liter.** `printf` i `Printf` to dla C dwie różne nazwy. Działa tylko pierwsza.
 
+### Komentarze
+
+W kolejnych przykładach zobaczysz w kodzie linijki zaczynające się od `//`. To **komentarze**: notatki dla ludzi, które kompilator pomija. Będą ci przypominać, co znaczy dany zapis. Ten sam program z komentarzami wygląda tak:
+
+```c title="hello.c z komentarzami"
+// Dołącz gotowe funkcje do wypisywania tekstu, m.in. printf
+#include <stdio.h>
+
+// Tu zaczyna się program
+int main(void)
+{
+    // Wypisz napis, a \n przenieś kursor do nowej linii
+    printf("hello, world\n");
+}
+```
+
 ## Skompiluj i uruchom
 
 Procesor nie rozumie tekstu z pliku `hello.c`. Rozumie tylko **kod maszynowy**, czyli instrukcje zapisane zerami i jedynkami. Na kod maszynowy tłumaczy program **kompilator**. W terminalu wygląda to tak:
@@ -123,7 +156,7 @@ Program może sam zgłosić błąd. Wystarczy, że zakończy się poleceniem `re
 int main(void)
 {
     printf("Coś poszło nie tak\n");
-    return 1;
+    return 1;    // kod wyjścia 1: błąd
 }
 ```
 

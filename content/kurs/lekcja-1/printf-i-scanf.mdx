@@ -20,6 +20,21 @@ czas: 15
   ]}
 />
 
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| `char imie[50];` | zmienna na napis (do 49 znaków) |
+| `int wiek;` | zmienna na liczbę całkowitą |
+| `printf("Cześć, %s!", imie);` | wypisz tekst, a w miejsce `%s` wstaw zawartość `imie` |
+| `scanf("%d", &wiek);` | wczytaj liczbę z klawiatury do zmiennej `wiek` |
+| `%d`, `%f`, `%c`, `%s` | wstawki: liczba całkowita, liczba z ułamkiem, znak, napis |
+| `&wiek` | adres zmiennej, czyli gdzie `scanf` ma zapisać wynik |
+| `\0` | znak końca napisu, dopisywany automatycznie |
+| `\n`, `\t` | nowa linia, tabulator |
+
+</Sciaga>
+
 ## Program, który pyta o imię
 
 W Scratchu program „Witaj, Ty” używał bloków `ask [ ] and wait` i `say (join [Cześć, ] (answer))`. W C robi to samo para funkcji: `scanf` wczytuje, a `printf` wypisuje.
@@ -29,9 +44,16 @@ W Scratchu program „Witaj, Ty” używał bloków `ask [ ] and wait` i `say (j
 
 int main(void)
 {
+    // Zmienna na napis: 50 znaków w rzędzie
     char imie[50];
+
+    // Pytanie bez \n, żeby odpowiedź była w tej samej linijce
     printf("Jak masz na imię? ");
+
+    // %s: wczytaj napis do zmiennej imie (bez &)
     scanf("%s", imie);
+
+    // W miejsce %s printf wstawi zawartość zmiennej imie
     printf("Cześć, %s!\n", imie);
 }
 ```
@@ -59,7 +81,7 @@ Co tu się dzieje:
 | `!` | `!` |
 | `\n` | przejście do nowej linii |
 
-Razem: `Cześć, Ola!`. Litera `s` pochodzi od *string*, czyli napis. Inne litery oznaczają inne rodzaje wartości, np. `%d` liczbę całkowitą. Pełna lista jest niżej. Wstawka działa jak `join` w Scratchu: skleja stały tekst z wartością zmiennej.
+Razem: `Cześć, Ola!`. Litera `s` pochodzi od *string*, czyli napis. Inne litery oznaczają inne rodzaje wartości, np. `%d` liczbę całkowitą. Pełna lista jest niżej. Wstawka działa jak `join` w Scratchu: skleja stały tekst z wartością zmiennej. Jak wygląda ten program bez pytania, z imieniem wpisanym na sztywno, pokazuje moduł „Typy danych”.
 
 ### Napis to rząd znaków
 
@@ -113,9 +135,15 @@ Wczytanie liczby wygląda prawie tak samo:
 
 int main(void)
 {
+    // int (od integer): zmienna na liczbę całkowitą
     int wiek;
     printf("Ile masz lat? ");
+
+    // %d: wczytaj liczbę całkowitą
+    // &wiek: adres zmiennej, czyli gdzie scanf ma zapisać liczbę
     scanf("%d", &wiek);
+
+    // W miejsce %d trafi wynik działania wiek + 1
     printf("Za rok będziesz mieć %d lat.\n", wiek + 1);
 }
 ```
@@ -149,6 +177,7 @@ Każda osoba pisze program, który pyta o imię, rok urodzenia i ulubioną liczb
 `scanf` zwraca liczbę wartości, które udało mu się wczytać. Gdy zamiast wieku ktoś wpisze „abc”, `scanf("%d", &wiek)` zwróci 0, a zmienna `wiek` zostanie bez zmian. Można to sprawdzić:
 
 ```c
+// scanf zwraca, ile wartości wczytał. Tu czekamy na jedną liczbę.
 if (scanf("%d", &wiek) != 1)
 {
     printf("To nie jest liczba.\n");

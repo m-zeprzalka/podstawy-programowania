@@ -5,6 +5,7 @@ import {
   DlaProwadzacego,
   Pojecia,
   Ramka,
+  Sciaga,
   Uwaga,
   Wskazowka,
 } from "@/components/kurs/bloki"
@@ -29,6 +30,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Cel,
     Pojecia,
     Ramka,
+    Sciaga,
     Uwaga,
     Wskazowka,
     DlaProwadzacego,

@@ -7,6 +7,7 @@ import { DopasujPojecia } from "./dopasuj-pojecia"
 import { GeneratorKrzaczkow } from "./generator-krzaczkow"
 import { KalkulatorMediow } from "./kalkulator-mediow"
 import { Kreski } from "./kreski"
+import { KrokPoKroku } from "./krok-po-kroku"
 import { KsiazkaTelefoniczna } from "./ksiazka-telefoniczna"
 import { LicznikKilometrow } from "./licznik-kilometrow"
 import { ListaKontrolna } from "./lista-kontrolna"
@@ -34,6 +35,7 @@ export const interaktywne = {
   GeneratorKrzaczkow,
   KalkulatorMediow,
   Kreski,
+  KrokPoKroku,
   KsiazkaTelefoniczna,
   LicznikKilometrow,
   ListaKontrolna,

@@ -1,21 +1,59 @@
 ---
 title: Własne funkcje
 nav: Funkcje
-description: Odpowiednik własnego bloku ze Scratcha. Funkcja z parametrem, funkcja, która zwraca wynik, i zapowiedź funkcji przed main.
-czas: 10
+description: Odpowiednik własnego bloku ze Scratcha. Dlaczego cały program siedzi w funkcji, co znaczą void i return i gdzie żyją zmienne.
+czas: 20
 ---
 
-<Cel>Pisać własne funkcje z parametrami i wartością zwracaną.</Cel>
+<Cel>Pisać własne funkcje z parametrami i wartością zwracaną oraz wiedzieć, gdzie żyją zmienne.</Cel>
 
 <Pojecia
   lista={[
     ["funkcja", "function"],
     ["parametr", "parameter"],
+    ["argument", "argument"],
+    ["wywołanie funkcji", "function call"],
     ["wartość zwracana", "return value"],
     ["prototyp funkcji", "function prototype"],
     ["zasięg zmiennej", "scope"],
+    ["zmienna globalna", "global variable"],
   ]}
 />
+
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| `void miau(int n) { … }` | definicja: funkcja dostaje liczbę `n` i nic nie oddaje |
+| `int kwadrat(int x) { … }` | definicja: funkcja dostaje liczbę i oddaje liczbę |
+| `miau(3);` | wywołanie: wykonaj funkcję, `n` dostanie 3 |
+| `void miau(int n);` | prototyp: zapowiedź funkcji nad `main`, ze średnikiem |
+| `void` przed nazwą | funkcja nic nie oddaje |
+| `(void)` w nawiasie | funkcja nic nie dostaje |
+| `return x * x;` | zakończ funkcję i oddaj wynik |
+| `{ … }` | zmienna żyje od miejsca utworzenia do zamykającej klamry |
+
+</Sciaga>
+
+## Dlaczego cały program jest w funkcji?
+
+W Pythonie albo JavaScripcie możesz napisać w pliku jedną linijkę, np. `console.log("hej")`, i ona po prostu się wykona. W C tak się nie da. **Każde polecenie musi stać w jakiejś funkcji.** Poza funkcjami mogą stać tylko „ustawienia” programu: linijki `#include`, prototypy i, w razie potrzeby, zmienne globalne (o nich niżej).
+
+Spróbuj napisać `printf` poza funkcją:
+
+```c
+#include <stdio.h>
+
+printf("hej\n");    // błąd: polecenie poza funkcją
+
+int main(void)
+{
+}
+```
+
+GCC zgłosi `expected declaration specifiers or ‘...’ before string constant`. Komunikat jest zawiły, ale znaczy tyle: „w tym miejscu spodziewałem się deklaracji, a nie polecenia”.
+
+Skąd ta zasada? Skompilowany program to plik, który system uruchamia od jednego, ustalonego miejsca. W C tym miejscem jest funkcja `main`. Wszystko inne dzieje się dlatego, że `main` (albo funkcja wywołana z `main`) to wywołała. Znasz to ze Scratcha: luźny klocek bez „czapki” `when green flag clicked` nigdy się nie uruchomi. W C luźne polecenie nawet się nie skompiluje.
 
 ## Własny blok w C
 
@@ -24,13 +62,16 @@ W Scratchu zbudowaliśmy własny blok `miau (n) razy`. W C to **funkcja** z **pa
 ```c title="miau.c"
 #include <stdio.h>
 
+// Prototyp: zapowiedź funkcji, która jest niżej. Na końcu średnik.
 void miau(int n);
 
 int main(void)
 {
-    miau(3);
+    miau(3);              // wywołanie: n dostanie 3
+    printf("Koniec!\n");
 }
 
+// Definicja: void, bo nic nie oddaje, i int n, bo dostaje liczbę
 void miau(int n)
 {
     for (int i = 0; i < n; i++)
@@ -42,39 +83,91 @@ void miau(int n)
 
 Rozbierzmy to na części:
 
-- `void miau(int n)` to **definicja** funkcji: nazwa `miau`, jeden parametr typu `int`. `void` na początku znaczy, że funkcja niczego nie zwraca, tylko coś robi (wypisuje tekst).
-- `miau(3);` w `main` to **wywołanie**. Parametr `n` dostaje wartość 3.
-- Linijka `void miau(int n);` nad `main` to **prototyp**, czyli zapowiedź funkcji.
+- `void miau(int n) { … }` na dole to **definicja** funkcji, czyli przepis. Ma nazwę `miau`, jeden parametr `n` typu `int`, a w klamrach to, co funkcja robi.
+- `miau(3);` w `main` to **wywołanie**: „wykonaj teraz ten przepis”. Liczba w nawiasie to **argument**. Trafia do parametru `n`, więc w środku funkcji `n` jest równe 3.
+- `void miau(int n);` nad `main` to **prototyp**, czyli zapowiedź funkcji. Wygląda jak pierwsza linijka definicji, ale zamiast klamer ma średnik.
+
+Parametr to zwykła zmienna, którą funkcja dostaje gotową, z wartością. Nie trzeba jej tworzyć drugi raz w środku funkcji.
 
 Po co zapowiedź? Kompilator czyta plik od góry do dołu. Gdy w `main` trafia na `miau(3)`, musi już wiedzieć, że taka funkcja istnieje i jakie przyjmuje argumenty. Bez prototypu GCC zgłosi `implicit declaration of function ‘miau’`. Można też przenieść całą funkcję nad `main`, ale z prototypami `main` zostaje na górze i od razu widać, co robi program.
 
+Zobacz, jak program skacze z `main` do funkcji i z powrotem:
+
+<KrokPoKroku program="miau" />
+
 Teraz `main` czyta się jak pseudokod: „miaucz trzy razy”. Szczegóły, jak to zrobić, są ukryte w funkcji. To jest **abstrakcja**.
+
+## Co znaczy void
+
+Słowo `void` znaczy „nic” i może stać w dwóch miejscach:
+
+| gdzie stoi | przykład | co znaczy |
+|---|---|---|
+| przed nazwą funkcji | `void miau(int n)` | funkcja **nic nie oddaje**, tylko coś robi, np. wypisuje tekst |
+| w nawiasie | `int main(void)` | funkcja **nic nie dostaje** na start |
+
+Każdą funkcję opiszesz więc dwoma pytaniami: co dostaje i co oddaje.
+
+| funkcja | co dostaje | co oddaje |
+|---|---|---|
+| `int main(void)` | nic | liczbę: kod wyjścia dla systemu |
+| `void miau(int n)` | liczbę `n` | nic, tylko wypisuje miau |
+| `int kwadrat(int x)` | liczbę `x` | liczbę: kwadrat `x` |
+
+W Scratchu też są dwa rodzaje klocków. Klocki-polecenia, np. `say` albo `move`, coś robią. To odpowiednik funkcji `void`. Owalne klocki, np. `join` albo `answer`, oddają wartość, którą wkładasz w inny klocek. To odpowiednik funkcji, która zwraca wynik.
 
 ## Funkcja, która zwraca wynik
 
-Funkcja może też coś obliczyć i **zwrócić** wynik, jak owalne klocki w Scratchu:
+Funkcja może coś obliczyć i **zwrócić** wynik, jak owalne klocki w Scratchu:
 
 ```c title="kwadrat.c"
 #include <stdio.h>
 
+// int przed nazwą: funkcja oddaje liczbę całkowitą
 int kwadrat(int x)
 {
-    return x * x;
+    return x * x;    // zakończ funkcję i oddaj x * x
 }
 
 int main(void)
 {
-    printf("%d\n", kwadrat(7));            // 49
-    int suma = kwadrat(3) + kwadrat(4);
-    printf("%d\n", suma);                  // 25
+    int wynik = kwadrat(5);    // kwadrat(5) zamienia się na 25
+    printf("%d\n", wynik);     // 25
+
+    // Wywołanie można wstawić wszędzie tam, gdzie pasuje liczba
+    printf("%d\n", kwadrat(2) + kwadrat(3));    // 4 + 9 = 13
 }
 ```
 
-`int` przed nazwą mówi, jakiego typu jest wynik. `return` kończy funkcję i oddaje wartość w miejsce wywołania. Wywołanie `kwadrat(7)` można wstawić wszędzie tam, gdzie pasuje liczba: do `printf`, do działania, do zmiennej.
+Tu funkcja stoi nad `main`, więc prototyp nie jest potrzebny: kompilator zna ją, zanim trafi na wywołanie.
+
+### Jak działa return
+
+Słowo `return` robi dwie rzeczy naraz:
+
+1. **Kończy funkcję** w tym miejscu. Linijki pod `return` już się nie wykonają.
+2. **Oddaje wartość** tam, skąd funkcję wywołano.
+
+Prześledźmy linijkę `int wynik = kwadrat(5);`:
+
+1. Program dochodzi do `kwadrat(5)` i skacze do funkcji. Parametr `x` dostaje 5.
+2. Funkcja liczy `x * x`, czyli 25.
+3. `return` kończy funkcję i oddaje 25.
+4. W `main` wywołanie `kwadrat(5)` zamienia się na 25. Linijka działa tak, jakby było w niej napisane `int wynik = 25;`.
+
+<KrokPoKroku program="kwadrat" />
+
+Typ przed nazwą funkcji mówi, co `return` ma oddać: w `int kwadrat` musi to być liczba całkowita. Funkcja `void` niczego nie oddaje, więc nie potrzebuje `return`. Można w niej napisać samo `return;`, żeby zakończyć ją wcześniej. Ten sam `return` zna już `main`: `return 0;` oddaje systemowi kod wyjścia (moduł „Pierwszy program”).
+
+## int main() czy int main(void)?
+
+W kodzie z internetu często zobaczysz `int main()` z pustymi nawiasami. Działa tak samo, a GCC nie zgłosi nawet ostrzeżenia. Skąd więc `void`?
+
+W starszych wersjach C puste nawiasy znaczyły „nie mówię, jakie argumenty przyjmuje ta funkcja”, a nie „żadnych”. Kompilator nie mógł wtedy sprawdzić, czy wywołujesz funkcję poprawnie. `(void)` mówi wprost: ta funkcja nic nie dostaje. Od standardu C23 puste nawiasy znaczą już to samo co `(void)`.<Zrodlo n={13} /> W kursie piszemy `(void)`, bo działa jednakowo w każdej wersji C.
 
 ## Zmienne żyją w swoich klamrach
 
-Zmienna istnieje tylko w bloku `{ }`, w którym ją utworzono. To jej **zasięg**. Zmienna `i` z pętli w funkcji `miau` nie istnieje w `main`, a parametr `x` z funkcji `kwadrat` jest widoczny tylko w niej. Dzięki temu dwie funkcje mogą mieć zmienne o tej samej nazwie i nie przeszkadzają sobie nawzajem.
+Zmienna istnieje od linijki, w której ją utworzono, do zamykającej klamry `}` bloku, w którym stoi. To jej **zasięg**. Zmienna `i` z pętli w funkcji `miau` nie istnieje w `main`, a parametr `x` z funkcji `kwadrat` jest widoczny tylko w niej.
 
 ```c
 int main(void)
@@ -84,6 +177,72 @@ int main(void)
         printf("%d\n", i);
     }
     printf("%d\n", i);    // błąd: ‘i’ undeclared, i już nie istnieje
+}
+```
+
+Dzięki temu dwie funkcje mogą mieć zmienne o tej samej nazwie i nie przeszkadzają sobie nawzajem. `n` w `main` i `n` w innej funkcji to dwie różne szufladki.
+
+Kilka pytań, które zwykle pojawiają się w tym miejscu:
+
+- **Czy ta zasada dotyczy tylko zmiennych?** W praktyce tak. Funkcje definiuje się poza klamrami, jedna pod drugą, a nigdy jedna w drugiej. Funkcja jest widoczna od swojej zapowiedzi (prototypu albo definicji) do końca pliku. Dlatego prototypy stoją na samej górze.
+- **Czy zmienną można utworzyć poza funkcjami, na początku pliku?** Można. Taka **zmienna globalna** jest widoczna we wszystkich funkcjach poniżej. Lepiej jednak jej unikać: każda funkcja może ją zmienić, więc trudno potem znaleźć, która zepsuła wartość. Jeśli funkcja ma parametr o tej samej nazwie co zmienna globalna, w jej środku wygrywa parametr. Dane przekazuj więc przez parametry i `return`.
+- **Czy zmienne trzeba tworzyć na początku funkcji?** Już nie. W starym C (standard C89) wszystkie zmienne musiały stać na początku bloku i tak wygląda dużo kodu w internecie. Od C99 tworzysz zmienną tam, gdzie jest potrzebna, np. licznik prosto w `for (int i = 0; …)`.
+- **Czy w innych językach jest inaczej?** Niekoniecznie. W JavaScripcie zmienne tworzone przez `let` i `const` też żyją tylko w swoich klamrach, tak jak w C. Inaczej działa tylko stare `var` oraz Python, w którym `if` i pętle nie tworzą osobnego zasięgu.
+
+## Typowe błędy
+
+Te błędy robi prawie każdy, kto pisze pierwsze funkcje. Tak wygląda próba napisania funkcji, która rysuje siatkę:
+
+```c
+int main(void)
+{
+    void siatka(int x, int y)    // błąd 1: funkcja w środku main
+    {
+        int x;                   // błąd 2: x już istnieje, to parametr
+        printf("Podaj liczbę kolumn: ");
+        scanf("%d", x);          // błąd 3: brak & przed x
+    }
+}
+```
+
+1. **Funkcja w funkcji.** W C funkcje stoją obok siebie, a nie jedna w drugiej. Definicję `siatka` przenieś pod `main`, a w `main` zostaw tylko wywołanie, np. `siatka(8, 4);`. GCC czasem przepuści funkcję w funkcji, bo to jego własne rozszerzenie, ale to nie jest część języka C i inne kompilatory zgłoszą błąd.
+2. **Parametr utworzony drugi raz.** Parametry `x` i `y` to już gotowe zmienne. Drugie `int x;` w środku funkcji kończy się błędem `‘x’ redeclared as different kind of symbol`. Usuń tę linijkę.
+3. **scanf bez &.** `scanf("%d", x)` dostaje wartość zamiast adresu. GCC ostrzeże, a program najpewniej się wysypie. Poprawnie: `scanf("%d", &x);`.
+4. **Pytanie w złym miejscu.** Jeśli funkcja dostaje wymiary w parametrach, nie musi o nie pytać. Zapytaj w `main`, a wymiary przekaż w wywołaniu. Wtedy funkcja robi jedną rzecz: rysuje.
+
+Poprawiona wersja:
+
+```c title="siatka.c"
+#include <stdio.h>
+
+void siatka(int kolumny, int wiersze);
+
+int main(void)
+{
+    int kolumny = 0;
+    int wiersze = 0;
+
+    // Pytamy w main...
+    printf("Podaj liczbę kolumn: ");
+    scanf("%d", &kolumny);
+    printf("Podaj liczbę wierszy: ");
+    scanf("%d", &wiersze);
+
+    // ...a funkcja tylko rysuje
+    siatka(kolumny, wiersze);
+}
+
+// Rysuje siatkę z cegieł #. Pętlę w pętli omawia moduł „Mario”.
+void siatka(int kolumny, int wiersze)
+{
+    for (int i = 0; i < wiersze; i++)
+    {
+        for (int j = 0; j < kolumny; j++)
+        {
+            printf("#");
+        }
+        printf("\n");
+    }
 }
 ```
 
@@ -112,5 +271,20 @@ Rozszerzamy `miau` o drugi parametr: `void powiedz(char tekst[], int n)` wypisuj
     pytanie="Co zwróci kwadrat(kwadrat(2))?"
     akceptowane={["16"]}
     wyjasnienie="kwadrat(2) = 4, a kwadrat(4) = 16. Wynik jednej funkcji może być argumentem drugiej."
+  />
+  <Pytanie
+    pytanie="Gdzie może stać definicja własnej funkcji?"
+    odpowiedzi={[
+      "Wewnątrz main, przed wywołaniem",
+      "Tylko w pliku stdio.h",
+      "Poza innymi funkcjami, np. pod main",
+    ]}
+    poprawna={2}
+    wyjasnienie="Funkcje w C stoją obok siebie. W main zostaje tylko wywołanie, a nad main prototyp."
+  />
+  <Pytanie
+    pytanie="Funkcja ma w środku dwie linijki: return 1; i return 2;. Co zwróci?"
+    akceptowane={["1", "jeden"]}
+    wyjasnienie="Pierwszy return kończy funkcję. Druga linijka nigdy się nie wykona."
   />
 </Quiz>

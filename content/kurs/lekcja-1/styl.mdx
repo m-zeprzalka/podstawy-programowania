@@ -18,6 +18,20 @@ czas: 8
   ]}
 />
 
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| poprawność, projekt, styl | trzy pytania, które zadajesz każdemu programowi |
+| `// komentarz` | notatka dla ludzi, kompilator ją pomija |
+| 4 spacje | wcięcie w każdym bloku `{ … }` |
+| `szerokosc`, nie `a` | nazwa mówi, co jest w zmiennej |
+| `x + y`, nie `x+y` | odstępy wokół operatorów |
+| `printf("i = %d\n", i);` | tymczasowy podgląd wartości przy szukaniu błędu |
+| *Format Document* | VS Code sam poprawia wcięcia |
+
+</Sciaga>
+
 ## Trzy pytania o każdy program
 
 1. **Poprawność.** Czy program robi to, co ma robić, także dla dziwnych danych, np. zera albo liczby ujemnej?
@@ -61,6 +75,10 @@ Zasady, których trzymamy się w kursie:
 - **Komentarze** zaczynają się od `//` i kompilator je pomija. Pisz w nich, **po co** jest dany fragment, a nie powtarzaj kodu słowami. Komentarz `// zwiększ i` przy `i++` nic nie wnosi.
 - **Odstępy** wokół operatorów: `x + y`, a nie `x+y`.
 
+<Wskazowka tytul="Komentarze do nauki">
+W przykładach tej lekcji komentarzy jest więcej niż w zwykłym kodzie, bo przypominają, co znaczy dany zapis, np. `// &x: adres zmiennej`. Na początku nauki pisz takie komentarze także we własnych programach: pomagają zapamiętać składnię. Z czasem zastępuj je komentarzami, które mówią, **po co** jest dany fragment.
+</Wskazowka>
+
 VS Code potrafi sam poprawić wcięcia: kliknij prawym przyciskiem w kod i wybierz *Format Document*.
 
 ## Szukanie błędów
@@ -70,7 +88,7 @@ Błąd w programie po angielsku to *bug*, a jego szukanie to **debugowanie**. Ki
 1. **Przeczytaj komunikat kompilatora.** Moduł o kompilacji pokazuje, jak to robić.
 2. **Wypisz, co się dzieje.** Dodaj tymczasowy `printf`, który pokaże wartość zmiennej w podejrzanym miejscu, np. `printf("i = %d\n", i);` w pętli. Wiele błędów od razu wychodzi na jaw. Pamiętaj, żeby potem go usunąć.
 3. **Rozpisz na kartce.** Tabelka z kolejnymi wartościami zmiennych, jak w module o pętlach, szybko pokazuje błąd o jeden.
-4. **Wytłumacz komuś.** Opowiedz kod linijka po linijce koledze, gumowej kaczce albo AI w trybie kaczki. Często błąd znajdziesz sam w połowie zdania.
+4. **Wytłumacz komuś.** Opowiedz kod linijka po linijce koledze, gumowej kaczce albo AI w trybie kaczki. Często błąd wychodzi na jaw w połowie zdania.
 
 <Ramka tytul="AI w tej lekcji">
 Zasada z lekcji 0 dalej obowiązuje: AI może wyjaśniać komunikaty błędów i pojęcia, ale nie pisze za ciebie rozwiązań zadań. Dobre pytanie do AI: „Mój program wypisuje 4 zamiast 3. Nie poprawiaj kodu, tylko zadaj mi pytanie, które pomoże znaleźć błąd”.

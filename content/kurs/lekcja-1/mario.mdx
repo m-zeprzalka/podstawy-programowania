@@ -1,8 +1,8 @@
 ---
 title: "Mario: pętla w pętli"
 nav: Mario
-description: Rysujemy klocki z gry Super Mario Bros. znakami # w terminalu. Pętle zagnieżdżone, rozmiar od użytkownika i własna funkcja.
-czas: 12
+description: Rysujemy elementy z gry Super Mario Bros. znakami w terminalu. Pętle zagnieżdżone i własna funkcja.
+czas: 14
 ---
 
 <Cel>Używać pętli zagnieżdżonych i dzielić program na funkcje.</Cel>
@@ -15,6 +15,19 @@ czas: 12
   ]}
 />
 
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| pętla w pętli | wewnętrzna pętla wykonuje się w całości przy każdym obrocie zewnętrznej |
+| `i`, `j` | liczniki: `i` dla zewnętrznej pętli (rzędy), `j` dla wewnętrznej (cegły) |
+| `printf("#");` | jedna cegła, bez przejścia do nowej linii |
+| `printf("\n");` | koniec rzędu: przejdź do nowej linii |
+| `rzad(n);` | wywołanie własnej funkcji, która rysuje rząd |
+| `i <= 4` | warunek z „lub równe”: liczy od 1 do 4 włącznie |
+
+</Sciaga>
+
 ## Rząd i kolumna
 
 W grze Super Mario Bros. nad głową Mario wiszą bloki ze znakami zapytania, a na ziemi stoją kolumny cegieł. Narysujmy je w terminalu.
@@ -24,9 +37,9 @@ Cztery znaki zapytania w rzędzie to pętla, która wypisuje `?` bez `\n`, a dop
 ```c
 for (int i = 0; i < 4; i++)
 {
-    printf("?");
+    printf("?");    // bez \n: znaki stoją obok siebie
 }
-printf("\n");
+printf("\n");       // dopiero po pętli nowa linia
 ```
 
 ```txt title="Wynik"
@@ -38,7 +51,7 @@ Kolumna trzech cegieł to ta sama pętla, ale z `\n` po każdym znaku:
 ```c
 for (int i = 0; i < 3; i++)
 {
-    printf("#\n");
+    printf("#\n");    // \n po każdej cegle: każda w osobnej linii
 }
 ```
 
@@ -71,6 +84,10 @@ for (int i = 0; i < 3; i++)          // dla każdego rzędu
 
 Zewnętrzna pętla (`i`) liczy rzędy, wewnętrzna (`j`) cegły w rzędzie. Na każdy obrót zewnętrznej pętli wewnętrzna wykonuje się w całości, więc `#` wypisze się 3 × 3 = 9 razy. Druga pętla potrzebuje innej nazwy licznika, stąd `j`.
 
+Laboratorium pokazuje mniejszą siatkę, 2 × 3, krok po kroku. Zwróć uwagę, że `j` powstaje od nowa przy każdym rzędzie:
+
+<KrokPoKroku program="siatka" />
+
 ## Rozmiar od użytkownika i własna funkcja
 
 Teraz rozmiar podaje użytkownik, a rysowanie rzędu wydzielamy do funkcji:
@@ -78,11 +95,14 @@ Teraz rozmiar podaje użytkownik, a rysowanie rzędu wydzielamy do funkcji:
 ```c title="mario.c"
 #include <stdio.h>
 
+// Prototyp: zapowiedź funkcji, która jest niżej
 void rzad(int szerokosc);
 
 int main(void)
 {
     int n = 0;
+
+    // Pytaj o rozmiar, dopóki nie będzie dodatni
     do
     {
         printf("Rozmiar: ");
@@ -90,12 +110,14 @@ int main(void)
     }
     while (n < 1);
 
+    // n razy narysuj rząd o szerokości n
     for (int i = 0; i < n; i++)
     {
         rzad(n);
     }
 }
 
+// Rysuje jeden rząd cegieł i przechodzi do nowej linii
 void rzad(int szerokosc)
 {
     for (int j = 0; j < szerokosc; j++)
@@ -113,6 +135,7 @@ Pętla `do while` pilnuje, żeby rozmiar był dodatni. Funkcja `rzad` ukrywa wew
 Co się stanie, gdy szerokość rzędu będzie zależeć od numeru rzędu? Pierwszy rząd ma jedną cegłę, drugi dwie i tak dalej:
 
 ```c
+// i od 1 do 4 włącznie, a rząd ma tyle cegieł, ile wynosi i
 for (int i = 1; i <= 4; i++)
 {
     rzad(i);

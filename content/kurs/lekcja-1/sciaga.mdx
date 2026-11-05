@@ -1,0 +1,136 @@
+---
+title: Ściąga z języka C
+nav: Ściąga
+description: Cała składnia z lekcji na jednej stronie. Każdy zapis z krótkim wyjaśnieniem, do wydrukowania albo do otwarcia obok edytora.
+czas: 5
+---
+
+<Cel>Mieć pod ręką wszystkie zapisy z lekcji: co znaczą i jak ich użyć.</Cel>
+
+Każdy moduł zaczyna się od małej ściągi. Tu są wszystkie w jednym miejscu, pogrupowane tematami. Gdy coś jest niejasne, wróć do modułu podanego w nawiasie.
+
+## Szkielet programu (Pierwszy program)
+
+```c
+#include <stdio.h>    // gotowe funkcje do wypisywania i wczytywania
+
+int main(void)        // tu zaczyna się program
+{
+    printf("hello, world\n");    // polecenie kończy się średnikiem
+}
+```
+
+| zapis | co znaczy |
+|---|---|
+| `#include <stdio.h>` | dołącz funkcje wejścia i wyjścia, m.in. `printf` i `scanf` |
+| `int main(void)` | funkcja, od której zaczyna się program: nic nie dostaje, oddaje liczbę |
+| `{ … }` | początek i koniec bloku kodu |
+| `;` | koniec polecenia |
+| `// komentarz` | notatka dla ludzi, kompilator ją pomija |
+| `return 0;` | zakończ `main` z kodem „wszystko w porządku” (można pominąć) |
+
+## Terminal i kompilacja (Gdzie pisać kod, Kompilacja)
+
+| zapis | co znaczy |
+|---|---|
+| `gcc -Wall plik.c -o program` | skompiluj z ostrzeżeniami do programu `program` |
+| `./program` | uruchom (Windows: `.\program`) |
+| `cd folder`, `cd ..` | wejdź do folderu, wyjdź folder wyżej |
+| `ls` | pokaż pliki w folderze (działa też w PowerShellu) |
+| Ctrl+C | przerwij działający program |
+| `error` / `warning` | błąd (programu nie będzie) / ostrzeżenie (jest, ale coś jest podejrzane) |
+| `hello.c:5:29` | plik, linijka 5, kolumna 29 |
+
+## Zmienne i typy (Typy danych)
+
+| zapis | co znaczy |
+|---|---|
+| `int wiek;` | utwórz zmienną na liczbę całkowitą |
+| `int wiek = 20;` | utwórz zmienną i od razu wpisz wartość |
+| `wiek = 21;` | wpisz nową wartość (bez typu!) |
+| `double cena = 9.99;` | liczba z ułamkiem, zawsze z kropką |
+| `char litera = 'A';` | jeden znak, w apostrofach |
+| `char imie[50];` | napis, czyli 50 znaków w rzędzie |
+| `char imie[] = "Ola";` | napis wpisany na sztywno, w cudzysłowie |
+| `bool gotowe = true;` | prawda albo fałsz (`#include <stdbool.h>`) |
+| `long long` | duża liczba całkowita |
+| `const int DNI = 7;` | stała: wartości nie da się zmienić |
+| `licznik++;` | zwiększ o 1 |
+| `liczba_osob` | nazwa z kilku słów: małe litery i podkreślnik |
+
+## Wypisywanie i wczytywanie (printf i scanf)
+
+| zapis | co znaczy |
+|---|---|
+| `printf("Cześć, %s!\n", imie);` | wypisz tekst, a w miejsce wstawki wstaw wartość zmiennej |
+| `scanf("%d", &wiek);` | wczytaj liczbę do zmiennej `wiek` |
+| `scanf("%s", imie);` | wczytaj jedno słowo do napisu (bez `&`) |
+| `scanf(" %c", &litera);` | wczytaj jeden znak (spacja przed `%c` pomija Enter) |
+| `&wiek` | adres zmiennej: gdzie `scanf` ma zapisać wynik |
+| `\n`, `\t`, `\"`, `\\` | nowa linia, tabulator, cudzysłów, ukośnik |
+
+| wstawka | typ | w `printf` | w `scanf` |
+|---|---|---|---|
+| `%d` | `int` | `printf("%d", wiek)` | `scanf("%d", &wiek)` |
+| `%f` / `%lf` | `double` | `printf("%f", cena)` | `scanf("%lf", &cena)` |
+| `%.2f` | `double` | dwie cyfry po kropce | nie dotyczy |
+| `%c` | `char` | `printf("%c", litera)` | `scanf(" %c", &litera)` |
+| `%s` | napis | `printf("%s", imie)` | `scanf("%s", imie)` |
+| `%lld` | `long long` | `printf("%lld", n)` | `scanf("%lld", &n)` |
+| `%zu` | wynik `sizeof` i `strlen` | `printf("%zu", sizeof(int))` | nie dotyczy |
+| `%%` | sam znak % | `printf("100%%")` | nie dotyczy |
+
+## Warunki (Warunki)
+
+| zapis | co znaczy |
+|---|---|
+| `if (x > 0) { … }` | jeśli warunek jest spełniony, wykonaj blok |
+| `else if (x < 0) { … }` | w przeciwnym razie sprawdź kolejny warunek |
+| `else { … }` | we wszystkich pozostałych przypadkach |
+| `==`, `!=` | równe, różne |
+| `<`, `>`, `<=`, `>=` | porównania |
+| `&&`, `\|\|`, `!` | i, lub, nie |
+| `x = 5` a `x == 5` | przypisanie a porównanie |
+| `odpowiedz == 't'` | znak porównujemy w apostrofach, nie w cudzysłowie |
+
+## Pętle (Pętle, Mario)
+
+| zapis | co znaczy |
+|---|---|
+| `for (int i = 0; i < 3; i++) { … }` | powtórz 3 razy (początek; warunek; krok) |
+| `while (warunek) { … }` | powtarzaj, dopóki warunek jest spełniony |
+| `do { … } while (warunek);` | zrób raz, potem powtarzaj, dopóki warunek jest spełniony |
+| `while (true) { … }` | pętla bez końca |
+| pętla w pętli | wewnętrzna wykonuje się w całości przy każdym obrocie zewnętrznej |
+| `i`, `j` | liczniki pętli zewnętrznej i wewnętrznej |
+
+## Funkcje (Funkcje)
+
+| zapis | co znaczy |
+|---|---|
+| `void miau(int n);` | prototyp: zapowiedź funkcji nad `main` |
+| `void miau(int n) { … }` | definicja: dostaje liczbę `n`, nic nie oddaje |
+| `int kwadrat(int x) { return x * x; }` | definicja: dostaje liczbę i oddaje liczbę |
+| `miau(3);` | wywołanie: `n` dostaje 3 |
+| `int wynik = kwadrat(5);` | wynik funkcji trafia do zmiennej |
+| `void` przed nazwą / w nawiasie | nic nie oddaje / nic nie dostaje |
+| `return` | zakończ funkcję i oddaj wartość |
+| zasięg | zmienna żyje do zamykającej klamry bloku, w którym ją utworzono |
+
+## Działania (Działania i granice)
+
+| zapis | co znaczy |
+|---|---|
+| `+`, `-`, `*`, `/` | cztery działania |
+| `x % y` | reszta z dzielenia |
+| `7 / 2` | 3, bo `int` przez `int` daje `int` |
+| `(double) x / y` | dzielenie z ułamkiem: 3.5 |
+| `INT_MAX` | największy `int` (`#include <limits.h>`) |
+
+## Napisy i polskie znaki (Polskie znaki)
+
+| zapis | co znaczy |
+|---|---|
+| `strlen("Zażółć")` | długość w bajtach: 10 (`#include <string.h>`) |
+| `"ą"` | polską literę trzymaj jako napis, nie jako `char` |
+| `chcp 65001` | Windows: przełącz terminal na UTF-8 |

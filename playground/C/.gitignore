@@ -1,0 +1,8 @@
+# Do repozytorium trafia tylko kod. Skompilowane programy
+# (pliki bez rozszerzenia, .exe, .o) Git pomija.
+*
+!*/
+!*.c
+!*.h
+!*.md
+!.gitignore

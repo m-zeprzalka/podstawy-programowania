@@ -2,7 +2,7 @@
 title: "Warunki: if, else if, else"
 nav: Warunki
 description: Program wybiera jedną z dróg. Porównania, operatory „i”, „lub”, „nie” oraz pułapka z pojedynczym znakiem równości.
-czas: 10
+czas: 12
 ---
 
 <Cel>Pisać warunki z porównaniami i operatorami logicznymi.</Cel>
@@ -17,7 +17,22 @@ czas: 10
   ]}
 />
 
-## Od klocka if do if w C
+<Sciaga>
+
+| zapis | co znaczy |
+|---|---|
+| `if (warunek) { … }` | jeśli warunek jest spełniony, wykonaj blok w klamrach |
+| `else if (warunek) { … }` | w przeciwnym razie sprawdź kolejny warunek |
+| `else { … }` | we wszystkich pozostałych przypadkach |
+| `<`, `>`, `<=`, `>=` | mniejsze, większe, mniejsze lub równe, większe lub równe |
+| `==`, `!=` | równe, różne |
+| `&&`, `\|\|`, `!` | i, lub, nie |
+| `x = 5` a `x == 5` | jeden znak `=` wpisuje wartość, dwa porównują |
+| `'t'` | jeden znak w apostrofach, np. odpowiedź t/n |
+
+</Sciaga>
+
+## Od klocka Scratcha do if w C
 
 Klocek `if < > then … else` ze Scratcha wygląda w C bardzo podobnie. Program porównuje dwie liczby:
 
@@ -26,13 +41,17 @@ Klocek `if < > then … else` ze Scratcha wygląda w C bardzo podobnie. Program 
 
 int main(void)
 {
+    // int (od integer): dwie zmienne na liczby całkowite
     int x;
     int y;
+
     printf("Podaj x: ");
+    // %d: wczytaj liczbę całkowitą, &x: adres, pod który ją zapisać
     scanf("%d", &x);
     printf("Podaj y: ");
     scanf("%d", &y);
 
+    // Warunki sprawdzamy po kolei. Wykona się tylko jedna gałąź.
     if (x < y)
     {
         printf("x jest mniejsze od y\n");
@@ -43,12 +62,18 @@ int main(void)
     }
     else
     {
+        // ani mniejsze, ani większe, czyli równe
         printf("x jest równe y\n");
     }
 }
 ```
 
 Warunek stoi w nawiasach okrągłych, a to, co ma się wykonać, w klamrowych. Komputer sprawdza warunki po kolei i wykonuje **tylko pierwszą** pasującą gałąź. Ostatnie `else` nie potrzebuje warunku: jeśli x nie jest ani mniejsze, ani większe od y, to musi być równe.
+
+<Ramka tytul="Przypomnienie: int x i &x">
+- **`int x;`** tworzy zmienną o nazwie `x` na liczbę całkowitą. W C każda zmienna musi mieć typ, dlatego `int` stoi przed nazwą. Nie ma to nic wspólnego ze stałą. Stałą zrobiłoby z `x` dopiero słowo `const` i wartość nadana od razu: `const int X = 5;`. Różnice między zmienną a stałą opisuje moduł „Typy danych”.
+- **`&x`** to adres zmiennej `x`, czyli numer jej szufladki w pamięci. `scanf` musi wiedzieć, **gdzie** zapisać wczytaną liczbę, więc dostaje adres, a nie zawartość zmiennej. W `printf` znaku `&` nie piszemy, bo tam chodzi o wartość. Więcej w module „printf i scanf”.
+</Ramka>
 
 <Wskazowka tytul="Dlaczego nie trzy osobne if?">
 Można napisać trzy niezależne `if`: `x < y`, `x > y` i `x == y`. Program działałby poprawnie, ale zawsze sprawdzałby wszystkie trzy warunki, nawet gdy pierwszy już się spełnił. `else if` oszczędza pracy i lepiej pokazuje, że gałęzie się wykluczają. To różnica w **projekcie** programu, a nie w jego poprawności.
@@ -76,7 +101,7 @@ Warunki można łączyć jak klocki `and`, `or` i `not` w Scratchu:
 | C | znaczenie | przykład |
 |---|---|---|
 | `&&` | i (oba warunki) | `wiek >= 18 && wiek <= 65` |
-| `\|\|` | lub (co najmniej jeden) | `c == 't' \|\| c == 'T'` |
+| `\|\|` | lub (co najmniej jeden) | `odpowiedz == 't' \|\| odpowiedz == 'T'` |
 | `!` | nie (odwraca) | `!(x == 0)` |
 
 Przykład: program pyta o zgodę i przyjmuje małą albo wielką literę.
@@ -86,22 +111,33 @@ Przykład: program pyta o zgodę i przyjmuje małą albo wielką literę.
 
 int main(void)
 {
-    char c;
-    printf("Zgadzasz się? (t/n) ");
-    scanf(" %c", &c);
+    // char: zmienna na jeden znak
+    char odpowiedz;
 
-    if (c == 't' || c == 'T')
+    // Pytanie to napis, więc stoi w cudzysłowie
+    printf("Zgadzasz się? (t/n) ");
+    // Spacja przed %c pomija Enter i spacje, które zostały w kolejce
+    scanf(" %c", &odpowiedz);
+
+    // Pojedyncze znaki porównujemy w apostrofach: 't', a nie "t"
+    if (odpowiedz == 't' || odpowiedz == 'T')
     {
         printf("Zgoda.\n");
     }
-    else if (c == 'n' || c == 'N')
+    else if (odpowiedz == 'n' || odpowiedz == 'N')
     {
         printf("Brak zgody.\n");
+    }
+    else
+    {
+        printf("Nie rozumiem.\n");
     }
 }
 ```
 
-Spacja przed `%c` w `scanf` każe pominąć spacje i znaki nowej linii, które mogły zostać po wcześniejszym wczytywaniu. Znaki porównujemy w **pojedynczym** cudzysłowie: `'t'`.
+Dlaczego pytanie stoi w cudzysłowie `" "`, a litery w apostrofach `' '`? To reguła języka C. Pytanie to **napis**, czyli wiele znaków, więc zapisujemy je w cudzysłowie. Odpowiedź to **jeden znak** typu `char`, a pojedynczy znak zapisuje się w apostrofach. Dla C `'t'` to po prostu liczba 116, czyli kod litery t, więc porównanie `odpowiedz == 't'` porównuje dwie liczby.
+
+Gdy pomylisz apostrofy z cudzysłowem i napiszesz `odpowiedz == "t"`, warunek nigdy nie będzie spełniony, a GCC ostrzeże: `comparison between pointer and integer`. Szczegóły są w module „Typy danych”, w części „Apostrof czy cudzysłów?”.
 
 <NaZajeciach tytul="Bramka w kinie" czas="5 min">
 Piszemy warunek wpuszczania na film: można wejść, jeśli widz ma co najmniej 16 lat albo przyszedł z rodzicem. Na tablicy zapisujemy to najpierw zdaniem, potem pseudokodem, a na końcu w C: `if (wiek >= 16 || z_rodzicem)`. Jak zmienić warunek, żeby seans był tylko dla osób od 16 do 26 lat?
@@ -111,17 +147,17 @@ Piszemy warunek wpuszczania na film: można wejść, jeśli widz ma co najmniej 
 Gdy jedną zmienną porównujesz z wieloma konkretnymi wartościami, wygodniejsze bywa `switch`:
 
 ```c
-switch (c)
+switch (odpowiedz)
 {
     case 't':
     case 'T':
         printf("Zgoda.\n");
-        break;
+        break;    // koniec tego przypadku
     case 'n':
     case 'N':
         printf("Brak zgody.\n");
         break;
-    default:
+    default:      // wszystko inne
         printf("Nie rozumiem.\n");
 }
 ```
