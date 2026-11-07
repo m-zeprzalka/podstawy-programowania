@@ -24,6 +24,7 @@ import { SuwakiRgb } from "./suwaki-rgb"
 import { TlumaczAscii } from "./tlumacz-ascii"
 import { TlumaczKlockow } from "./tlumacz-klockow"
 import { Tokenizer } from "./tokenizer"
+import { WejscieWyjscie } from "./wejscie-wyjscie"
 import { WykresZlozonosci } from "./wykres-zlozonosci"
 import { Zarowki } from "./zarowki"
 import { ZgadnijLiczbe } from "./zgadnij-liczbe"
@@ -52,6 +53,7 @@ export const interaktywne = {
   TlumaczAscii,
   TlumaczKlockow,
   Tokenizer,
+  WejscieWyjscie,
   WykresZlozonosci,
   Zarowki,
   ZgadnijLiczbe,

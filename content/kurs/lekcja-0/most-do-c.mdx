@@ -18,9 +18,28 @@ czas: 9
   ]}
 />
 
+<Sciaga>
+
+| pojęcie | co znaczy |
+|---|---|
+| **pamięć** | rząd ponumerowanych szufladek, każda mieści jeden bajt |
+| **adres** | numer szufladki, zwykle szesnastkowo, np. `0x7ffd5c3a` |
+| **zmienna** | nazwana szufladka (albo kilka sąsiednich) |
+| **procesor** | wykonuje instrukcje: dodaje, porównuje, skacze w inne miejsce programu |
+| **pobierz, zdekoduj, wykonaj** | cykl, który procesor powtarza w kółko |
+| **skok** | przejście w inne miejsce programu, jak „wróć do linii 3” |
+| **kompilator** | tłumaczy kod źródłowy na kod maszynowy, czyli instrukcje dla procesora |
+| **język programowania** | abstrakcja nad zerami i jedynkami |
+| `printf` | odpowiednik scratchowego bloku `powiedz` |
+| `main` | odpowiednik „kiedy kliknięto zieloną flagę” |
+
+</Sciaga>
+
 ## Pamięć: ponumerowane szufladki
 
 **Pamięć** można sobie wyobrazić jako długi rząd szufladek, z których każda mieści jeden bajt. Każda szufladka ma numer, czyli **adres**, zapisywany zwykle szesnastkowo, np. `0x7ffd5c3a`. **Zmienna** w języku C to po prostu nazwana szufladka (albo kilka sąsiednich).
+
+Napis zajmuje w pamięci o jedną szufladkę więcej, niż ma znaków. Na jego końcu język C dopisuje bajt `0x00`, który oznacza „tu kończy się napis”. „HI!” zajmuje więc cztery szufladki: 72, 73, 33 i 0.
 
 <Pamiec />
 

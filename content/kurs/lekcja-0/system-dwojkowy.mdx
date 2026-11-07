@@ -18,6 +18,23 @@ czas: 14
   ]}
 />
 
+<Sciaga>
+
+| pojęcie | co znaczy |
+|---|---|
+| **waga pozycji** | potęga podstawy przypisana miejscu cyfry, np. ×100, ×10, ×1 |
+| **system dwójkowy** | cyfry 0 i 1, wagi to potęgi dwójki: 1, 2, 4, 8… |
+| **bit** | zero albo jedynka, wyłączone albo włączone (od *binary digit*) |
+| **tranzystor** | maleńki przełącznik, jak żarówka: świeci się albo nie |
+| **bajt** | 8 bitów, czyli 256 wartości: od 0 do 255 |
+| **zamiana na dwójkowy** | idź od największej wagi: jeśli się mieści, zapal i odejmij |
+| `00101010` | 42, bo 32 + 8 + 2 |
+| **n bitów** | 2ⁿ wartości, od 0 do 2ⁿ − 1; każdy bit podwaja zakres |
+| **jedna ręka** | pięć bitów o wagach 1, 2, 4, 8, 16, czyli maksimum 31 |
+| **system szesnastkowy** | cyfry 0–9 i A–F; jedna cyfra to 4 bity, przedrostek `0x` |
+
+</Sciaga>
+
 ## Jak naprawdę czytamy liczbę 123
 
 W liczbie 123 każda pozycja ma swoją **wagę**, czyli potęgę dziesiątki:
@@ -128,9 +145,9 @@ Zapis szesnastkowy spotkasz w kolorach (`#FF5733`), kodach Unicode (`U+0105`) i 
     wyjasnienie="13 = 8 + 4 + 1, więc zapalamy wagi 8, 4 i 1: 1101."
   />
   <Pytanie
-    pytanie="Ile to jest 0x2A w systemie dziesiętnym?"
-    akceptowane={["42"]}
-    wyjasnienie="2 × 16 + A (czyli 10) = 32 + 10 = 42."
+    pytanie="Jaką liczbę dziesiętną zapisuje bajt 00010110?"
+    akceptowane={["22", "dwadzieścia dwa"]}
+    wyjasnienie="Świecą żarówki o wagach 16, 4 i 2: 16 + 4 + 2 = 22."
   />
   <Pytanie
     pytanie="Ile różnych wartości można zapisać w jednym bajcie?"

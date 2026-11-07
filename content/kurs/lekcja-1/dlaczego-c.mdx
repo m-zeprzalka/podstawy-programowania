@@ -16,6 +16,23 @@ czas: 6
   ]}
 />
 
+<Sciaga>
+
+| pojęcie | co znaczy |
+|---|---|
+| **dlaczego C** | trzeba samodzielnie zadbać o typy, pamięć i granice liczb |
+| **C** | język stworzony około 1972 roku przez Dennisa Ritchiego w Bell Labs |
+| **B** | poprzednik C od Kena Thompsona, wywodzi się z języka BCPL |
+| **Unix** | system, którego jądro w 1973 roku przepisano z asemblera na C |
+| **asembler** | instrukcje konkretnego procesora |
+| **K&R** | książka „The C Programming Language” Kernighana i Ritchiego z 1978 roku |
+| **standard języka** | oficjalna wersja C: C89/C90, C99, C11, C17 i C23 |
+| **C23** | najnowszy standard, domyślny w GCC od wersji 15 |
+| **Linux, CPython, SQLite** | programy napisane w C, których pewnie używasz codziennie |
+| **C, C++, C#** | trzy różne języki; w kursie piszemy w czystym C |
+
+</Sciaga>
+
 ## Ze Scratcha do C
 
 Scratch pozwolił skupić się na pomysłach: funkcjach, pętlach, warunkach i zmiennych. Teraz te same pomysły zapiszemy tekstem, w prawdziwym języku programowania. Zamiast przeciągać klocki, będziemy pisać kod, a zamiast zielonej flagi użyjemy kompilatora i terminala.
@@ -55,9 +72,23 @@ Nazwy są podobne, ale to trzy różne języki. C++ powstał jako rozszerzenie C
     wyjasnienie="Dennis Ritchie stworzył C w Bell Labs na początku lat 70. Linus Torvalds napisał jądro Linuksa (w C), a Guido van Rossum stworzył Pythona."
   />
   <Pytanie
-    pytanie="Który z tych programów jest napisany w C?"
-    odpowiedzi={["Jądro systemu Linux", "Scratch 3.0", "Ten kurs w przeglądarce"]}
+    pytanie="Dlaczego kurs zaczyna pisanie kodu od języka C?"
+    odpowiedzi={[
+      "Bo C jest najnowszym językiem programowania",
+      "Bo w C trzeba samemu zadbać o typy, pamięć i granice liczb, więc widać, co dzieje się „pod spodem”",
+      "Bo w C pisze się większość stron internetowych",
+    ]}
+    poprawna={1}
+    wyjasnienie="C wymaga pilnowania typów, pamięci i granic liczb, czyli tego, co w lekcji 0 działo się pod spodem. Kto zrozumie C, łatwiej nauczy się kolejnych języków."
+  />
+  <Pytanie
+    pytanie="Dlaczego oprogramowanie pralek, samochodów i routerów często pisze się w C?"
+    odpowiedzi={[
+      "Bo C działa szybko i potrzebuje mało pamięci",
+      "Bo C jest najłatwiejszym językiem",
+      "Bo programów w C nie trzeba kompilować",
+    ]}
     poprawna={0}
-    wyjasnienie="Jądro Linuksa powstaje w C. Scratch 3.0 i strony internetowe to głównie JavaScript."
+    wyjasnienie="Urządzenia mają małe procesory i mało pamięci, a programy w C są szybkie i oszczędne."
   />
 </Quiz>

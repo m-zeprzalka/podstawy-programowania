@@ -128,7 +128,7 @@ function grafemy(tekst: string): string[] | null {
  */
 export function RozbieraczEmoji({
   tekst: tekstStartowy = "👨‍👩‍👧",
-  tytul = "Rozbieracz emoji",
+  tytul = "Tłumacz emoji",
 }: {
   /** Tekst początkowy. */
   tekst?: string

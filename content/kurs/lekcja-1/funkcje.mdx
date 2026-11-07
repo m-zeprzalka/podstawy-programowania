@@ -247,7 +247,7 @@ void siatka(int kolumny, int wiersze)
 ```
 
 <NaZajeciach tytul="Funkcja z dwoma parametrami" czas="5 min">
-Rozszerzamy `miau` o drugi parametr: `void powiedz(char tekst[], int n)` wypisuje dowolny tekst n razy. Wywołanie `powiedz("hau", 2);` wypisze dwa razy „hau”. Kto skończy, pisze funkcję `int wieksza(int a, int b)`, która zwraca większą z dwóch liczb.
+Piszemy funkcję z dwoma parametrami: `void linia(char znak, int n)` rysuje poziomą linię z n takich samych znaków i przechodzi do nowej linii. Wywołanie `linia('#', 5);` wypisze `#####`, a `linia('-', 12);` dwanaście kresek, np. na górną krawędź ramki z ćwiczenia „Wizytówka”. Kto skończy, pisze funkcję `int dluzszy_bok(int szerokosc, int wysokosc)`, która zwraca dłuższy bok obrazu: `dluzszy_bok(1080, 1920)` zwróci 1920. Pytanie do sali: która z tych funkcji ma `void` przed nazwą i dlaczego?
 </NaZajeciach>
 
 <Quiz>
@@ -283,7 +283,7 @@ Rozszerzamy `miau` o drugi parametr: `void powiedz(char tekst[], int n)` wypisuj
     wyjasnienie="Funkcje w C stoją obok siebie. W main zostaje tylko wywołanie, a nad main prototyp."
   />
   <Pytanie
-    pytanie="Funkcja ma w środku dwie linijki: return 1; i return 2;. Co zwróci?"
+    pytanie={`Co zwróci wywołanie f()? int f(void) { return 1; return 2; }`}
     akceptowane={["1", "jeden"]}
     wyjasnienie="Pierwszy return kończy funkcję. Druga linijka nigdy się nie wykona."
   />

@@ -9,6 +9,7 @@ import {
   CheckIcon,
   CircleNotchIcon,
   CopyIcon,
+  DownloadSimpleIcon,
   PaperPlaneRightIcon,
   WarningIcon,
 } from "@phosphor-icons/react"
@@ -32,7 +33,7 @@ import { cn } from "@/lib/utils"
 const MODEL = "claude-opus-5-5"
 const API_URL = "https://api.anthropic.com/v1/messages"
 const API_VERSION = "2026-10-21"
-const MAX_TOKENS = 1024
+const MAX_TOKENS = 16000
 /** Zaślepka klucza w kodzie. Tylko ASCII: inne znaki w nagłówku HTTP wywracają fetch. */
 const KLUCZ_ZASLEPKA = "sk-ant-..."
 
@@ -64,66 +65,95 @@ function programPython(system: string | null, user: string) {
     "# chat.py",
     "import anthropic",
     "",
-    "client = anthropic.Anthropic()  # klucz API w zmiennej ANTHROPIC_API_KEY",
+    "# Klient bierze klucz API ze zmiennej ANTHROPIC_API_KEY",
+    "klient = anthropic.Anthropic()",
     "",
-    ...(system !== null ? [`system = ${lit(system)}`] : []),
-    '# Wersja interaktywna: prompt = input("Prompt: ")',
-    `prompt = ${lit(user)}`,
-    "",
-    "message = client.messages.create(",
+    "odpowiedz = klient.messages.create(",
     `    model=${lit(MODEL)},`,
     `    max_tokens=${MAX_TOKENS},`,
-    ...(system !== null ? ["    system=system,"] : []),
-    "    messages=[",
-    '        {"role": "user", "content": prompt},',
-    "    ],",
+    ...(system !== null ? [`    system=${lit(system)},`] : []),
+    `    messages=[{"role": "user", "content": ${lit(user)}}],`,
     ")",
     "",
-    "# Odpowiedź to lista bloków. Wypisujemy bloki z tekstem.",
-    "for block in message.content:",
-    '    if block.type == "text":',
-    "        print(block.text)",
+    "# Wypisz tekst odpowiedzi (przed nim może stać blok „myślenia”)",
+    "for blok in odpowiedz.content:",
+    '    if blok.type == "text":',
+    "        print(blok.text)",
   ].join("\n")
 }
 
-function programJS(system: string | null, user: string) {
+/** Tekst w HTML: znaki < i & zamieniamy na encje. */
+const escHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
+/** Napis w <script>: jak `lit`, ale bez sekwencji </, która zamknęłaby skrypt. */
+const litSkrypt = (s: string) => lit(s).replace(/<\//g, "<\\/")
+
+function programHTML(system: string | null, user: string) {
   return [
-    "// chat.mjs: czysty JavaScript, bez instalowania bibliotek",
-    `const API_KEY = ${lit(KLUCZ_ZASLEPKA)} // tu wklej swój klucz`,
+    "<!doctype html>",
+    '<html lang="pl">',
+    "<head>",
+    '  <meta charset="utf-8">',
+    "  <title>Czat z Claude'em</title>",
+    "</head>",
+    "<body>",
+    "  <h1>Czat z Claude'em</h1>",
+    `  <textarea id="pytanie" rows="4" cols="60">${escHtml(user)}</textarea>`,
+    "  <br>",
+    '  <button id="wyslij">Wyślij</button>',
+    '  <p id="odpowiedz"></p>',
     "",
-    ...(system !== null ? [`const system = ${lit(system)}`] : []),
-    `const prompt = ${lit(user)}`,
+    "  <script>",
+    "    // Tu wklej klucz API od prowadzącego",
+    `    const KLUCZ = ${lit(KLUCZ_ZASLEPKA)};`,
     "",
-    `const response = await fetch(${lit(API_URL)}, {`,
-    '  method: "POST",',
-    "  headers: {",
-    '    "x-api-key": API_KEY,',
-    `    "anthropic-version": ${lit(API_VERSION)},`,
-    '    "content-type": "application/json",',
-    "    // Pozwala wysłać żądanie prosto z przeglądarki (CORS)",
-    '    "anthropic-dangerous-direct-browser-access": "true",',
-    "  },",
-    "  body: JSON.stringify({",
-    `    model: ${lit(MODEL)},`,
-    `    max_tokens: ${MAX_TOKENS},`,
-    ...(system !== null ? ["    system: system,"] : []),
-    '    messages: [{ role: "user", content: prompt }],',
-    "  }),",
-    "})",
+    "    // Po kliknięciu przycisku wyślij pytanie do Claude'a",
+    '    document.getElementById("wyslij").onclick = async () => {',
+    '      const pytanie = document.getElementById("pytanie").value;',
+    '      const pole = document.getElementById("odpowiedz");',
+    '      pole.textContent = "Claude pisze…";',
     "",
-    "const data = await response.json()",
-    "if (!response.ok) throw new Error(data.error.message)",
+    `      const odpowiedz = await fetch(${lit(API_URL)}, {`,
+    '        method: "POST",',
+    "        headers: {",
+    '          "x-api-key": KLUCZ,',
+    `          "anthropic-version": ${lit(API_VERSION)},`,
+    '          "content-type": "application/json",',
+    '          "anthropic-dangerous-direct-browser-access": "true",',
+    "        },",
+    "        body: JSON.stringify({",
+    `          model: ${lit(MODEL)},`,
+    `          max_tokens: ${MAX_TOKENS},`,
+    ...(system !== null ? [`          system: ${litSkrypt(system)},`] : []),
+    '          messages: [{ role: "user", content: pytanie }],',
+    "        }),",
+    "      });",
     "",
-    "// Odpowiedź to lista bloków. Wypisujemy bloki z tekstem.",
-    "for (const block of data.content) {",
-    '  if (block.type === "text") console.log(block.text)',
-    "}",
+    "      // Odpowiedź to JSON. Szukamy w nim bloku z tekstem.",
+    "      const dane = await odpowiedz.json();",
+    '      const blok = dane.content?.find((b) => b.type === "text");',
+    '      pole.textContent = blok ? blok.text : "Błąd: " + dane.error?.message;',
+    "    };",
+    "  </script>",
+    "</body>",
+    "</html>",
   ].join("\n")
+}
+
+/** Zapisuje tekst jako plik na dysku użytkownika (np. czat.html). */
+function pobierzPlik(nazwa: string, tresc: string) {
+  const url = URL.createObjectURL(
+    new Blob([tresc], { type: "text/html;charset=utf-8" })
+  )
+  const a = document.createElement("a")
+  a.href = url
+  a.download = nazwa
+  a.click()
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
 /* ---------- Bardzo proste podświetlanie składni ---------- */
 
-type Jezyk = "json" | "python" | "js" | "http"
+type Jezyk = "json" | "python" | "js" | "html" | "http"
 
 type Rodzaj =
   | "klucz"
@@ -163,6 +193,19 @@ const SKLADNIA: Record<Jezyk, { re: RegExp; grupy: Rodzaj[] }> = {
     re: /(\/\/.*)|("(?:[^"\\]|\\.)*")|\b(const|let|await|for|of|if|else|throw|new|return|true|false|null)\b|\b([A-Za-z_$][\w$]*)(?=\()|\b([A-Za-z_$][\w$]*)(?=\s*:)|(\d+)|([()[\]{}.,:=;!])|([^/"()[\]{}.,:=;!\w$]+|[\w$]+|.)/g,
     grupy: [
       "komentarz",
+      "napis",
+      "slowo",
+      "funkcja",
+      "klucz",
+      "liczba",
+      "znak",
+    ],
+  },
+  html: {
+    re: /(\/\/.*)|(<\/?[A-Za-z!][\w-]*|\/?>)|("(?:[^"\\]|\\.)*")|\b(const|let|await|async|if|else|return|true|false|null)\b|\b([A-Za-z_$][\w$]*)(?=\()|\b([A-Za-z_$][\w$]*)(?=\s*:|=")|(\d+)|([()[\]{}.,:=;!?])|([^/<>"()[\]{}.,:=;!?\w$]+|[\w$]+|.)/g,
+    grupy: [
+      "komentarz",
+      "slowo",
       "napis",
       "slowo",
       "funkcja",
@@ -405,22 +448,22 @@ function Stoper({ od }: { od: number }) {
 /* ---------- Komponent ---------- */
 
 /**
- * „Prompt Playground”: monit systemowy i monit użytkownika oraz to samo
+ * „Prompt Playground”: prompt systemowy i prompt użytkownika oraz to samo
  * żądanie do Claude'a w trzech postaciach: JSON (HTTP), Python (biblioteka
- * `anthropic`) i czysty JavaScript (`fetch`). Zakładka „Na żywo” wysyła
+ * `anthropic`) i strona HTML z JavaScriptem (`fetch`). Zakładka „Na żywo” wysyła
  * żądanie prosto z przeglądarki, jeśli wkleisz klucz API. Klucz zostaje
  * tylko w pamięci komponentu i trafia wyłącznie do api.anthropic.com.
  *
  * @example <PromptPlayground />
- * @example <PromptPlayground system="Odpowiadaj jak pirat." user="Co to jest bit?" />
+ * @example <PromptPlayground system="Odpowiadaj tylko kodami kolorów." user="Paleta dla kawiarni" />
  */
 export function PromptPlayground({
-  system = "Odpowiadaj jednym zdaniem. Udawaj, że jesteś kotem.",
-  user = "W jednym zdaniu: czym jest programowanie?",
+  system = "Jesteś copywriterem w studiu graficznym. Odpowiadaj jednym krótkim hasłem.",
+  user = "Zaproponuj hasło na plakat festiwalu filmów animowanych.",
 }: {
-  /** Początkowa treść monitu systemowego. */
+  /** Początkowa treść promptu systemowego. */
   system?: string
-  /** Początkowa treść monitu użytkownika. */
+  /** Początkowa treść promptu użytkownika. */
   user?: string
 }) {
   const [sys, setSys] = React.useState(system)
@@ -437,11 +480,11 @@ export function PromptPlayground({
 
   React.useEffect(() => () => przerwij.current?.abort(), [])
 
-  // Pusty monit systemowy nic nie wnosi, więc w żądaniu go pomijamy.
+  // Pusty prompt systemowy nic nie wnosi, więc w żądaniu go pomijamy.
   const aktywnySystem = sysWlaczony && sys.trim() !== "" ? sys : null
   const json = JSON.stringify(cialoZadania(aktywnySystem, usr), null, 2)
   const python = programPython(aktywnySystem, usr)
-  const js = programJS(aktywnySystem, usr)
+  const html = programHTML(aktywnySystem, usr)
 
   const czeka = wysylka.typ === "czeka"
   const moznaWyslac = !czeka && klucz.trim() !== "" && usr.trim() !== ""
@@ -513,7 +556,7 @@ export function PromptPlayground({
   return (
     <Lab
       tytul="Prompt Playground"
-      opis="Zmień monity i zobacz to samo żądanie do Claude'a jako JSON, w Pythonie i w JavaScripcie. Z kluczem API wyślesz je na żywo w zakładce „Na żywo”."
+      opis="Zmień prompty i zobacz to samo żądanie do Claude'a jako JSON, w Pythonie i jako stronę HTML z JavaScriptem. Z kluczem API wyślesz je na żywo w zakładce „Na żywo”."
       akcje={
         <Button
           variant="ghost"
@@ -523,7 +566,7 @@ export function PromptPlayground({
             setUsr(user)
             setSysWlaczony(true)
           }}
-          aria-label="Przywróć przykładowe monity"
+          aria-label="Przywróć przykładowe prompty"
         >
           <ArrowCounterClockwiseIcon />
         </Button>
@@ -535,7 +578,7 @@ export function PromptPlayground({
           <Field className="gap-1.5">
             <div className="flex min-h-10 items-center justify-between gap-3">
               <FieldLabel htmlFor={sysId} className="text-sm font-medium">
-                Monit systemowy
+                Prompt systemowy
               </FieldLabel>
               <label className="flex min-h-10 cursor-pointer items-center gap-2 pl-2 font-mono text-xs text-muted-foreground">
                 <span aria-hidden>
@@ -544,7 +587,7 @@ export function PromptPlayground({
                 <Switch
                   checked={sysWlaczony}
                   onCheckedChange={(v) => setSysWlaczony(v)}
-                  aria-label="Używaj monitu systemowego"
+                  aria-label="Używaj promptu systemowego"
                 />
               </label>
             </div>
@@ -564,7 +607,7 @@ export function PromptPlayground({
           <Field className="gap-1.5">
             <div className="flex min-h-10 items-center">
               <FieldLabel htmlFor={usrId} className="text-sm font-medium">
-                Monit użytkownika
+                Prompt użytkownika
               </FieldLabel>
             </div>
             <Textarea
@@ -584,7 +627,7 @@ export function PromptPlayground({
           <TabsList className="w-full group-data-horizontal/tabs:h-10">
             <TabsTrigger value="json">JSON</TabsTrigger>
             <TabsTrigger value="python">Python</TabsTrigger>
-            <TabsTrigger value="js">JavaScript</TabsTrigger>
+            <TabsTrigger value="js">HTML + JS</TabsTrigger>
             <TabsTrigger value="na-zywo">Na żywo</TabsTrigger>
           </TabsList>
 
@@ -595,11 +638,12 @@ export function PromptPlayground({
               <p>
                 Tak wygląda żądanie, które naprawdę leci przez sieć: adres,
                 nagłówki (klucz API, wersja API, format treści) i ciało w
-                formacie JSON. Python i JavaScript budują dokładnie to samo.
+                formacie JSON. Python i strona z JavaScriptem budują dokładnie
+                to samo.
               </p>
               <p>
                 <Kod>max_tokens</Kod> to górny limit długości odpowiedzi w
-                tokenach. Monit systemowy trafia do pola <Kod>system</Kod>, a
+                tokenach. Prompt systemowy trafia do pola <Kod>system</Kod>, a
                 pytanie do listy <Kod>messages</Kod> z rolą <Kod>user</Kod>.
               </p>
             </Notka>
@@ -609,10 +653,10 @@ export function PromptPlayground({
             <KodBlok nazwa="chat.py" kod={python} jezyk="python" />
             <Notka>
               <p>
-                Około piętnastu linijek: biblioteka, klient, żądanie, wypisanie
-                odpowiedzi. Odpowiedź to lista bloków: Claude może najpierw
-                „pomyśleć” (blok <Kod>thinking</Kod>), a potem odpowiedzieć
-                (blok <Kod>text</Kod>), dlatego wypisujemy tylko tekst.
+                Kilkanaście linijek: biblioteka, klient, żądanie i wypisanie
+                odpowiedzi. Odpowiedź to lista bloków. Claude może najpierw
+                „pomyśleć” (blok <Kod>thinking</Kod>), więc pętla na końcu
+                wypisuje tylko bloki z tekstem.
               </p>
               <p className="font-medium text-foreground">
                 Jak uruchomić (Python 3.10+):
@@ -637,33 +681,44 @@ export function PromptPlayground({
           </TabsContent>
 
           <TabsContent value="js" className="flex flex-col gap-2 text-sm">
-            <KodBlok nazwa="chat.mjs" kod={js} jezyk="js" />
+            <KodBlok nazwa="czat.html" kod={html} jezyk="html" />
             <Notka>
               <p>
-                Bez żadnej biblioteki: wbudowana funkcja <Kod>fetch</Kod> wysyła
-                to samo żądanie HTTP. Ten sam kod działa w Node.js i w
-                przeglądarce, więc wystarczy dowolny komputer z internetem.
+                Cała aplikacja w jednym pliku. HTML buduje stronę: pole na
+                pytanie, przycisk i akapit na odpowiedź. JavaScript w znaczniku{" "}
+                <Kod>&lt;script&gt;</Kod> wysyła pytanie do Claude&apos;a i
+                wpisuje odpowiedź na stronę. Nie trzeba niczego instalować.
               </p>
-              <ul className="flex list-disc flex-col gap-1 pl-5">
+              <p className="font-medium text-foreground">Jak uruchomić:</p>
+              <ol className="flex list-decimal flex-col gap-1 pl-5">
                 <li>
-                  <span className="text-foreground">Node.js 18+:</span> zapisz
-                  jako <Kod>chat.mjs</Kod>, wpisz klucz w <Kod>API_KEY</Kod>{" "}
-                  (albo użyj <Kod>process.env.ANTHROPIC_API_KEY</Kod>) i uruchom{" "}
-                  <Kod>node chat.mjs</Kod>.
+                  Pobierz plik przyciskiem poniżej albo skopiuj kod do pustego
+                  pliku <Kod>czat.html</Kod> (np. w VS Code albo w Notatniku).
                 </li>
                 <li>
-                  <span className="text-foreground">Przeglądarka:</span>{" "}
-                  naciśnij F12, otwórz zakładkę Konsola, wklej kod z kluczem i
-                  naciśnij Enter. Za pierwszym razem przeglądarka może poprosić
-                  o wpisanie zgody na wklejanie (np. <Kod>allow pasting</Kod>).
-                  Przed kolejnym uruchomieniem odśwież stronę (F5).
+                  W linijce <Kod>const KLUCZ</Kod> wklej klucz API od
+                  prowadzącego w miejsce <Kod>sk-ant-...</Kod>.
                 </li>
-              </ul>
+                <li>
+                  Otwórz plik dwuklikiem w przeglądarce, wpisz pytanie i kliknij
+                  „Wyślij”. Jeśli napis „Claude pisze…” nie znika, naciśnij F12
+                  i przeczytaj błąd w zakładce Konsola.
+                </li>
+              </ol>
+              <Button
+                variant="outline"
+                className="mt-1 w-fit"
+                onClick={() => pobierzPlik("czat.html", html)}
+              >
+                <DownloadSimpleIcon data-icon="inline-start" />
+                Pobierz czat.html
+              </Button>
               <p>
                 Nagłówek <Kod>anthropic-dangerous-direct-browser-access</Kod>{" "}
                 pozwala wywołać API prosto ze strony. „Dangerous”, bo klucz jest
-                wtedy widoczny w kodzie: dobre na zajęcia, ale nie do aplikacji
-                udostępnianej innym.
+                wtedy widoczny w pliku. Na zajęciach to w porządku, ale takiego
+                pliku z wpisanym kluczem nie wysyłaj nikomu i nie publikuj w
+                internecie.
               </p>
             </Notka>
           </TabsContent>
@@ -731,8 +786,8 @@ export function PromptPlayground({
                       <p className="font-mono text-[0.6875rem] text-muted-foreground">
                         #{p.id} ·{" "}
                         {p.system !== null
-                          ? "z monitem systemowym"
-                          : "bez monitu systemowego"}
+                          ? "z promptem systemowym"
+                          : "bez promptu systemowego"}
                       </p>
                       <p className="line-clamp-1 text-xs text-muted-foreground">
                         <span className="font-mono text-chart-3">user: </span>
@@ -823,7 +878,7 @@ function Schemat({
     <div className="flex flex-col gap-4">
       <ol className="grid items-stretch gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.9fr)_auto_minmax(0,1.4fr)] sm:items-center">
         <li className="flex flex-col gap-2 border bg-background p-3">
-          <LabLabel>Wejście · monity</LabLabel>
+          <LabLabel>Wejście · prompty</LabLabel>
           {system !== null ? (
             <p className="line-clamp-3 border-l-2 border-amber pl-2 text-xs/relaxed">
               <span className="font-mono text-amber-ink">system: </span>
@@ -907,6 +962,7 @@ function Wyjscie({
           <em className="text-muted-foreground">(brak tekstu w odpowiedzi)</em>
         )}
       </p>
+      <Probki tekst={przebieg.tekst} />
       {przebieg.stopReason === "max_tokens" ? (
         <p className="text-xs/relaxed text-amber-ink">
           Odpowiedź ucięta: skończył się limit max_tokens ({MAX_TOKENS}).
@@ -927,5 +983,28 @@ function Wyjscie({
           : ""}
       </p>
     </div>
+  )
+}
+
+/** Kody kolorów #RRGGBB z odpowiedzi jako próbki, np. przy prośbie o paletę. */
+function Probki({ tekst }: { tekst: string }) {
+  const kolory = Array.from(new Set(tekst.match(/#[0-9a-fA-F]{6}\b/g) ?? []))
+  if (!kolory.length) return null
+  return (
+    <ul className="flex flex-wrap gap-1.5" aria-label="Kolory z odpowiedzi">
+      {kolory.map((k) => (
+        <li
+          key={k}
+          className="flex items-center gap-1.5 border bg-background px-1.5 py-1 font-mono text-xs"
+        >
+          <span
+            className="size-4 border"
+            style={{ backgroundColor: k }}
+            aria-hidden
+          />
+          {k.toUpperCase()}
+        </li>
+      ))}
+    </ul>
   )
 }

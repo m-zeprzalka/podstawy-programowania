@@ -19,6 +19,23 @@ czas: 14
   ]}
 />
 
+<Sciaga>
+
+| pojęcie | co znaczy |
+|---|---|
+| **strona kodowa** | przydział kodów 128–255 dla liter danego kraju lub producenta |
+| **Unicode** | jedna wspólna tabela, w której każdy znak ma własny numer |
+| **punkt kodowy** | numer znaku w Unicode, np. „ą” to 261 |
+| `U+0105` | numer 261 („ą”) zapisany szesnastkowo |
+| **system szesnastkowy** | cyfry 0–9 i A–F; jedna cyfra to dokładnie 4 bity |
+| `U+`, `0x`, `#` | przedrostki, które mówią: „to liczba szesnastkowa” |
+| **UTF-8** | zapis numeru w bajtach: im większy numer, tym więcej bajtów |
+| **bajty w UTF-8** | 1 dla ASCII, 2 dla polskich liter, 3 dla chińskich znaków, 4 dla emoji |
+| **ZWJ** | niewidoczny znak `U+200D`, który skleja kilka emoji w jedno |
+| **krzaczki** | tekst zapisany według jednej umowy, a odczytany według innej |
+
+</Sciaga>
+
 ## ASCII to za mało
 
 ASCII z poprzedniego modułu ma 128 kodów: angielskie litery, cyfry i kilka symboli. Nie ma w nim „ą”, „ł”, cyrylicy, chińskich znaków ani emoji.

@@ -1,7 +1,7 @@
 ---
 title: "ASCII: założenie, w którym liczby oznaczają litery"
 nav: ASCII
-description: Te same bity mogą znaczyć liczbę albo literę. ASCII to założenie, które mówi, jak je czytać. 72 73 33 to „HI!”.
+description: Te same bity mogą oznaczać liczbę albo literę. ASCII to założenie, które mówi, jak je czytać. 72 73 33 to „HI!”.
 czas: 8
 ---
 
@@ -14,6 +14,22 @@ czas: 8
     ["znak sterujący", "control character"],
   ]}
 />
+
+<Sciaga>
+
+| pojęcie | co znaczy |
+|---|---|
+| **kodowanie znaków** | wspólna umowa, które liczby oznaczają które znaki |
+| **ASCII** | 128 kodów, od 0 do 127, choć bajt mieści 256 |
+| `01000001` | 65, czyli litera A |
+| `72 73 33` | napis „HI!” |
+| **znaki sterujące** | kody 0–31 i 127: niczego nie rysują, tylko coś robią |
+| **10 i 9** | nowa linia i tabulator |
+| **32** | spacja |
+| **A = 65, a = 97** | różnica 32, czyli jeden bit, zmienia wielkość litery |
+| **kod − 48** | wartość cyfry, bo znak „0” ma kod 48 |
+
+</Sciaga>
 
 ## Liczby, które są literami
 

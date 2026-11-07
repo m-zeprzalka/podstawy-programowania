@@ -1,0 +1,403 @@
+/*
+ * Slajdy prezentacji (app/prezentacje). Każdy slajd to kontener o proporcjach
+ * 16:9, a wszystkie rozmiary są w cqw (setnych szerokości slajdu), więc slajd
+ * wygląda tak samo na rzutniku, w podglądzie i w PDF-ie (1920 × 1080 px).
+ */
+
+/* ---------- Scena ---------- */
+
+.prezentacja-scena {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+.prezentacja-scena--jeden {
+  justify-content: center;
+}
+/* Na ekranie widać tylko bieżący slajd, a przy druku wszystkie. */
+@media screen {
+  .prezentacja-scena--jeden .slajd-ramka:not([data-biezacy]) {
+    display: none;
+  }
+}
+.prezentacja-scena--jeden .slajd-ramka {
+  width: min(calc(100vw - 2rem), calc((100dvh - 5.5rem) * 16 / 9));
+}
+/* Z otwartymi notatkami slajd robi miejsce na panel pod spodem. */
+.prezentacja--notatki .prezentacja-scena--jeden .slajd-ramka {
+  width: min(calc(100vw - 2rem), calc((100dvh - 15.5rem) * 16 / 9));
+}
+.prezentacja-scena--wszystkie .slajd-ramka {
+  width: min(100%, 64rem);
+}
+.prezentacja-scena:fullscreen {
+  justify-content: center;
+  padding: 0;
+  background: var(--background);
+}
+.prezentacja-scena:fullscreen .slajd-ramka {
+  width: min(100vw, calc(100vh * 16 / 9));
+}
+.prezentacja-scena:fullscreen .slajd {
+  border: 0;
+}
+
+.slajd-ramka {
+  position: relative;
+  container-type: inline-size;
+}
+.slajd-wybor {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+  outline-offset: 4px;
+}
+.slajd-wybor:hover + .slajd {
+  border-color: var(--signal);
+}
+
+/* ---------- Slajd ---------- */
+
+.slajd {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 4cqw 4cqw;
+  color: var(--foreground);
+  padding: 2.6cqw 5.5cqw 2.2cqw;
+  font-family: var(--font-sans), var(--font-cjk), var(--font-emoji), sans-serif;
+}
+
+.slajd-naglowek,
+.slajd-stopka {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 1.05cqw;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  text-transform: lowercase;
+}
+.slajd-stopka {
+  justify-content: flex-end;
+}
+.slajd-logo {
+  gap: 0.15cqw !important;
+}
+.slajd-logo > span {
+  width: 0.45cqw !important;
+  height: 0.45cqw !important;
+}
+
+.slajd-tresc {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 1.5cqw;
+}
+.slajd-tresc > * + * {
+  margin-top: 1.6cqw;
+}
+
+/* Typografia */
+.slajd h1 {
+  font-size: 6cqw;
+  line-height: 1.04;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  max-width: 80%;
+}
+.slajd h2 {
+  font-size: 3.5cqw;
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.slajd h2::before {
+  content: "";
+  display: block;
+  width: 4cqw;
+  height: 0.38cqw;
+  margin-bottom: 1.3cqw;
+  background: var(--signal);
+  box-shadow: 0 0 1cqw var(--signal);
+}
+.slajd-tresc > h2 + * {
+  margin-top: 2.4cqw;
+}
+.slajd h3,
+.slajd-etykieta {
+  font-family: var(--font-mono);
+  font-size: 1.25cqw;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.slajd p,
+.slajd li {
+  font-size: 2.15cqw;
+  line-height: 1.42;
+  text-wrap: pretty;
+}
+.slajd strong {
+  font-weight: 600;
+}
+.slajd em {
+  font-style: italic;
+}
+.slajd a {
+  color: var(--signal-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Listy z Markdowna (bez klasy): zielone kwadraty, jak w kursie */
+.slajd ul:not([class]),
+.slajd ol:not([class]) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9cqw;
+}
+.slajd ul:not([class]) > li {
+  position: relative;
+  padding-left: 2.4cqw;
+}
+.slajd ul:not([class]) > li::before {
+  content: "";
+  position: absolute;
+  left: 0.2cqw;
+  top: 0.62em;
+  width: 0.75cqw;
+  height: 0.75cqw;
+  background: var(--signal);
+}
+.slajd ol:not([class]) {
+  counter-reset: punkt;
+}
+.slajd ol:not([class]) > li {
+  position: relative;
+  padding-left: 3.4cqw;
+  counter-increment: punkt;
+}
+.slajd ol:not([class]) > li::before {
+  content: counter(punkt, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  top: 0.2em;
+  color: var(--signal-ink);
+}
+
+/* Kod */
+.slajd :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 0.05em 0.35em;
+  border: 1px solid var(--border);
+  background: var(--muted);
+}
+.slajd pre {
+  border: 0.12cqw solid var(--border);
+  background: var(--card);
+  padding: 1.6cqw 2.2cqw;
+  font-family: var(--font-mono);
+  font-size: 1.65cqw;
+  line-height: 1.55;
+  overflow: hidden;
+  white-space: pre;
+}
+.slajd pre code {
+  font-family: inherit;
+}
+/* Jedna linijka kodu, np. ciąg liczb: większa czcionka. */
+.slajd pre:not(:has(.line + .line)) {
+  font-size: 2.3cqw;
+}
+
+/* Tabele */
+.slajd table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 0.12cqw solid var(--border);
+  background: var(--background);
+}
+.slajd th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 1.2cqw;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  background: var(--muted);
+  padding: 0.9cqw 1.4cqw;
+}
+.slajd td {
+  font-size: 1.85cqw;
+  line-height: 1.35;
+  padding: 0.85cqw 1.4cqw;
+  border-top: 0.12cqw solid var(--border);
+  vertical-align: top;
+}
+
+/* Cytat: ćwiczenie albo pytanie do sali */
+.slajd blockquote {
+  border-left: 0.45cqw solid var(--signal);
+  background: var(--signal-soft);
+  padding: 1.3cqw 2cqw;
+}
+.slajd blockquote p {
+  font-size: 2cqw;
+}
+
+/* ---------- Układy ---------- */
+
+.slajd--tytul .slajd-tresc {
+  justify-content: center;
+}
+.slajd--tytul .slajd-tresc > * + * {
+  margin-top: 2cqw;
+}
+.slajd--tytul p {
+  font-size: 2.3cqw;
+  color: var(--muted-foreground);
+  max-width: 70%;
+}
+.slajd--tytul p:first-of-type {
+  font-family: var(--font-mono);
+  font-size: 1.6cqw;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--signal-ink);
+}
+
+.slajd--duzy h2 {
+  font-size: 2.1cqw;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+}
+.slajd--duzy p:first-of-type {
+  font-size: 4.6cqw;
+  line-height: 1.18;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  max-width: 90%;
+}
+.slajd--duzy p:first-of-type strong {
+  color: var(--signal-ink);
+  font-weight: 600;
+}
+.slajd--duzy p + p {
+  font-size: 2.3cqw;
+  color: var(--muted-foreground);
+}
+
+.slajd-kolumny {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 1.8cqw;
+}
+.slajd-kolumna {
+  border: 0.12cqw solid var(--border);
+  background: var(--card);
+  padding: 2cqw;
+}
+.slajd-kolumna > * + * {
+  margin-top: 1.1cqw;
+}
+.slajd-kolumna h3 {
+  color: var(--signal-ink);
+}
+.slajd-kolumna p,
+.slajd-kolumna li {
+  font-size: 1.95cqw;
+}
+.slajd-kolumny:has(> :nth-child(4)) p,
+.slajd-kolumny:has(> :nth-child(4)) li {
+  font-size: 1.7cqw;
+}
+
+/* ---------- Druk i PDF: jeden slajd na stronę, zawsze jasny motyw ---------- */
+
+@page {
+  size: 1920px 1080px;
+  margin: 0;
+}
+
+@media print {
+  html.dark {
+    color-scheme: light;
+    --background: oklch(0.992 0.0015 106);
+    --foreground: oklch(0.2 0.006 160);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.2 0.006 160);
+    --primary: oklch(0.2 0.006 160);
+    --primary-foreground: oklch(0.985 0.002 106);
+    --secondary: oklch(0.962 0.003 106);
+    --muted: oklch(0.962 0.003 106);
+    --muted-foreground: oklch(0.47 0.008 160);
+    --border: oklch(0.905 0.004 106);
+    --input: oklch(0.875 0.004 106);
+    --signal: oklch(0.6 0.16 150);
+    --signal-ink: oklch(0.46 0.12 152);
+    --signal-soft: oklch(0.955 0.035 152);
+    --signal-foreground: oklch(0.99 0.01 150);
+    --grid-line: oklch(0.2 0.006 160 / 5%);
+  }
+  html.dark .shiki,
+  html.dark .shiki span {
+    color: var(--shiki-light);
+  }
+  html,
+  body {
+    background: var(--background);
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .prezentacja {
+    display: block;
+    min-height: 0;
+    background: none;
+  }
+  .prezentacja-ui {
+    display: none !important;
+  }
+  .prezentacja-scena {
+    display: block;
+    padding: 0;
+  }
+  .slajd-ramka {
+    display: block;
+    width: 1920px !important;
+    break-after: page;
+    break-inside: avoid;
+  }
+  .slajd-ramka:last-child {
+    break-after: auto;
+  }
+  .slajd-wybor {
+    display: none;
+  }
+  .slajd {
+    border: 0;
+  }
+}

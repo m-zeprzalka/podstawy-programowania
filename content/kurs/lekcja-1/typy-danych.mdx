@@ -204,6 +204,8 @@ licznik++;                // to samo, najkrócej
 
 Znak `=` w C to **przypisanie**, a nie równość. `licznik = licznik + 1` czytaj: „weź obecną wartość licznika, dodaj jeden i wpisz wynik z powrotem do licznika”. Do sprawdzania równości służy podwójny znak `==`, który poznasz w module o warunkach.
 
+Do zmiany wartości zawsze potrzebne jest przypisanie: `=`, `+=` albo `++`. Sama linijka `licznik + 1;` oblicza wynik, ale nigdzie go nie zapisuje, więc `licznik` się nie zmienia. GCC z opcją `-Wall` ostrzeże: `statement with no effect`.
+
 <Uwaga tytul="Zmienna bez wartości">
 Zmienna, której nie nadano wartości, zawiera przypadkowe resztki z pamięci. `int x; printf("%d", x);` może wypisać cokolwiek. Nadawaj wartość od razu: `int x = 0;`.
 </Uwaga>
@@ -263,7 +265,7 @@ Zasada „nazwa mówi, co jest w środku” ma kilka wyjątków. Niektóre jedno
 Krótka nazwa jest w porządku, gdy zmienna żyje kilka linijek, a jej rola jest oczywista, np. licznik w pętli. Przewodnik stylu Linuksa radzi nazwać licznik pętli po prostu `i`, a nie `loop_counter`.<Zrodlo n={31} /> Gdy zmienna żyje dłużej albo jej rola nie jest oczywista, nazwa ma ją opisywać. Dlatego w kursie piszemy `odpowiedz` zamiast `c` i `szerokosc` zamiast `a`.
 
 <NaZajeciach tytul="Jaki typ?" czas="4 min">
-Sala dobiera typ do danych: wiek, cena w złotych, temperatura za oknem, pierwsza litera imienia, „czy użytkownik jest zalogowany”, liczba ludzi na Ziemi. Pułapki: cenę lepiej trzymać w groszach jako `int` (pamiętasz 0.1 + 0.2?), a ponad 8 miliardów ludzi nie zmieści się w `int`. Na koniec każda osoba wymyśla nazwę dla każdej zmiennej w stylu snake_case.
+Sala dobiera typ do danych z projektu graficznego: szerokość obrazu w pikselach, przezroczystość warstwy od 0 do 1, „czy warstwa jest widoczna”, pierwsza litera nazwy fontu, cena licencji fontu, liczba bajtów w godzinie nieskompresowanego wideo 4K (30 klatek na sekundę). Pułapki: cenę lepiej trzymać w groszach jako `int` (pamiętasz 0.1 + 0.2?), a godzina wideo 4K to około 2,7 biliona bajtów, więc nie zmieści się w `int`, tylko w `long long`. Na koniec każda osoba wymyśla nazwę dla każdej zmiennej w stylu snake_case.
 </NaZajeciach>
 
 <Quiz>

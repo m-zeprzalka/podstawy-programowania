@@ -21,6 +21,23 @@ czas: 16
   ]}
 />
 
+<Sciaga>
+
+| pojęcie | co znaczy |
+|---|---|
+| **typ danych** | umowa, jak czytać liczby; w C np. `int`, `char`, `float` |
+| **wideo** | sekwencja obrazów (klatek), np. 30 klatek na sekundę (fps) |
+| **próbkowanie** | wielokrotne mierzenie fali dźwiękowej w każdej sekundzie |
+| **kompresja bezstratna** | po rozpakowaniu te same bajty, np. PNG, ZIP, FLAC |
+| **kompresja stratna** | wyrzuca to, co mało wpływa na odbiór, np. JPEG, MP3 |
+| **n bitów** | 2ⁿ różnych wartości, bez znaku od 0 do 2ⁿ − 1 |
+| **2 147 483 647** | największa 32-bitowa liczba całkowita ze znakiem |
+| **przepełnienie** | wynik nie mieści się w bitach; 8-bitowy licznik po 255 wraca do 0 |
+| `0.1 + 0.2` | daje `0.30000000000000004`, bo 0,1 nie da się zapisać dokładnie dwójkowo |
+| **token** | fragment tekstu z numerem w słowniku modelu językowego |
+
+</Sciaga>
+
 ## Wszystko jest liczbą
 
 **Obraz** to siatka pikseli RGB. **Wideo** to sekwencja obrazów wyświetlanych jeden po drugim, jak w narysowanej historyjce na rogu zeszytu (flipbooku). **Muzykę** zapisuje się bajtami na dwa sposoby: jako nuty-liczby (wysokość, długość, głośność, jak w standardzie MIDI, którego numerów nut używa rozszerzenie „Muzyka” w Scratchu) albo przez **próbkowanie**, czyli wielokrotne mierzenie fali dźwiękowej w każdej sekundzie.
@@ -125,6 +142,14 @@ const a = new Uint8Array(1); a[0] = 256; a[0]   // 0
 const b = new Int32Array(1); b[0] = 2147483647; b[0] += 1; b[0] // -2147483648
 0.1 + 0.2 === 0.3                                // false
 ```
+
+Na koniec tablica, w której przeglądarka trzyma piksele obrazu na stronie (`canvas`). Zamiast się przekręcać, zatrzymuje się na granicy:
+
+```js
+const c = new Uint8ClampedArray(1); c[0] = 300; c[0] // 255
+```
+
+Dlaczego dla kolorów to lepsze niż przekręcenie na 44? Za jasny piksel ma zostać biały, a nie zrobić się prawie czarny.
 </NaZajeciach>
 
 <NaZajeciach tytul="Ile kosztuje polski?" czas="3 min">
@@ -145,13 +170,10 @@ W tokenizerze OpenAI (platform.openai.com/tokenizer) porównujemy „I met a hug
     wyjasnienie="2³¹ − 1 = 2 147 483 647. Jeden z 32 bitów przypada na znak, więc na wartość zostaje 31."
   />
   <Pytanie
-    pytanie="Czy teledysk Gangnam Style naprawdę „zepsuł” YouTube?"
-    odpowiedzi={[
-      "Tak, licznik się przepełnił i YouTube przestał działać",
-      "Nie, licznik zmieniono wcześniej, a komunikat był żartem (easter egg)",
-    ]}
+    pytanie="Który format kompresuje bezstratnie, czyli po rozpakowaniu daje dokładnie te same bajty?"
+    odpowiedzi={["JPEG", "PNG", "MP3", "H.264"]}
     poprawna={1}
-    wyjasnienie="Granica 2 147 483 647 jest prawdziwa, ale YouTube przeszedł na 64 bity, zanim teledysk ją przekroczył."
+    wyjasnienie="PNG (tak jak ZIP i FLAC) to kompresja bezstratna. JPEG, MP3 i H.264 są stratne: wyrzucają szczegóły, których człowiek prawie nie zauważa."
   />
   <Pytanie
     pytanie="Dlaczego 0.1 + 0.2 nie daje dokładnie 0.3?"

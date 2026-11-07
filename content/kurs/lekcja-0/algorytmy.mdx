@@ -1,7 +1,7 @@
 ---
 title: "Algorytmy"
 nav: Algorytmy
-description: Możemy używać różnych algorytmów na osiągnięcie tego samego rezultatu. W tym rozdziale porównamy to na przykładzie Trzech sposobów szukania nazwiska w książce telefonicznej. Wszystkie znajdą osobę, ale jeden robi to zdecydowanie bardziej wydajnie niż inny.
+description: Możemy używać różnych algorytmów do osiągnięcia tego samego rezultatu. W tym rozdziale porównamy to na przykładzie trzech sposobów szukania nazwiska w książce telefonicznej. Wszystkie znajdą osobę, ale jeden robi to zdecydowanie wydajniej niż pozostałe.
 czas: 12
 ---
 
@@ -19,6 +19,22 @@ czas: 12
     ["wydajność", "efficiency"],
   ]}
 />
+
+<Sciaga>
+
+| pojęcie | co znaczy |
+|---|---|
+| **algorytm** | instrukcje krok po kroku, które rozwiązują problem |
+| **wyszukiwanie liniowe** | strona po stronie; przy n stronach do n kroków |
+| **po dwie strony naraz** | n/2 kroków, ale bez poprawki może przeskoczyć nazwisko |
+| **wyszukiwanie binarne** | otwórz na środku, odrzuć niepotrzebną połowę, powtarzaj |
+| **log₂ n** | kroki wyszukiwania binarnego: dwa razy więcej danych, jeden krok więcej |
+| **milion stron** | strona po stronie milion kroków, od środka tylko 20 |
+| **zgadywanie od 1 do 1000** | 10 pytań o środek przedziału zawsze wystarczy, bo 2¹⁰ = 1024 |
+| **poprawność i wydajność** | najpierw poprawność, potem szybkość; szybki, ale błędny algorytm jest bezużyteczny |
+| **dane posortowane** | warunek działania wyszukiwania binarnego |
+
+</Sciaga>
 
 ## Problem: znaleźć nazwisko
 
@@ -60,7 +76,7 @@ Wyszukiwanie binarne działa tylko na danych **posortowanych**. W nieposortowane
   <Pytanie
     pytanie="Ile kroków potrzebuje wyszukiwanie binarne w książce z milionem stron (w najgorszym razie)?"
     akceptowane={["20", "dwadzieścia"]}
-    wyjasnienie="2²⁰ = 1 048 576 ≥ 1 000 000, więc wystarczy 20 połowień."
+    wyjasnienie="2²⁰ = 1 048 576 ≥ 1 000 000, więc wystarczy 20 przepołowień."
   />
   <Pytanie
     pytanie="Algorytm „po dwie strony naraz” bez poprawki jest:"

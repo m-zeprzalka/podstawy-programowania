@@ -148,7 +148,7 @@ Z kolei słynna opowieść o „nuklearnym Gandhim” z gry Civilization, które
 </Dociekliwi>
 
 <NaZajeciach tytul="Zgadnij wynik" czas="5 min">
-Na slajdzie wyrażenia, sala zgaduje wynik przed uruchomieniem: `17 / 5`, `17 % 5`, `(double) 17 / 5`, `(double) (17 / 5)`, `-7 / 2` (w C: −3, obcięcie w stronę zera), `2147483647 + 1`. Kto trafi wszystkie sześć?
+Na slajdzie wyrażenia, sala zgaduje wynik przed uruchomieniem. Liczby to wymiary ekranu Full HD: `1920 / 1080`, `1920 % 1080`, `(double) 1920 / 1080` (to proporcje 16:9) i `(double) (1920 / 1080)`. Na koniec `-7 / 2` (w C: −3, obcięcie w stronę zera) i `2147483647 + 1`. Kto trafi wszystkie sześć?
 </NaZajeciach>
 
 <Quiz>
@@ -163,9 +163,9 @@ Na slajdzie wyrażenia, sala zgaduje wynik przed uruchomieniem: `17 / 5`, `17 % 
     wyjasnienie="14 = 3 × 4 + 2, więc reszta z dzielenia wynosi 2."
   />
   <Pytanie
-    pytanie="Jak dostać wynik 3.5 z dzielenia int x = 7 przez int y = 2?"
-    odpowiedzi={["(double) (x / y)", "x / y + 0.5", "(double) x / y"]}
+    pytanie="Który zapis da wynik 3.5 z dzielenia int x = 7 przez int y = 2?"
+    odpowiedzi={["x / y", "(double) (x / y)", "(double) x / y"]}
     poprawna={2}
-    wyjasnienie="Trzeba zamienić typ przed dzieleniem. (double) (x / y) najpierw liczy 7 / 2 = 3, a dopiero potem zamienia 3 na 3.0."
+    wyjasnienie="x / y to dzielenie całkowite, czyli 3. (double) (x / y) najpierw liczy 3, a dopiero potem zamienia je na 3.0. Tylko (double) x / y zamienia typ przed dzieleniem i daje 3.5."
   />
 </Quiz>
