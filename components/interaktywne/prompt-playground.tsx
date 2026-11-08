@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { odmiana } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
@@ -87,6 +88,16 @@ const escHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;")
 /** Napis w <script>: jak `lit`, ale bez sekwencji </, która zamknęłaby skrypt. */
 const litSkrypt = (s: string) => lit(s).replace(/<\//g, "<\\/")
 
+/** Tailwind z CDN, w wersji zgodnej z kursem. Konkretny numer: plik się nie zmieni. */
+const TAILWIND_CDN = "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3"
+
+type WersjaCzatu = "podstawowa" | "tailwind"
+
+const PLIK_CZATU: Record<WersjaCzatu, string> = {
+  podstawowa: "czat.html",
+  tailwind: "czat-tailwind.html",
+}
+
 function programHTML(system: string | null, user: string) {
   return [
     "<!doctype html>",
@@ -102,6 +113,73 @@ function programHTML(system: string | null, user: string) {
     '  <button id="wyslij">Wyślij</button>',
     '  <p id="odpowiedz"></p>',
     "",
+    ...skryptCzatu(system),
+    "</body>",
+    "</html>",
+  ].join("\n")
+}
+
+/**
+ * Ten sam czat co `programHTML`: te same identyfikatory i ten sam skrypt.
+ * Różni się tylko wyglądem, który nadają klasy Tailwinda.
+ */
+function programHTMLTailwind(system: string | null, user: string) {
+  return [
+    "<!doctype html>",
+    '<html lang="pl">',
+    "<head>",
+    '  <meta charset="utf-8">',
+    '  <meta name="viewport" content="width=device-width, initial-scale=1">',
+    "  <title>Czat z Claude'em</title>",
+    "  <!-- Tailwind z internetu: zamienia klasy z atrybutów class na wygląd -->",
+    `  <script src="${TAILWIND_CDN}"></script>`,
+    "</head>",
+    '<body class="bg-stone-50 text-stone-900 antialiased">',
+    '  <main class="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-4 py-10">',
+    "",
+    "    <!-- Powitanie -->",
+    '    <header class="flex flex-col items-center gap-3 text-center">',
+    '      <div class="flex size-12 items-center justify-center rounded-2xl bg-stone-900 text-white">',
+    '        <svg class="size-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">',
+    '          <path d="M12 2c.6 4.9 2.9 7.4 8 8-5.1.6-7.4 3.1-8 8-.6-4.9-2.9-7.4-8-8 5.1-.6 7.4-3.1 8-8z"/>',
+    "        </svg>",
+    "      </div>",
+    '      <h1 class="text-sm text-stone-500">Czat z Claude\'em</h1>',
+    '      <p class="text-3xl font-semibold tracking-tight sm:text-4xl">Czym mogę pomóc?</p>',
+    "    </header>",
+    "",
+    "    <!-- Odpowiedź: ramka jest ukryta, dopóki akapit #odpowiedz jest pusty -->",
+    '    <section class="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm has-[#odpowiedz:empty]:hidden">',
+    '      <p class="mb-2 text-xs font-medium tracking-widest text-stone-400 uppercase">Claude</p>',
+    '      <p id="odpowiedz" class="leading-relaxed whitespace-pre-wrap"></p>',
+    "    </section>",
+    "",
+    "    <!-- Pole na pytanie z przyciskiem -->",
+    '    <div class="rounded-3xl border border-stone-200 bg-white p-2 shadow-sm transition focus-within:border-stone-400 focus-within:shadow-md">',
+    `      <textarea id="pytanie" rows="3" placeholder="Zapytaj o cokolwiek…" class="block w-full resize-none bg-transparent px-3 py-2 text-base outline-none placeholder:text-stone-400">${escHtml(user)}</textarea>`,
+    '      <div class="flex items-center justify-between gap-3 pl-3">',
+    `        <span class="font-mono text-xs text-stone-400">${MODEL}</span>`,
+    '        <button id="wyslij" class="flex items-center gap-1.5 rounded-full bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700 active:scale-95">',
+    "          Wyślij",
+    '          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">',
+    '            <path d="M12 19V5M5 12l7-7 7 7"/>',
+    "          </svg>",
+    "        </button>",
+    "      </div>",
+    "    </div>",
+    "",
+    '    <p class="text-center text-xs text-stone-400">Claude może się mylić. Sprawdzaj ważne informacje.</p>',
+    "  </main>",
+    "",
+    ...skryptCzatu(system),
+    "</body>",
+    "</html>",
+  ].join("\n")
+}
+
+/** Skrypt wspólny dla obu wersji: wysyła pytanie i wpisuje odpowiedź. */
+function skryptCzatu(system: string | null) {
+  return [
     "  <script>",
     "    // Tu wklej klucz API od prowadzącego",
     `    const KLUCZ = ${lit(KLUCZ_ZASLEPKA)};`,
@@ -134,9 +212,15 @@ function programHTML(system: string | null, user: string) {
     '      pole.textContent = blok ? blok.text : "Błąd: " + dane.error?.message;',
     "    };",
     "  </script>",
-    "</body>",
-    "</html>",
-  ].join("\n")
+  ]
+}
+
+const PROGRAM_CZATU: Record<
+  WersjaCzatu,
+  (system: string | null, user: string) => string
+> = {
+  podstawowa: programHTML,
+  tailwind: programHTMLTailwind,
 }
 
 /** Zapisuje tekst jako plik na dysku użytkownika (np. czat.html). */
@@ -202,7 +286,7 @@ const SKLADNIA: Record<Jezyk, { re: RegExp; grupy: Rodzaj[] }> = {
     ],
   },
   html: {
-    re: /(\/\/.*)|(<\/?[A-Za-z!][\w-]*|\/?>)|("(?:[^"\\]|\\.)*")|\b(const|let|await|async|if|else|return|true|false|null)\b|\b([A-Za-z_$][\w$]*)(?=\()|\b([A-Za-z_$][\w$]*)(?=\s*:|=")|(\d+)|([()[\]{}.,:=;!?])|([^/<>"()[\]{}.,:=;!?\w$]+|[\w$]+|.)/g,
+    re: /(\/\/.*|<!--.*?-->)|(<\/?[A-Za-z!][\w-]*|\/?>)|("(?:[^"\\]|\\.)*")|\b(const|let|await|async|if|else|return|true|false|null)\b|\b([A-Za-z_$][\w$]*)(?=\()|\b([A-Za-z_$][\w$]*)(?=\s*:|=")|(\d+)|([()[\]{}.,:=;!?])|([^/<>"()[\]{}.,:=;!?\w$]+|[\w$]+|.)/g,
     grupy: [
       "komentarz",
       "slowo",
@@ -477,6 +561,8 @@ export function PromptPlayground({
   const sysId = React.useId()
   const usrId = React.useId()
   const kluczId = React.useId()
+  const wersjaId = React.useId()
+  const [wersja, setWersja] = React.useState<WersjaCzatu>("podstawowa")
 
   React.useEffect(() => () => przerwij.current?.abort(), [])
 
@@ -484,7 +570,8 @@ export function PromptPlayground({
   const aktywnySystem = sysWlaczony && sys.trim() !== "" ? sys : null
   const json = JSON.stringify(cialoZadania(aktywnySystem, usr), null, 2)
   const python = programPython(aktywnySystem, usr)
-  const html = programHTML(aktywnySystem, usr)
+  const plikCzatu = PLIK_CZATU[wersja]
+  const html = PROGRAM_CZATU[wersja](aktywnySystem, usr)
 
   const czeka = wysylka.typ === "czeka"
   const moznaWyslac = !czeka && klucz.trim() !== "" && usr.trim() !== ""
@@ -681,7 +768,26 @@ export function PromptPlayground({
           </TabsContent>
 
           <TabsContent value="js" className="flex flex-col gap-2 text-sm">
-            <KodBlok nazwa="czat.html" kod={html} jezyk="html" />
+            <div className="flex flex-wrap items-center gap-2">
+              <span id={wersjaId} className="text-xs text-muted-foreground">
+                Wygląd strony:
+              </span>
+              <ToggleGroup
+                value={[wersja]}
+                onValueChange={(v) => {
+                  if (v[0]) setWersja(v[0] as WersjaCzatu)
+                }}
+                variant="outline"
+                size="sm"
+                aria-labelledby={wersjaId}
+              >
+                <ToggleGroupItem value="podstawowa">Podstawowy</ToggleGroupItem>
+                <ToggleGroupItem value="tailwind">
+                  Nowoczesny (Tailwind)
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            <KodBlok nazwa={plikCzatu} kod={html} jezyk="html" />
             <Notka>
               <p>
                 Cała aplikacja w jednym pliku. HTML buduje stronę: pole na
@@ -689,11 +795,20 @@ export function PromptPlayground({
                 <Kod>&lt;script&gt;</Kod> wysyła pytanie do Claude&apos;a i
                 wpisuje odpowiedź na stronę. Nie trzeba niczego instalować.
               </p>
+              <p>
+                Wersja nowoczesna ma te same elementy i ten sam JavaScript.
+                Wygląda jak ekran prawdziwego czatu, bo każdy element dostał
+                klasy Tailwinda w atrybucie <Kod>class</Kod>, np.{" "}
+                <Kod>rounded-full</Kod> (zaokrąglenie) albo{" "}
+                <Kod>bg-stone-900</Kod> (kolor tła). Sam Tailwind wczytuje się z
+                internetu jedną linijką <Kod>&lt;script src=…&gt;</Kod> w
+                nagłówku strony.
+              </p>
               <p className="font-medium text-foreground">Jak uruchomić:</p>
               <ol className="flex list-decimal flex-col gap-1 pl-5">
                 <li>
                   Pobierz plik przyciskiem poniżej albo skopiuj kod do pustego
-                  pliku <Kod>czat.html</Kod> (np. w VS Code albo w Notatniku).
+                  pliku <Kod>{plikCzatu}</Kod> (np. w VS Code albo w Notatniku).
                 </li>
                 <li>
                   W linijce <Kod>const KLUCZ</Kod> wklej klucz API od
@@ -708,10 +823,10 @@ export function PromptPlayground({
               <Button
                 variant="outline"
                 className="mt-1 w-fit"
-                onClick={() => pobierzPlik("czat.html", html)}
+                onClick={() => pobierzPlik(plikCzatu, html)}
               >
                 <DownloadSimpleIcon data-icon="inline-start" />
-                Pobierz czat.html
+                Pobierz {plikCzatu}
               </Button>
               <p>
                 Nagłówek <Kod>anthropic-dangerous-direct-browser-access</Kod>{" "}

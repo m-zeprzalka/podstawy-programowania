@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Czat z Claude'em</title>
+  <!-- Tailwind z internetu: zamienia klasy z atrybutów class na wygląd -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3"></script>
+</head>
+<body class="bg-stone-50 text-stone-900 antialiased">
+  <main class="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 px-4 py-10">
+
+    <!-- Powitanie -->
+    <header class="flex flex-col items-center gap-3 text-center">
+      <div class="flex size-12 items-center justify-center rounded-2xl bg-stone-900 text-white">
+        <svg class="size-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2c.6 4.9 2.9 7.4 8 8-5.1.6-7.4 3.1-8 8-.6-4.9-2.9-7.4-8-8 5.1-.6 7.4-3.1 8-8z"/>
+        </svg>
+      </div>
+      <h1 class="text-sm text-stone-500">Czat z Claude'em</h1>
+      <p class="text-3xl font-semibold tracking-tight sm:text-4xl">Czym mogę pomóc?</p>
+    </header>
+
+    <!-- Odpowiedź: ramka jest ukryta, dopóki akapit #odpowiedz jest pusty -->
+    <section class="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm has-[#odpowiedz:empty]:hidden">
+      <p class="mb-2 text-xs font-medium tracking-widest text-stone-400 uppercase">Claude</p>
+      <p id="odpowiedz" class="leading-relaxed whitespace-pre-wrap"></p>
+    </section>
+
+    <!-- Pole na pytanie z przyciskiem -->
+    <div class="rounded-3xl border border-stone-200 bg-white p-2 shadow-sm transition focus-within:border-stone-400 focus-within:shadow-md">
+      <textarea id="pytanie" rows="3" placeholder="Zapytaj o cokolwiek…" class="block w-full resize-none bg-transparent px-3 py-2 text-base outline-none placeholder:text-stone-400">Zaproponuj hasło na plakat festiwalu filmów animowanych.</textarea>
+      <div class="flex items-center justify-between gap-3 pl-3">
+        <span class="font-mono text-xs text-stone-400">claude-opus-5-5</span>
+        <button id="wyslij" class="flex items-center gap-1.5 rounded-full bg-stone-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-stone-700 active:scale-95">
+          Wyślij
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-stone-400">Claude może się mylić. Sprawdzaj ważne informacje.</p>
+  </main>
+
+  <script>
+    // Tu wklej klucz API od prowadzącego
+    const KLUCZ = "sk-ant-...";
+
+    // Po kliknięciu przycisku wyślij pytanie do Claude'a
+    document.getElementById("wyslij").onclick = async () => {
+      const pytanie = document.getElementById("pytanie").value;
+      const pole = document.getElementById("odpowiedz");
+      pole.textContent = "Claude pisze…";
+
+      const odpowiedz = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": KLUCZ,
+          "anthropic-version": "2026-10-21",
+          "content-type": "application/json",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({
+          model: "claude-opus-5-5",
+          max_tokens: 16000,
+          system: "Jesteś copywriterem w studiu graficznym. Odpowiadaj jednym krótkim hasłem.",
+          messages: [{ role: "user", content: pytanie }],
+        }),
+      });
+
+      // Odpowiedź to JSON. Szukamy w nim bloku z tekstem.
+      const dane = await odpowiedz.json();
+      const blok = dane.content?.find((b) => b.type === "text");
+      pole.textContent = blok ? blok.text : "Błąd: " + dane.error?.message;
+    };
+  </script>
+</body>
+</html>
